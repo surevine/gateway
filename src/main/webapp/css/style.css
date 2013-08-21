@@ -1,0 +1,70 @@
+* {
+  padding: 0px;
+  margin: 0px;
+}
+
+a {
+  color: #4183C4;
+  text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+body {
+  font-family: helvetica, arial, sans-serif;
+}
+
+div#content {
+	position: relative;
+}
+div#projects {
+	padding: 20px;
+}
+div#queue {
+	right: 50%;
+	left: 10px;
+}
+div#rules, div#queue {
+	position: absolute;
+	top: 10px;
+	bottom: 10px;
+	padding: 10px;
+}
+div#rules {
+	right: 10px;
+	left: 50%;
+}
+
+header {
+	margin: 20px;
+	position: relative;
+}
+
+header div#menubar {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+table td, table th {
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+table th {
+  background-color: #eee;
+}
+
+textarea {
+	width: 100%;
+	min-height: 400px;
+	height: 100%;
+	font-size: 1em;
+	padding: 10px;
+	box-sizing: border-box;
+}

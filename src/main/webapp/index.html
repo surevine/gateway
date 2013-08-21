@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Community Gateway</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <script type="text/ecmascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script type="text/ecmascript" src="js/main.js"></script>
+  </head>
+  <body>
+    <header>
+    	<h1>gateway</h1>
+    	<div id="menubar"><a href="index.html">home</a> &bullet; <a href="/admin.html">admin</a></div>
+    </header>
+    
+    <!-- List of source / destination systems -->
+    <div id="sources">
+    </div>
+    
+    <div id="destinations">
+    </div>
+    
+    <!-- List of projects -->
+    <div id="projects">
+	  <table>
+	    <tr>
+	      <th>Name</th>
+	      <th>Status</th>
+	      <th>Enabled?</th>
+	    </tr>
+	    <tr>
+	      <td><a href="project.html?name=gitlab">gitlab</a></td>
+	      <td>FLAGGED</td>
+	      <td><input type="checkbox" checked="checked"/></td>
+	    </tr>
+	  </table>
+    </div>
+    <footer>
+    </footer>
+  </body>
+</html>
