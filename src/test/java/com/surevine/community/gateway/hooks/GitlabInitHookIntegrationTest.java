@@ -6,6 +6,6 @@ public class GitlabInitHookIntegrationTest {
 
 	@Test
 	public void testInit() {
-		new GitlabInitHook().call();
+		new GitlabContextHook().init();
 	}
 }

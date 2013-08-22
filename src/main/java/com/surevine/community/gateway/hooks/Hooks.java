@@ -43,10 +43,21 @@ public class Hooks {
 	 * Call all hooks which initialise services.
 	 */
 	public static void callInit() {
-        final ServiceLoader<GatewayInitHook> hooks = ServiceLoader.load(GatewayInitHook.class);
+        final ServiceLoader<GatewayContextHook> hooks = ServiceLoader.load(GatewayContextHook.class);
         
-        for (final GatewayInitHook hook : hooks) {
-            hook.call();
+        for (final GatewayContextHook hook : hooks) {
+            hook.init();
+        }
+	}
+	
+	/**
+	 * Call all hooks which destroy services.
+	 */
+	public static void callDestroy() {
+        final ServiceLoader<GatewayContextHook> hooks = ServiceLoader.load(GatewayContextHook.class);
+        
+        for (final GatewayContextHook hook : hooks) {
+            hook.destroy();
         }
 	}
 }

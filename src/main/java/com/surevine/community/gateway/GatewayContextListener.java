@@ -12,5 +12,6 @@ public class GatewayContextListener implements ServletContextListener {
 	}
 
 	public void contextDestroyed(final ServletContextEvent event) {
+		Hooks.callDestroy();
 	}
 }

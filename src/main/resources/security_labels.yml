@@ -1,0 +1,32 @@
+# # # # # # # # # # # # # # # # # #
+#   Security label config file    #
+# # # # # # # # # # # # # # # # # #
+
+production: &base
+  labels:
+    p0: OPEN
+    p1: COMMERCIAL
+    p2: PRIVATE
+    p8: PERSONAL
+    p9: IN CONFIDENCE
+    p16: UK
+    p17: US
+    p18: CN
+    p19: FR
+    p20: BE
+    p64: STAFF
+    p65: RECRUITMENT
+    p66: SALES
+    p67: MANAGEMENT
+    p68: HR
+    p69: DEVELOPMENT
+    p70: FINANCE
+
+development:
+  <<: *base
+
+test:
+  <<: *base
+
+staging:
+  <<: *base

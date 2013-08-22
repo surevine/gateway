@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.surevine.community.gateway.GatewayJedis;
+
 public class Projects {
 
 	private static Map<String, Project> projects = new ConcurrentHashMap<>(10, 0.9f, 1);
@@ -20,6 +22,8 @@ public class Projects {
 	}
 	
 	public static void put(final Project project) {
+		GatewayJedis.put(project.getName(),  project);
+		
 		projects.put(project.getName(), project);
 	}
 }

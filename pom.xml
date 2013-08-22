@@ -56,6 +56,16 @@
 			<artifactId>fluent-hc</artifactId>
 			<version>4.2.5</version>
 		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.12</version>
+		</dependency>
 
 		<!-- PROVIDED -->
 		<dependency>

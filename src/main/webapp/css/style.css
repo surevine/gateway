@@ -51,17 +51,17 @@ header div#menubar {
 	top: 0px;
 	right: 0px;
 }
-p.error-label {
+p#error-label {
 	background-color: #c67;
 }
-p.error-label, p.security-label {
+p#error-label, p#security-label {
 	text-align: center;
 	padding: 10px;
 	color: white;
 	font-size: 13px;
 	line-height: 18px;
 }
-p.security-label {
+p#security-label {
 	background-color: #76c;
 }
 
