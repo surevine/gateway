@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Community Gateway</title>
+		<link rel="stylesheet" type="text/css" href="css/style.css" />
+		<script type="text/ecmascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+		<script type="text/ecmascript" src="js/main.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1>admin</h1>
+			<div id="menubar"><a href="index.html">projects</a></div>
+		</header>
+		<div id="content">
+			<div id="sources">
+				<h3>sources</h3>
+				<table>
+					<tr>
+						<th>Host</th>
+						<th>Port</th>
+						<th>Type</th>
+					</tr>
+					<tr>
+						<td>10.66.2.124</td>
+						<td>80</td>
+						<td>GITLAB</td>
+					</tr>
+				</table>
+			</div>
+			
+		    <!-- JS Rules -->
+		    <div id="rules">
+		    	<h3>rules</h3>
+		    	<textarea>// Only send locally-sourced produce.
+Rules.mandate(metadata.get("organisation") == "local");
+	
+// Rule: Do not send anything over FTP.
+Rules.mandate(destination.indexOf("ftp://") !== 0);</textarea>
+		    </div>
+		</div>
+		<footer> </footer>
+	</body>
+</html>

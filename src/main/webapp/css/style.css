@@ -4,7 +4,7 @@
 }
 
 a {
-  color: #4183C4;
+  color: #3a89a3;
   text-decoration: none;
 }
 
@@ -26,7 +26,11 @@ div#queue {
 	right: 50%;
 	left: 10px;
 }
-div#rules, div#queue {
+div#sources {
+	right: 50%;
+	left: 10px;
+}
+div#rules, div#queue, div#sources {
 	position: absolute;
 	top: 10px;
 	bottom: 10px;
@@ -46,6 +50,19 @@ header div#menubar {
 	position: absolute;
 	top: 0px;
 	right: 0px;
+}
+p.error-label {
+	background-color: #c67;
+}
+p.error-label, p.security-label {
+	text-align: center;
+	padding: 10px;
+	color: white;
+	font-size: 13px;
+	line-height: 18px;
+}
+p.security-label {
+	background-color: #76c;
 }
 
 table {

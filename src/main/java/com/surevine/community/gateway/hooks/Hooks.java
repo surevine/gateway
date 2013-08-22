@@ -38,4 +38,15 @@ public class Hooks {
             hook.call(source, properties, destinations);
         }
 	}
+	
+	/**
+	 * Call all hooks which initialise services.
+	 */
+	public static void callInit() {
+        final ServiceLoader<GatewayInitHook> hooks = ServiceLoader.load(GatewayInitHook.class);
+        
+        for (final GatewayInitHook hook : hooks) {
+            hook.call();
+        }
+	}
 }

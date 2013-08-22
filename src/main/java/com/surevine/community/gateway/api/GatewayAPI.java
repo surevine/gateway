@@ -3,6 +3,8 @@ package com.surevine.community.gateway.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,8 @@ import java.util.regex.Pattern;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -23,14 +27,24 @@ import com.surevine.community.gateway.Metadata;
 import com.surevine.community.gateway.Quarantine;
 import com.surevine.community.gateway.hooks.GatewayTransferException;
 import com.surevine.community.gateway.hooks.Hooks;
+import com.surevine.community.gateway.model.Project;
+import com.surevine.community.gateway.model.Projects;
 
-@Path("/")
+@Path("/projects")
 public class GatewayAPI {
 	
 	@GET
-	@Path("/projects/all")
-	public void getProjects() {
-		
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Collection<Project> getProjects() {
+		return new ArrayList<Project>(Projects.get());
+	}
+	
+	@GET
+	@Path("/{name}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Project getProject(final @PathParam("name") String name) {
+		return Projects.get(name);
 	}
 
 	@POST
@@ -45,7 +59,7 @@ public class GatewayAPI {
 			if (key.equals("file")) {
 				final InputPart part = data.get(key).get(0);
 				
-	            final Pattern p =  Pattern.compile("filename=\"(.*)\""); 
+	            final Pattern p = Pattern.compile("filename=\"(.*)\""); 
 	            final Matcher m = p.matcher(part.getHeaders().getFirst("Content-Disposition"));            
 	            if (m.find()) {
 	                properties.put("filename", m.group(1));
