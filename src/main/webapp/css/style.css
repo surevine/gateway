@@ -13,7 +13,13 @@ a:hover {
 }
 
 body {
-  font-family: helvetica, arial, sans-serif;
+  font: 16px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+button {
+	padding: 5px 15px;
+	cursor: pointer;
+	font-size: 0.9em;
 }
 
 div#content {
@@ -22,21 +28,17 @@ div#content {
 div#projects {
 	padding: 20px;
 }
-div#queue {
+div.left {
 	right: 50%;
 	left: 10px;
 }
-div#sources {
-	right: 50%;
-	left: 10px;
-}
-div#rules, div#queue, div#sources {
+div.right, div.left {
 	position: absolute;
 	top: 10px;
 	bottom: 10px;
 	padding: 10px;
 }
-div#rules {
+div.right {
 	right: 10px;
 	left: 50%;
 }
@@ -53,6 +55,7 @@ header div#menubar {
 }
 p#error-label {
 	background-color: #c67;
+	display: none;
 }
 p#error-label, p#security-label {
 	text-align: center;

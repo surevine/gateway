@@ -11,6 +11,7 @@ public class ResteasyApplication extends Application {
 	
 	public ResteasyApplication() {
 		singletons.add(new GatewayAPI());
+		singletons.add(new GitlabAPI());
 	}
 	
 	@Override

@@ -8,6 +8,9 @@ import com.surevine.community.gateway.GatewayJedis;
 
 public class Projects {
 
+	/**
+	 * IDs need to be namespaced by source system.
+	 */
 	private static Map<String, Project> projects = new ConcurrentHashMap<>(10, 0.9f, 1);
 	
 	private Projects() {
@@ -17,13 +20,21 @@ public class Projects {
 		return projects.values();
 	}
 	
-	public static Project get(final String name) {
-		return projects.get(name);
+	public static Project get(final String id) {
+		return projects.get(id);
 	}
 	
 	public static void put(final Project project) {
-		GatewayJedis.put(project.getName(),  project);
+		GatewayJedis.put(project);
 		
-		projects.put(project.getName(), project);
+		projects.put(project.getId(), project);
+	}
+	
+	public static void init(final Project project) {
+		GatewayJedis.init(project);
+		
+		GatewayJedis.put(project);
+		
+		projects.put(project.getId(), project);
 	}
 }

@@ -8,6 +8,7 @@ import lombok.Data;
 public class Project {
 
 	private String
+		id,
 		name,
 		description,
 		friendlySecurityLabel,

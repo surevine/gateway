@@ -19,7 +19,7 @@ public class GitlabContextHook implements GatewayContextHook {
 	
 	private static final Logger LOG = Logger.getLogger(GitlabContextHook.class.getName());
 	
-	private ScheduledExecutorService scheduler;
+	private static ScheduledExecutorService scheduler;
 
 	@Override
 	public void init() {
@@ -44,13 +44,15 @@ public class GitlabContextHook implements GatewayContextHook {
 			
 			for (final JsonNode project : json) {
 				final Project p = new Project();
+				
+				p.setId(String.valueOf(project.get("id").getLongValue()));
 				p.setName(project.get("name").getTextValue());
 				p.setDescription(project.get("description").getTextValue());
 				p.setSourceUrl(project.get("ssh_url_to_repo").getTextValue());
 				p.setWebUrl(project.get("web_url").getTextValue());
 				p.setSecurityLabel(project.get("security_label").getTextValue());
 				
-				Projects.put(p);
+				Projects.init(p);
 			}
 			LOG.info("Total projects: " +Projects.get().size());
 		} catch (final IOException e) {

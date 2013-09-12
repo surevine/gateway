@@ -13,8 +13,11 @@
  *   destination - The URI intended for the file to be sent to.
  */
 
-// Only send locally-sourced produce.
-Rules.mandate(metadata.get("organisation") == "local");
+// Rule: Only send locally-sourced produce.
+//Rules.mandate(metadata.get("organisation") == "local");
 
 // Rule: Do not send anything over FTP.
 Rules.mandate(destination.indexOf("ftp://") !== 0);
+
+// Rule: File copy only.
+//Rules.mandate(destination.indexOf("file://") === 0)

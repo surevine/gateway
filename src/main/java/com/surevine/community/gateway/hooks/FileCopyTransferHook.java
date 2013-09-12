@@ -18,12 +18,14 @@ public class FileCopyTransferHook implements GatewayTransferHook {
 		for (final URI uri : destinations) {
 			if ("file".equals(uri.getScheme())) {
 				try {
-					Files.copy(source, Paths.get(uri));
+					LOG.info(String.format("Copying from %s to %s", source.toString(), Paths.get(Paths.get(uri).toString(), source.getFileName().toString())));
+					
+					Files.copy(source, Paths.get(Paths.get(uri).toString(), source.getFileName().toString()));
 				} catch (final IOException e) {
-					LOG.warning(String.format("Failed to transfer %s to %s because an error occured:",
-							source.getFileName().toString(), uri.toString(), e.getMessage()));
-					LOG.log(Level.FINE, e.getMessage(), e);
+					LOG.log(Level.SEVERE, e.getMessage(), e);
 				}
+			} else {
+				LOG.warning(String.format("Unable to perform file copy for the %s scheme.", uri.getScheme()));
 			}
 		}
 	}

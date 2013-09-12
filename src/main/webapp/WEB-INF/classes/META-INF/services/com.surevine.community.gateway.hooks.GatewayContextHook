@@ -1,1 +1,2 @@
 com.surevine.community.gateway.hooks.GitlabContextHook
+com.surevine.community.gateway.hooks.FileImportContextHook
