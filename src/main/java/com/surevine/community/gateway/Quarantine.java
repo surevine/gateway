@@ -13,7 +13,7 @@ public class Quarantine {
 		// FIXME: Hard coded.
 		final Path quarantine = Paths.get("/tmp/export-quarantine", UUID.randomUUID().toString());
 		if (!Files.exists(quarantine)) {
-			Files.createDirectory(quarantine);
+			Files.createDirectories(quarantine);
 		}
 		
 		final Path target = Paths.get(quarantine.toString(),

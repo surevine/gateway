@@ -43,7 +43,7 @@ public class FileImportContextHook implements GatewayContextHook {
 		
 		final Path importDirectory = Paths.get("/tmp/import-quarantine");
 		if (!Files.exists(importDirectory)) {
-			Files.createDirectory(importDirectory);
+			Files.createDirectories(importDirectory);
 		}
 		
 		final WatchService watcher = FileSystems.getDefault().newWatchService();
