@@ -18,9 +18,13 @@ public class FileCopyTransferHook implements GatewayTransferHook {
 		for (final URI uri : destinations) {
 			if ("file".equals(uri.getScheme())) {
 				try {
-					LOG.info(String.format("Copying from %s to %s", source.toString(), Paths.get(Paths.get(uri).toString(), source.getFileName().toString())));
+					LOG.info(String.format("Copying from %s to %s",
+							source.toString(),
+							Paths.get(Paths.get(uri).toString(),
+									source.getFileName().toString())));
 					
-					Files.copy(source, Paths.get(Paths.get(uri).toString(), source.getFileName().toString()));
+					Files.copy(source, Paths.get(Paths.get(uri).toString(),
+							source.getFileName().toString()));
 				} catch (final IOException e) {
 					LOG.log(Level.SEVERE, e.getMessage(), e);
 				}

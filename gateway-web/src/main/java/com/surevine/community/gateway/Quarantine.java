@@ -4,14 +4,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Saves imported content to a temporary directory.
+ * 
+ * @author rich.midwinter@gmail.com
+ */
 public class Quarantine {
 	
-	public static Path save(final byte[] file, final Map<String, String> properties) throws IOException {
-		// FIXME: Hard coded.
-		final Path quarantine = Paths.get("/tmp/export-quarantine", UUID.randomUUID().toString());
+	public static Path save(final byte[] file,
+			final Map<String, String> properties) throws IOException {
+		final Path quarantine = Paths.get(GatewayProperties.get(
+				GatewayProperties.EXPORT_QUARANTINE_DIR),
+				UUID.randomUUID().toString());
 		if (!Files.exists(quarantine)) {
 			Files.createDirectories(quarantine);
 		}
@@ -19,7 +27,7 @@ public class Quarantine {
 		final Path target = Paths.get(quarantine.toString(),
 				properties.get("filename"));
 		
-		Files.write(target, file);
+		Files.write(target, file, StandardOpenOption.CREATE);
 		
 		return target;
 	}

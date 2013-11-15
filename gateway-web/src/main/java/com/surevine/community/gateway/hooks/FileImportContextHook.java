@@ -1,6 +1,7 @@
 package com.surevine.community.gateway.hooks;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,6 +10,8 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,20 +58,35 @@ public class FileImportContextHook implements GatewayContextHook {
 				switch (event.kind().name()) {
 				case "ENTRY_CREATE":
 					final Path target = (Path) event.context();
+					final Path workingDirectory = Paths.get(
+							target.getParent().toString(),
+							UUID.randomUUID().toString());
+					
+					LOG.info(String.format("Extracting archive %s", target.getFileName()));
+					
+					Files.createDirectories(workingDirectory);
 					
 					// Extract.
 					Runtime.getRuntime().exec(
-							new String[] {"tar", "xzvf", target.getFileName().toString()},
+							new String[] {"tar", "xzvf", target.toString(),
+									"-C", workingDirectory.toString()},
 							new String[] {},
 							target.getParent().toFile()).waitFor();
 					
-					// Add git remote.
-					Runtime.getRuntime().exec(
+					// Read the metadata.json file.
+					final List<String> lines = Files.readAllLines(Paths.get(workingDirectory.toString(), ".metadata.json"), Charset.forName("UTF-8"));
+					LOG.info("Metadata contents:");
+					for (final String line : lines) {
+						LOG.info(line);
+					}
+					
+					// Add git remote if we're doing a push.
+					/*Runtime.getRuntime().exec(
 							new String[] {"git", "remote", target.getFileName().toString()},
 							new String[] {},
-							target.getParent().toFile()).waitFor();
+							target.getParent().toFile()).waitFor();*/
 					
-					// Push into server.
+					// Run import hooks with metadata and file
 					
 					
 					// Remove.

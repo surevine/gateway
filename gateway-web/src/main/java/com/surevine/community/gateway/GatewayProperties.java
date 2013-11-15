@@ -9,7 +9,8 @@ public enum GatewayProperties {
 	GITLAB_PORT,
 	GITLAB_CONTEXT,
 	GITLAB_VERSION,
-	GITLAB_TOKEN;
+	GITLAB_TOKEN,
+	EXPORT_QUARANTINE_DIR;
 	
 	private static final ResourceBundle BUNDLE;
 	
