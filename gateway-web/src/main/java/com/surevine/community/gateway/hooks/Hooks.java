@@ -22,6 +22,21 @@ public class Hooks {
             hook.call(source, properties);
         }
 	}
+
+	/**
+	 * Call all hooks which review imported files.
+	 * 
+	 * @param source Path to file.
+	 * @param properties Metadata associated with the file.
+	 */
+	public static void callPostReceive(final Path source,
+			final Map<String, String> properties) {
+        final ServiceLoader<GatewayPostReceiveHook> hooks = ServiceLoader.load(GatewayPostReceiveHook.class);
+        
+        for (final GatewayPostReceiveHook hook : hooks) {
+            hook.call(source, properties);
+        }
+	}
 	
 	/**
 	 * Call all hooks which transfer files.

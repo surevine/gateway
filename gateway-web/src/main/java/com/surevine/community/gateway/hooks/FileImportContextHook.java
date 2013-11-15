@@ -1,20 +1,32 @@
 package com.surevine.community.gateway.hooks;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.List;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+
+/**
+ * Watches for new files within a directory. As and when they appear it then
+ * calls available PostReceiveHooks for them to distribute to local systems.
+ * 
+ * @author rich.midwinter@gmail.com
+ */
 public class FileImportContextHook implements GatewayContextHook {
 	
 	private static final Logger LOG = Logger.getLogger(FileImportContextHook.class.getName());
@@ -44,7 +56,7 @@ public class FileImportContextHook implements GatewayContextHook {
 	private void listen() throws IOException, InterruptedException {
 		LOG.info("Starting file import watcher.");
 		
-		final Path importDirectory = Paths.get("/tmp/import-quarantine");
+		final Path importDirectory = Paths.get("/tmp/import-quarantine");  //FIXME: Hard coded
 		if (!Files.exists(importDirectory)) {
 			Files.createDirectories(importDirectory);
 		}
@@ -58,12 +70,13 @@ public class FileImportContextHook implements GatewayContextHook {
 				switch (event.kind().name()) {
 				case "ENTRY_CREATE":
 					final Path target = (Path) event.context();
-					final Path workingDirectory = Paths.get(
-							target.getParent().toString(),
-							UUID.randomUUID().toString());
 					
 					LOG.info(String.format("Extracting archive %s", target.getFileName()));
 					
+					// Create a working directory
+					final Path workingDirectory = Paths.get(
+							"/tmp/import-working", // FIXME: Hard coded
+							UUID.randomUUID().toString());
 					Files.createDirectories(workingDirectory);
 					
 					// Extract.
@@ -74,12 +87,18 @@ public class FileImportContextHook implements GatewayContextHook {
 							target.getParent().toFile()).waitFor();
 					
 					// Read the metadata.json file.
-					final List<String> lines = Files.readAllLines(Paths.get(workingDirectory.toString(), ".metadata.json"), Charset.forName("UTF-8"));
-					LOG.info("Metadata contents:");
-					for (final String line : lines) {
-						LOG.info(line);
-					}
+				    final TypeReference<HashMap<String,String>> typeRef = new TypeReference<HashMap<String,String> 
+				               >() {}; 
+				    final HashMap<String,String> properties = new ObjectMapper(
+				    		new JsonFactory()).readValue(
+				    		Paths.get(workingDirectory.toString(),
+							".metadata.json").toFile(), typeRef); 
+				    
+				    for (final String keyy : properties.keySet()) {
+				    	System.out.println(keyy + " " +properties.get(key));
+				    }
 					
+					// FIXME: This should be in a Git / Gitlab post-receive hook
 					// Add git remote if we're doing a push.
 					/*Runtime.getRuntime().exec(
 							new String[] {"git", "remote", target.getFileName().toString()},
@@ -87,10 +106,36 @@ public class FileImportContextHook implements GatewayContextHook {
 							target.getParent().toFile()).waitFor();*/
 					
 					// Run import hooks with metadata and file
-					
+					Hooks.callPostReceive(target, properties);
 					
 					// Remove.
-					
+					Files.delete(target);
+					Files.walkFileTree(workingDirectory, new SimpleFileVisitor<Path>() {
+						@Override
+						public FileVisitResult visitFile(final Path file,
+								final BasicFileAttributes attrs) throws IOException {
+							Files.delete(file);
+							return FileVisitResult.CONTINUE;
+						}
+
+						@Override
+						public FileVisitResult visitFileFailed(final Path file,
+								final IOException exc) throws IOException {
+							Files.delete(file);
+							return FileVisitResult.CONTINUE;
+						}
+
+						@Override
+						public FileVisitResult postVisitDirectory(final Path dir,
+								final IOException exc) throws IOException {
+							if (exc == null) {
+								Files.delete(dir);
+								return FileVisitResult.CONTINUE;
+							} else {
+								throw exc;
+							}
+						}
+					});
 					break;
 				}
 			}

@@ -29,6 +29,11 @@
 			<artifactId>filecopy-transfer-plugin</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>nexus-deploy-plugin</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- COMPILE TIME -->
 		<dependency>

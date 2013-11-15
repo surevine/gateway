@@ -9,6 +9,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Copies an imported file to a file:// destination. 
+ * 
+ * @author rich.midwinter@gmail.com
+ */
 public class FileCopyTransferHook implements GatewayTransferHook {
 	
 	private static final Logger LOG = Logger.getLogger(FileCopyTransferHook.class.getName());
