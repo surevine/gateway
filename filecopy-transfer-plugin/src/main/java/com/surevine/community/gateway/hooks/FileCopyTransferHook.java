@@ -5,6 +5,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +30,7 @@ public class FileCopyTransferHook implements GatewayTransferHook {
 									source.getFileName().toString())));
 					
 					Files.copy(source, Paths.get(Paths.get(uri).toString(),
-							source.getFileName().toString()));
+							source.getFileName().toString()), StandardCopyOption.REPLACE_EXISTING);
 				} catch (final IOException e) {
 					LOG.log(Level.SEVERE, e.getMessage(), e);
 				}

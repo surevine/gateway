@@ -32,7 +32,7 @@ public class FileImportContextHook implements GatewayContextHook {
 	private static final Logger LOG = Logger.getLogger(FileImportContextHook.class.getName());
 	
 	private static Thread fileImporter;
-
+	
 	@Override
 	public void init() {
 		fileImporter = new Thread() {
@@ -54,8 +54,6 @@ public class FileImportContextHook implements GatewayContextHook {
 	}
 	
 	private void listen() throws IOException, InterruptedException {
-		LOG.info("Starting file import watcher.");
-		
 		final Path importDirectory = Paths.get("/tmp/import-quarantine");  //FIXME: Hard coded
 		if (!Files.exists(importDirectory)) {
 			Files.createDirectories(importDirectory);
@@ -67,11 +65,11 @@ public class FileImportContextHook implements GatewayContextHook {
 		while (true) {
 			final WatchKey key = watcher.take();
 			for (final WatchEvent<?> event : key.pollEvents()) {
-				switch (event.kind().name()) {
-				case "ENTRY_CREATE":
-					final Path target = (Path) event.context();
-					
-					LOG.info(String.format("Extracting archive %s", target.getFileName()));
+				final WatchEvent.Kind<?> kind = event.kind();
+				
+				if (StandardWatchEventKinds.ENTRY_CREATE.equals(kind)) {
+					final Path directory = (Path) key.watchable();
+					final Path target = directory.resolve((Path) event.context());
 					
 					// Create a working directory
 					final Path workingDirectory = Paths.get(
@@ -81,10 +79,10 @@ public class FileImportContextHook implements GatewayContextHook {
 					
 					// Extract.
 					Runtime.getRuntime().exec(
-							new String[] {"tar", "xzvf", target.toString(),
+							new String[] {"tar", "xzvf", target.toAbsolutePath().toString(),
 									"-C", workingDirectory.toString()},
 							new String[] {},
-							target.getParent().toFile()).waitFor();
+							target.toFile().getAbsoluteFile().getParentFile()).waitFor();
 					
 					// Read the metadata.json file.
 				    final TypeReference<HashMap<String,String>> typeRef = new TypeReference<HashMap<String,String> 
@@ -93,10 +91,6 @@ public class FileImportContextHook implements GatewayContextHook {
 				    		new JsonFactory()).readValue(
 				    		Paths.get(workingDirectory.toString(),
 							".metadata.json").toFile(), typeRef); 
-				    
-				    for (final String keyy : properties.keySet()) {
-				    	System.out.println(keyy + " " +properties.get(key));
-				    }
 					
 					// FIXME: This should be in a Git / Gitlab post-receive hook
 					// Add git remote if we're doing a push.
@@ -136,7 +130,6 @@ public class FileImportContextHook implements GatewayContextHook {
 							}
 						}
 					});
-					break;
 				}
 			}
 			
@@ -146,5 +139,6 @@ public class FileImportContextHook implements GatewayContextHook {
 
 	@Override
 	public void destroy() {
+		fileImporter.interrupt();
 	}
 }

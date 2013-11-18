@@ -1,4 +1,4 @@
-package com.surevine.community.gaateway.hooks;
+package com.surevine.community.gateway.hooks;
 
 import java.nio.file.Path;
 import java.util.Map;
