@@ -1,4 +1,4 @@
-package com.surevine.community.gateway;
+package com.surevine.community.gateway.model.util;
 
 import java.util.ArrayList;
 import java.util.List;

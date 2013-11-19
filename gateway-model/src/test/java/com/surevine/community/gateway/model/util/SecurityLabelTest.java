@@ -1,4 +1,4 @@
-package com.surevine.community.gateway;
+package com.surevine.community.gateway.model.util;
 
 import static org.junit.Assert.assertEquals;
 

@@ -91,7 +91,8 @@ public class GitlabAPI {
 					.body(entity)
 					.execute().returnContent().asString();
 		} catch (final IOException e) {
-			LOG.log(Level.SEVERE, "Unable to retrieve projects from gitlab.", e);
+			LOG.log(Level.SEVERE, "Unable to retrieve projects from gitlab: " +e.getMessage());
+			LOG.log(Level.FINEST, "Unable to retrieve projects from gitlab.", e);
 		}
 	}
 }

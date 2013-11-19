@@ -17,13 +17,16 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletContextEvent;
+
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
 /**
  * Watches for new files within a directory. As and when they appear it then
- * calls available PostReceiveHooks for them to distribute to local systems.
+ * extracts them, parses the metadata and calls available PostReceiveHooks for
+ * them to distribute to LAN systems.
  * 
  * @author rich.midwinter@gmail.com
  */
@@ -34,7 +37,7 @@ public class FileImportContextHook implements GatewayContextHook {
 	private static Thread fileImporter;
 	
 	@Override
-	public void init() {
+	public void init(final ServletContextEvent event) {
 		fileImporter = new Thread() {
 			{
 				setDaemon(true);
@@ -45,12 +48,18 @@ public class FileImportContextHook implements GatewayContextHook {
 				try {
 					listen();
 				} catch (final IOException | InterruptedException e) {
-					LOG.log(Level.SEVERE, "Failure listening for file system imports.", e);
+					LOG.log(Level.SEVERE, "Failure listening for file system imports: " +e.getMessage());
+					LOG.log(Level.FINEST, "Failure listening for file system imports.", e);
 				}
 			}
 		};
 		
 		fileImporter.start();
+	}
+
+	@Override
+	public void destroy(final ServletContextEvent event) {
+		fileImporter.interrupt();
 	}
 	
 	private void listen() throws IOException, InterruptedException {
@@ -135,10 +144,5 @@ public class FileImportContextHook implements GatewayContextHook {
 			
 			key.reset();
 		}
-	}
-
-	@Override
-	public void destroy() {
-		fileImporter.interrupt();
 	}
 }

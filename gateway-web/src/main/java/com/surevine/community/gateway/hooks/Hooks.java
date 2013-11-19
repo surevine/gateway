@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import javax.servlet.ServletContextEvent;
+
 public class Hooks {
 
 	/**
@@ -57,22 +59,22 @@ public class Hooks {
 	/**
 	 * Call all hooks which initialise services.
 	 */
-	public static void callInit() {
+	public static void callInit(final ServletContextEvent event) {
         final ServiceLoader<GatewayContextHook> hooks = ServiceLoader.load(GatewayContextHook.class);
         
         for (final GatewayContextHook hook : hooks) {
-            hook.init();
+            hook.init(event);
         }
 	}
 	
 	/**
 	 * Call all hooks which destroy services.
 	 */
-	public static void callDestroy() {
+	public static void callDestroy(final ServletContextEvent event) {
         final ServiceLoader<GatewayContextHook> hooks = ServiceLoader.load(GatewayContextHook.class);
         
         for (final GatewayContextHook hook : hooks) {
-            hook.destroy();
+            hook.destroy(event);
         }
 	}
 }

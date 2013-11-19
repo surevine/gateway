@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.surevine.community</groupId>
 	<artifactId>gateway</artifactId>
@@ -31,6 +32,11 @@
 			<dependency>
 				<groupId>org.jboss.resteasy</groupId>
 				<artifactId>resteasy-multipart-provider</artifactId>
+				<version>${resteasy.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-cdi</artifactId>
 				<version>${resteasy.version}</version>
 			</dependency>
 			<dependency>
@@ -122,10 +128,13 @@
 		</plugins>
 	</build>
 	<modules>
+		<module>gateway-model</module>
 		<module>plugin-api</module>
 		<module>filecopy-transfer-plugin</module>
-		<module>gateway-web</module>
 		<module>nexus-deploy-plugin</module>
-    <module>shell-transfer-plugin</module>
-  </modules>
+		<module>shell-transfer-plugin</module>
+		<module>gitlab-plugin</module>
+		<module>gateway-web</module>
+		<module>gateway-jedis</module>
+	</modules>
 </project>

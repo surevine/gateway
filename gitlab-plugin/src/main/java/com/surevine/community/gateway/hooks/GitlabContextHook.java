@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletContextEvent;
+
 import org.apache.http.client.fluent.Request;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -22,7 +24,7 @@ public class GitlabContextHook implements GatewayContextHook {
 	private static ScheduledExecutorService scheduler;
 
 	@Override
-	public void init() {
+	public void init(final ServletContextEvent event) {
 		scheduler = Executors.newSingleThreadScheduledExecutor();
 		scheduler.scheduleWithFixedDelay(new Runnable() {
 			@Override
@@ -33,7 +35,7 @@ public class GitlabContextHook implements GatewayContextHook {
 	}
 
 	@Override
-	public void destroy() {
+	public void destroy(final ServletContextEvent event) {
 		scheduler.shutdownNow();
 	}
 	
@@ -80,7 +82,8 @@ public class GitlabContextHook implements GatewayContextHook {
 		try {
 			content = Request.Get(url).execute().returnContent().asString();
 		} catch (final IOException e) {
-			LOG.log(Level.SEVERE, "Unable to retrieve projects from gitlab.", e);
+			LOG.log(Level.SEVERE, "Unable to retrieve projects from gitlab: " +e.getMessage());
+			LOG.log(Level.FINEST, "Unable to retrieve projects from gitlab.", e);
 		}
 		
 		// Parse response

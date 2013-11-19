@@ -8,16 +8,14 @@
 		<artifactId>gateway</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>plugin-api</artifactId>
-	<name>plugin-api</name>
+	<artifactId>gateway-jedis</artifactId>
+	<name>gateway-jedis</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>
 		<dependency>
-			<groupId>org.jboss.spec.javax.servlet</groupId>
-			<artifactId>jboss-servlet-api_3.1_spec</artifactId>
-			<scope>provided</scope>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
 		</dependency>
-		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

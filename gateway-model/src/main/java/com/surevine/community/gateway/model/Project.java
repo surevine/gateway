@@ -1,8 +1,8 @@
 package com.surevine.community.gateway.model;
 
-import com.surevine.community.gateway.SecurityLabel;
-
 import lombok.Data;
+
+import com.surevine.community.gateway.model.util.SecurityLabel;
 
 @Data
 public class Project {

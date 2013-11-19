@@ -1,5 +1,7 @@
 package com.surevine.community.gateway.hooks;
 
+import javax.servlet.ServletContextEvent;
+
 /**
  * Implementations of {@link GatewayContextHook} are called at the
  * contextInitialised of the {@GatewayContextListener}.
@@ -10,7 +12,7 @@ package com.surevine.community.gateway.hooks;
  */
 public interface GatewayContextHook {
 
-	void init();
+	void init(ServletContextEvent event);
 	
-	void destroy();
+	void destroy(ServletContextEvent event);
 }

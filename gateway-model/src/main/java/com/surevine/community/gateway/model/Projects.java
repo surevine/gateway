@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.surevine.community.gateway.GatewayJedis;
+import com.surevine.community.gateway.jedis.GatewayJedis;
 
 public class Projects {
 
@@ -25,15 +25,13 @@ public class Projects {
 	}
 	
 	public static void put(final Project project) {
-		GatewayJedis.put(project);
+		GatewayJedis.put(project.getId(), project.isEnabled());
 		
 		projects.put(project.getId(), project);
 	}
 	
 	public static void init(final Project project) {
-		GatewayJedis.init(project);
-		
-		GatewayJedis.put(project);
+		project.setEnabled(GatewayJedis.isEnabled(project.getId()));
 		
 		projects.put(project.getId(), project);
 	}
