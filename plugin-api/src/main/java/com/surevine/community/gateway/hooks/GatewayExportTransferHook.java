@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 /**
- * Implementations of {@link GatewayTransferHook} are called to send received
+ * Implementations of {@link GatewayExportTransferHook} are called to send received
  * files out to other {link URI} based destinations with whitelisted metadata.
  * 
  * This allows for various transport mechanisms to send files to other gateways
@@ -13,7 +13,7 @@ import java.util.Map;
  * 
  * @author richard.midwinter@surevine.com
  */
-public interface GatewayTransferHook {
+public interface GatewayExportTransferHook {
 
 	void call(Path source, Map<String, String> properties, URI... destinations);
 }

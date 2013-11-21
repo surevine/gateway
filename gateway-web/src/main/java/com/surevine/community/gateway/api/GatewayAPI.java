@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -23,10 +24,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
+import com.google.common.io.ByteStreams;
 import com.surevine.community.gateway.JavaScriptExportFilter;
 import com.surevine.community.gateway.Metadata;
 import com.surevine.community.gateway.Quarantine;
@@ -35,7 +36,7 @@ import com.surevine.community.gateway.hooks.Hooks;
 import com.surevine.community.gateway.model.Project;
 import com.surevine.community.gateway.model.Projects;
 
-@Path("/gw")
+@Path("/export")
 public class GatewayAPI {
 	
 	private static final Logger LOG = Logger.getLogger(GatewayAPI.class.getName());
@@ -93,8 +94,7 @@ public class GatewayAPI {
 	                properties.put("filename", m.group(1));
 	            }
 				
-//				file = ByteStreams.toByteArray(part.getBody(InputStream.class, null));
-	            file = IOUtils.toByteArray(part.getBody(InputStream.class, null));
+				file = ByteStreams.toByteArray(part.getBody(InputStream.class, null));
 			} else {
 				final List<InputPart> inputs = data.get(key);
 				
@@ -112,19 +112,19 @@ public class GatewayAPI {
 		final java.nio.file.Path source = Quarantine.save(file, properties);
 		
 		// Get all possible export destinations.
-		// We're hardcoding our own import destination to export to.
-		final URI[] destinations = new URI[] {
+		// We're hardcoding our own file import destination to export to.
+		final List<URI> destinations = Arrays.asList(new URI[] {
 				new URI("file:///tmp/import-quarantine")
-		};
+		});
 		
-		// Call pre-receive hooks.
-		Hooks.callPreReceive(source, properties);
+		// Call preExport hooks.
+		Hooks.callPreExport(source, properties, destinations);
 		
 		// Run rules engine to see if and where we're going to send it.
-		final URI[] filteredDestinations = JavaScriptExportFilter.filter(source, properties, destinations);
+		JavaScriptExportFilter.filter(source, properties, destinations);
 		
-		// Call transfer hooks with sanitised properties after delay.
-		Hooks.callTransfer(source, Metadata.sanitise(properties), filteredDestinations);
+		// Call export transfer hooks with sanitised properties after delay.
+		Hooks.callExportTransfer(source, Metadata.sanitise(properties), destinations.toArray(new URI[]{}));
 		
 		// Clean up quarantine.
 		Quarantine.remove(source);

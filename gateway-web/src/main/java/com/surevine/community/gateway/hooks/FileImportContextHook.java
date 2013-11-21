@@ -1,5 +1,7 @@
 package com.surevine.community.gateway.hooks;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -64,29 +66,32 @@ public class FileImportContextHook implements GatewayContextHook {
 	
 	private void listen() throws IOException, InterruptedException {
 		final Path importDirectory = Paths.get("/tmp/import-quarantine");  //FIXME: Hard coded
-		if (!Files.exists(importDirectory)) {
-			Files.createDirectories(importDirectory);
-		}
+		Files.createDirectories(importDirectory);
 		
 		final WatchService watcher = FileSystems.getDefault().newWatchService();
 		importDirectory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
 		
 		while (true) {
+			LOG.info("Awaiting filesystem events.");
 			final WatchKey key = watcher.take();
+			
 			for (final WatchEvent<?> event : key.pollEvents()) {
 				final WatchEvent.Kind<?> kind = event.kind();
 				
 				if (StandardWatchEventKinds.ENTRY_CREATE.equals(kind)) {
+					LOG.info("New file detected.");
 					final Path directory = (Path) key.watchable();
 					final Path target = directory.resolve((Path) event.context());
 					
 					// Create a working directory
+					LOG.info("Creating working directory");
 					final Path workingDirectory = Paths.get(
 							"/tmp/import-working", // FIXME: Hard coded
 							UUID.randomUUID().toString());
 					Files.createDirectories(workingDirectory);
 					
 					// Extract.
+					LOG.info("Extracting received file.");
 					Runtime.getRuntime().exec(
 							new String[] {"tar", "xzvf", target.toAbsolutePath().toString(),
 									"-C", workingDirectory.toString()},
@@ -94,6 +99,7 @@ public class FileImportContextHook implements GatewayContextHook {
 							target.toFile().getAbsoluteFile().getParentFile()).waitFor();
 					
 					// Read the metadata.json file.
+					LOG.info("Reading metadata file.");
 				    final TypeReference<HashMap<String,String>> typeRef = new TypeReference<HashMap<String,String> 
 				               >() {}; 
 				    final HashMap<String,String> properties = new ObjectMapper(
@@ -109,7 +115,12 @@ public class FileImportContextHook implements GatewayContextHook {
 							target.getParent().toFile()).waitFor();*/
 					
 					// Run import hooks with metadata and file
-					Hooks.callPostReceive(target, properties);
+				    final File[] received = workingDirectory.toFile().listFiles(new FilenameFilter() {
+						@Override
+						public boolean accept(final File dir, final String name) {
+							return !name.equals(".metadata.json");
+						}});
+					Hooks.callImportTransfer(received, properties);
 					
 					// Remove.
 					Files.delete(target);

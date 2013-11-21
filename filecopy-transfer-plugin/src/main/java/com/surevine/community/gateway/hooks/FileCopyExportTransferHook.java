@@ -15,9 +15,9 @@ import java.util.logging.Logger;
  * 
  * @author rich.midwinter@gmail.com
  */
-public class FileCopyTransferHook implements GatewayTransferHook {
+public class FileCopyExportTransferHook implements GatewayExportTransferHook {
 	
-	private static final Logger LOG = Logger.getLogger(FileCopyTransferHook.class.getName());
+	private static final Logger LOG = Logger.getLogger(FileCopyExportTransferHook.class.getName());
 
 	public void call(final Path source, final Map<String, String> properties,
 			final URI... destinations) {
@@ -29,8 +29,14 @@ public class FileCopyTransferHook implements GatewayTransferHook {
 							Paths.get(Paths.get(uri).toString(),
 									source.getFileName().toString())));
 					
-					Files.copy(source, Paths.get(Paths.get(uri).toString(),
+					// FIXME: FileImport picks up the start of a copy, so we
+					// use a move to prevent extracting partial files. But this
+					// prevents further hooks using the original, so in future
+					// we should copy to a tmp directory, move, then cleanup.
+					Files.move(source, Paths.get(Paths.get(uri).toString(),
 							source.getFileName().toString()), StandardCopyOption.REPLACE_EXISTING);
+					
+					LOG.info("Copy complete.");
 				} catch (final IOException e) {
 					LOG.log(Level.SEVERE, e.getMessage(), e);
 				}

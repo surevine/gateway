@@ -33,7 +33,12 @@ public class Quarantine {
 	}
 	
 	public static void remove(final Path target) throws IOException {
-		Files.delete(target);
-		Files.delete(target.getParent());
+		if (Files.exists(target)) {
+			Files.delete(target);
+		}
+		
+		if (Files.exists(target.getParent())) {
+			Files.delete(target.getParent());
+		}
 	}
 }

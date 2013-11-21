@@ -12,9 +12,9 @@ import java.util.logging.Logger;
  * 
  * @author rich.midwinter@gmail.com
  */
-public class ShellTransferHook implements GatewayTransferHook {
+public class ShellExportTransferHook implements GatewayExportTransferHook {
 	
-	private static final Logger LOG = Logger.getLogger(ShellTransferHook.class.getName());
+	private static final Logger LOG = Logger.getLogger(ShellExportTransferHook.class.getName());
 
 	public void call(final Path source, final Map<String, String> properties,
 			final URI... destinations) {
