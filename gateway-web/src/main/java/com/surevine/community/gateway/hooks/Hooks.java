@@ -6,10 +6,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletContextEvent;
 
 public class Hooks {
+	
+	private static final Logger LOG = Logger.getLogger(Hooks.class.getName());
 
 	/**
 	 * Call all hooks which review files on receipt, bound for export.
@@ -23,7 +26,11 @@ public class Hooks {
         final ServiceLoader<GatewayPreExportHook> hooks = ServiceLoader.load(GatewayPreExportHook.class);
         
         for (final GatewayPreExportHook hook : hooks) {
+        	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+        	
             hook.call(source, properties, destinations);
+            
+        	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
         }
 	}
 
@@ -39,7 +46,11 @@ public class Hooks {
         final ServiceLoader<GatewayPreImportHook> hooks = ServiceLoader.load(GatewayPreImportHook.class);
         
         for (final GatewayPreImportHook hook : hooks) {
+        	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+        	
             hook.call(source, properties);
+            
+        	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
         }
 	}
 
@@ -54,7 +65,11 @@ public class Hooks {
         final ServiceLoader<GatewayImportTransferHook> hooks = ServiceLoader.load(GatewayImportTransferHook.class);
         
         for (final GatewayImportTransferHook hook : hooks) {
+        	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+        	
             hook.call(received, properties);
+            
+        	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
         }
 	}
 	
@@ -70,7 +85,11 @@ public class Hooks {
         final ServiceLoader<GatewayExportTransferHook> hooks = ServiceLoader.load(GatewayExportTransferHook.class);
         
         for (final GatewayExportTransferHook hook : hooks) {
+        	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+        	
             hook.call(source, properties, destinations);
+            
+        	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
         }
 	}
 	
@@ -81,7 +100,11 @@ public class Hooks {
         final ServiceLoader<GatewayContextHook> hooks = ServiceLoader.load(GatewayContextHook.class);
         
         for (final GatewayContextHook hook : hooks) {
+        	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+        	
             hook.init(event);
+            
+        	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
         }
 	}
 	
@@ -92,7 +115,11 @@ public class Hooks {
         final ServiceLoader<GatewayContextHook> hooks = ServiceLoader.load(GatewayContextHook.class);
         
         for (final GatewayContextHook hook : hooks) {
+        	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+        	
             hook.destroy(event);
+            
+        	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
         }
 	}
 }

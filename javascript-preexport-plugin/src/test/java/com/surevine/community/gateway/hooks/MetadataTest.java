@@ -1,8 +1,10 @@
-package com.surevine.community.gateway;
+package com.surevine.community.gateway.hooks;
 
 import static org.junit.Assert.assertEquals;
 
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,11 +16,11 @@ public class MetadataTest {
 	public void testFilter() throws URISyntaxException {
 		final Map<String, String> properties = new HashMap<String, String>();
 		
-		properties.put("filenamae", "test");
+		properties.put("filename", "test");
 		properties.put("organisation", "local");
 		
-		final Map<String, String> filteredProperties = Metadata.sanitise(properties);
+		new JavascriptPreExportHook().call(null, properties, Arrays.asList(new URI[]{ new URI("http://google.com") }));
 		
-		assertEquals(1, filteredProperties.keySet().size());
+		assertEquals(1, properties.keySet().size());
 	}
 }

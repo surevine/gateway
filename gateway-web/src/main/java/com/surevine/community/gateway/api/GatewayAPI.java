@@ -28,8 +28,6 @@ import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import com.google.common.io.ByteStreams;
-import com.surevine.community.gateway.JavaScriptExportFilter;
-import com.surevine.community.gateway.Metadata;
 import com.surevine.community.gateway.Quarantine;
 import com.surevine.community.gateway.hooks.GatewayTransferException;
 import com.surevine.community.gateway.hooks.Hooks;
@@ -71,10 +69,10 @@ public class GatewayAPI {
 	 * 
 	 * Uses a multipart form upload. Invokeable:
 	 * 
-	 * curl -X POST -F "filename=myproject.tar.gz" -F "file=@myproject.tar.gz" http://gateway/gateway/api/gw/
+	 * curl -X POST -F "filename=myproject.tar.gz" -F "file=@myproject.tar.gz" http://gateway/gateway/api/export/
 	 * 
 	 * The content must be a gzipped tarball and must contain a file named
-	 * .metadata.json as we'll stored the properties in it.
+	 * .metadata.json with key-value metadata properties in it.
 	 */
 	@POST
 	@Path("/")
@@ -113,18 +111,20 @@ public class GatewayAPI {
 		
 		// Get all possible export destinations.
 		// We're hardcoding our own file import destination to export to.
-		final List<URI> destinations = Arrays.asList(new URI[] {
+		// N.B. Arrays.asList returns a fixed length list that you cannot remove
+		// items from - which we need to allow preExport plugins to do, hence
+		// the seemingly superfluous new ArrayList();
+		final List<URI> destinations = new ArrayList<URI>(Arrays.asList(new URI[] {
 				new URI("file:///tmp/import-quarantine")
-		});
+		}));
 		
 		// Call preExport hooks.
 		Hooks.callPreExport(source, properties, destinations);
 		
-		// Run rules engine to see if and where we're going to send it.
-		JavaScriptExportFilter.filter(source, properties, destinations);
+		// Configurable delay?
 		
-		// Call export transfer hooks with sanitised properties after delay.
-		Hooks.callExportTransfer(source, Metadata.sanitise(properties), destinations.toArray(new URI[]{}));
+		// Call export transfer hooks
+		Hooks.callExportTransfer(source, properties, destinations.toArray(new URI[]{}));
 		
 		// Clean up quarantine.
 		Quarantine.remove(source);

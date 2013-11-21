@@ -37,6 +37,11 @@
 			<artifactId>gitlab-plugin</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>javascript-preexport-plugin</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- COMPILE TIME -->
 		<dependency>
