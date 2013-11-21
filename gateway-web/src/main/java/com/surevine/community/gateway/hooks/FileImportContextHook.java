@@ -25,6 +25,8 @@ import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
+import com.surevine.community.gateway.GatewayProperties;
+
 /**
  * Watches for new files within a directory. As and when they appear it then
  * extracts them, parses the metadata and calls available PostReceiveHooks for
@@ -65,7 +67,7 @@ public class FileImportContextHook implements GatewayContextHook {
 	}
 	
 	private void listen() throws IOException, InterruptedException {
-		final Path importDirectory = Paths.get("/tmp/import-quarantine");  //FIXME: Hard coded
+		final Path importDirectory = Paths.get(GatewayProperties.get(GatewayProperties.IMPORT_WATCH_DIR));
 		Files.createDirectories(importDirectory);
 		
 		final WatchService watcher = FileSystems.getDefault().newWatchService();
@@ -86,7 +88,7 @@ public class FileImportContextHook implements GatewayContextHook {
 					// Create a working directory
 					LOG.info("Creating working directory");
 					final Path workingDirectory = Paths.get(
-							"/tmp/import-working", // FIXME: Hard coded
+							GatewayProperties.get(GatewayProperties.IMPORT_WORKING_DIR),
 							UUID.randomUUID().toString());
 					Files.createDirectories(workingDirectory);
 					

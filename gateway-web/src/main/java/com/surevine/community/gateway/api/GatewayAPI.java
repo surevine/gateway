@@ -115,7 +115,7 @@ public class GatewayAPI {
 		// items from - which we need to allow preExport plugins to do, hence
 		// the seemingly superfluous new ArrayList();
 		final List<URI> destinations = new ArrayList<URI>(Arrays.asList(new URI[] {
-				new URI("file:///tmp/import-quarantine")
+				new URI("file:///tmp/import-quarantine") //FIXME: Don't hard code
 		}));
 		
 		// Call preExport hooks.
@@ -129,6 +129,6 @@ public class GatewayAPI {
 		// Clean up quarantine.
 		Quarantine.remove(source);
 		
-		// Send notifications.
+		//FIXME: Send notifications, add UI hooks. 
 	}
 }
