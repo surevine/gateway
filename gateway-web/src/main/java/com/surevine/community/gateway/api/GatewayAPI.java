@@ -27,8 +27,12 @@ import javax.ws.rs.core.MediaType;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
+import com.surevine.community.gateway.GatewayProperties;
 import com.surevine.community.gateway.Quarantine;
+import com.surevine.community.gateway.history.History;
 import com.surevine.community.gateway.hooks.GatewayTransferException;
 import com.surevine.community.gateway.hooks.Hooks;
 import com.surevine.community.gateway.model.Project;
@@ -76,11 +80,11 @@ public class GatewayAPI {
 	 */
 	@POST
 	@Path("/")
-	public void upload(final MultipartFormDataInput form) throws IOException, GatewayTransferException, URISyntaxException {		
+	public void upload(final MultipartFormDataInput form) throws IOException, GatewayTransferException, URISyntaxException {
+		LOG.info("Parsing multipart form.");
+		
+		byte[] file = null;		
 		final Map<String, String> properties = new HashMap<String, String>(form.getFormDataMap().size());
-		
-		byte[] file = null;
-		
 		final Map<String, List<InputPart>> data = form.getFormDataMap();
 		for (final String key : data.keySet()) {
 			if (key.equals("file")) {
@@ -105,18 +109,26 @@ public class GatewayAPI {
 		}
 		
 		LOG.info(String.format("Importing %s", properties.get("filename")));
+		History.getInstance().add(String.format("Received file %s for export.", properties.get("filename")));
 		
 		// Save file to quarantine.
 		final java.nio.file.Path source = Quarantine.save(file, properties);
 		
-		// Get all possible export destinations.
-		// We're hardcoding our own file import destination to export to.
-		// N.B. Arrays.asList returns a fixed length list that you cannot remove
-		// items from - which we need to allow preExport plugins to do, hence
-		// the seemingly superfluous new ArrayList();
-		final List<URI> destinations = new ArrayList<URI>(Arrays.asList(new URI[] {
-				new URI("file:///tmp/import-quarantine") //FIXME: Don't hard code
-		}));
+		// Get all possible export destinations (convert from CSV property
+		// String to a List of URIs).
+		final List<String> urls = new ArrayList<String>(Arrays.asList(GatewayProperties.get(
+				GatewayProperties.EXPORT_DESTINATIONS).split(",")));
+		final List<URI> destinations = Lists.transform(urls, new Function<String, URI>() {
+			@Override
+			public URI apply(final String uri) {
+				try {
+					return new URI(uri);
+				} catch (final URISyntaxException e) {
+					throw new RuntimeException(String.format(
+							"The supplied URI [%s] is invalid.", uri), e);
+				}
+			}
+		});
 		
 		// Call preExport hooks.
 		Hooks.callPreExport(source, properties, destinations);
@@ -128,6 +140,7 @@ public class GatewayAPI {
 		
 		// Clean up quarantine.
 		Quarantine.remove(source);
+		History.getInstance().add(String.format("Finished exporting %s.", properties.get("filename")));
 		
 		//FIXME: Send notifications, add UI hooks. 
 	}

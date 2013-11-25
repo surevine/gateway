@@ -36,6 +36,8 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 	    	LOG.info(String.format("STARTING javascript hook [%s].", hook));
 	    	
 		    for (final URI destination : destinations) {
+		    	LOG.info("Processing destination " +destination);
+		    	
 			    final Rule rule = new Rule();
 			    
 			    jsEngine.put("Rules", rule);
@@ -49,7 +51,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 					e.printStackTrace(); // FIXME: Handle
 				}
 			    
-			    if (!rule.isAllowed()) {
+			    if (!rule.isAllowed() & destinations.contains(destination)) {
 			    	destinations.remove(destination);
 			    }
 		    }

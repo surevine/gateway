@@ -19,10 +19,6 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 	protected void deployMainArtifact(final File[] received, final Map<String, String> properties) {
 		LOG.info("Checking properties for Nexus deployment.");
 		
-		for (final String key : properties.keySet()) {
-			LOG.info(String.format("Property %s has value %s", key, properties.get(key)));
-		}
-		
 		// Generic
 		Preconditions.checkArgument(received.length == 1,
 				String.format("%d files received. I only know how to deploy 1 to Nexus.", received.length));

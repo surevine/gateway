@@ -19,6 +19,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 
 import org.codehaus.jackson.JsonFactory;
@@ -26,6 +28,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
 import com.surevine.community.gateway.GatewayProperties;
+import com.surevine.community.gateway.history.History;
 
 /**
  * Watches for new files within a directory. As and when they appear it then
@@ -34,9 +37,13 @@ import com.surevine.community.gateway.GatewayProperties;
  * 
  * @author rich.midwinter@gmail.com
  */
+@RequestScoped
 public class FileImportContextHook implements GatewayContextHook {
 	
 	private static final Logger LOG = Logger.getLogger(FileImportContextHook.class.getName());
+	
+	@Inject
+	private History history;
 	
 	private static Thread fileImporter;
 	
@@ -84,6 +91,8 @@ public class FileImportContextHook implements GatewayContextHook {
 					LOG.info("New file detected.");
 					final Path directory = (Path) key.watchable();
 					final Path target = directory.resolve((Path) event.context());
+					
+					History.getInstance().add(String.format("Received file %s for import.", target.getFileName()));
 					
 					// Create a working directory
 					LOG.info("Creating working directory");
@@ -152,6 +161,8 @@ public class FileImportContextHook implements GatewayContextHook {
 							}
 						}
 					});
+
+					History.getInstance().add(String.format("Finished importing %s.", target.getFileName()));
 				}
 			}
 			

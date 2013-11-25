@@ -10,6 +10,9 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletContextEvent;
 
+import com.google.common.base.Joiner;
+import com.surevine.community.gateway.history.History;
+
 public class Hooks {
 	
 	private static final Logger LOG = Logger.getLogger(Hooks.class.getName());
@@ -27,6 +30,9 @@ public class Hooks {
         
         for (final GatewayPreExportHook hook : hooks) {
         	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+    		History.getInstance().add(String.format("Running %s against %s.",
+    				hook.getClass().getSimpleName(),
+    				source.getName(source.getNameCount()-1)));
         	
             hook.call(source, properties, destinations);
             
@@ -47,6 +53,9 @@ public class Hooks {
         
         for (final GatewayPreImportHook hook : hooks) {
         	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+    		History.getInstance().add(String.format("Running %s against %s.",
+    				hook.getClass().getSimpleName(),
+    				source.getName(source.getNameCount()-1)));
         	
             hook.call(source, properties);
             
@@ -66,6 +75,9 @@ public class Hooks {
         
         for (final GatewayImportTransferHook hook : hooks) {
         	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+    		History.getInstance().add(String.format("Running %s against %s.",
+    				hook.getClass().getSimpleName(),
+    				Joiner.on(",").join(received)));
         	
             hook.call(received, properties);
             
@@ -86,6 +98,9 @@ public class Hooks {
         
         for (final GatewayExportTransferHook hook : hooks) {
         	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+    		History.getInstance().add(String.format("Running %s against %s.",
+    				hook.getClass().getSimpleName(),
+    				source.getName(source.getNameCount()-1)));
         	
             hook.call(source, properties, destinations);
             
@@ -101,6 +116,8 @@ public class Hooks {
         
         for (final GatewayContextHook hook : hooks) {
         	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+    		History.getInstance().add(String.format("Running %s.",
+    				hook.getClass().getSimpleName()));
         	
             hook.init(event);
             
@@ -116,6 +133,8 @@ public class Hooks {
         
         for (final GatewayContextHook hook : hooks) {
         	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+    		History.getInstance().add(String.format("Running %s.",
+    				hook.getClass().getSimpleName()));
         	
             hook.destroy(event);
             
