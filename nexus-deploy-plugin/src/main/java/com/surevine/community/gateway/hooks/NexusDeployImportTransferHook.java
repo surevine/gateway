@@ -38,7 +38,7 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 				LOG.info("File is for Nexus deploy. Executing.");
 
 				// FIXME: Temporarily override repository
-				properties.put(MavenKey.REPOSITORY_ID.toString(), "theirsnapshots");
+//				properties.put(MavenKey.REPOSITORY_ID.toString(), "theirsnapshots");
 				
 				final String url = getRepositoryUrl(destination)
 						+properties.get(MavenKey.REPOSITORY_ID.toString());

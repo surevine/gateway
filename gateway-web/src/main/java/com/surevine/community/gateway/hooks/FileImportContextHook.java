@@ -42,8 +42,8 @@ public class FileImportContextHook implements GatewayContextHook {
 	
 	private static final Logger LOG = Logger.getLogger(FileImportContextHook.class.getName());
 	
-	@Inject
-	private History history;
+//	@Inject
+//	private History history;
 	
 	private static Thread fileImporter;
 	
@@ -131,6 +131,11 @@ public class FileImportContextHook implements GatewayContextHook {
 						public boolean accept(final File dir, final String name) {
 							return !name.equals(".metadata.json");
 						}});
+				    
+				    for (final File file : received) {
+				    	Hooks.callPreImport(file.toPath(), properties);
+				    }
+				    
 					Hooks.callImportTransfer(received, properties);
 					
 					// Remove.

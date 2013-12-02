@@ -143,6 +143,6 @@
 		<module>gitlab-plugin</module>
 		<module>gateway-web</module>
 		<module>gateway-jedis</module>
-		<module>javascript-preexport-plugin</module>
+		<module>javascript-plugins</module>
 	</modules>
 </project>

@@ -48,7 +48,7 @@ public class Hooks {
 	 * @throws GatewayTransferException If submission should be rejected.
 	 */
 	public static void callPreImport(final Path source,
-			final Map<String, String> properties) throws GatewayTransferException {
+			final Map<String, String> properties) {
         final ServiceLoader<GatewayPreImportHook> hooks = ServiceLoader.load(GatewayPreImportHook.class);
         
         for (final GatewayPreImportHook hook : hooks) {

@@ -26,7 +26,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 	    final ScriptEngine jsEngine = manager.getEngineByName("JavaScript");
 	    final Properties config = new Properties();
 	    try {
-			config.load(getClass().getResourceAsStream("/javascript-preexport.properties"));
+			config.load(getClass().getResourceAsStream("/javascript-hook.properties"));
 		} catch (final IOException e1) {
 			e1.printStackTrace(); // FIXME: Handle
 		}

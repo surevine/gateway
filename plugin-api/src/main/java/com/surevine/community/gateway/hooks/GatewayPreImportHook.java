@@ -14,6 +14,5 @@ import java.util.Map;
  */
 public interface GatewayPreImportHook {
 
-	void call(Path source, Map<String, String> properties)
-			throws GatewayTransferException;
+	void call(Path source, Map<String, String> properties);
 }
