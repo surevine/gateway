@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -32,6 +33,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 		}
 	    
 	    final String[] hooks = config.getProperty("preexport.configurations").split(",");
+	    Collection<URI> toRemove = new ArrayList<URI>(destinations.size());
 	    for (final String hook : hooks) {
 	    	LOG.info(String.format("STARTING javascript hook [%s].", hook));
 	    	
@@ -52,11 +54,11 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 				}
 			    
 			    if (!rule.isAllowed() & destinations.contains(destination)) {
-			    	destinations.remove(destination);
+			    	toRemove.add(destination);
 			    }
 		    }
-
-	    	LOG.info(String.format("COMPLETE javascript hook [%s].", hook));
 	    }
+    	LOG.info(String.format("COMPLETE javascript hook [%s].", hook));
+    	destinations.removeAll(toRemove);
 	}
 }
