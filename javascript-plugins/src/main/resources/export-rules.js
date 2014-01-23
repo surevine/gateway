@@ -12,12 +12,22 @@
  *   metadata    - A map of key-value properties for the file.
  *   destination - The URI intended for the file to be sent to.
  */
+importClass(java.util.Arrays);
+importClass(java.lang.System);
 
 // Rule: Only send locally-sourced produce.
 //Rules.mandate(metadata.get("organisation") == "local");
 
 // Rule: Do not send anything over FTP.
 Rules.mandate(destination.indexOf("ftp://") !== 0);
+
+Rules.mandate(function() {
+	if (Arrays.asList(metadata.get("groups").split(",")).indexOf("STAFF") >= 0) {
+		System.out.println("Groups contains STAFF");
+		return !destination.equals("file:///tmp/foreign");
+	}
+	return true;
+}());
 
 // Rule: File copy only.
 //Rules.mandate(destination.indexOf("file://") === 0)

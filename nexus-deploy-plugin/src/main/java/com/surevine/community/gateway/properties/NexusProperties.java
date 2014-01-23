@@ -8,7 +8,9 @@ public enum NexusProperties {
 	HOSTNAME,
 	PORT,
 	USERNAME,
-	PASSWORD;
+	PASSWORD,
+	DEPLOY_SCRIPT,
+	DESTINATIONS;
 	
 	private static final ResourceBundle BUNDLE;
 	
@@ -17,7 +19,12 @@ public enum NexusProperties {
 	}
 	
 	public static String[] listDestinations() {
-		return BUNDLE.getString("nexus.destinations").split(",");
+		return get(NexusProperties.DESTINATIONS).split(",");
+	}
+	
+	public static String get(final NexusProperties property) {
+		return BUNDLE.getString(String.format("nexus.%s",
+				property.toString().toLowerCase().replaceAll("_", ".")));
 	}
 	
 	public static String get(final String destination,

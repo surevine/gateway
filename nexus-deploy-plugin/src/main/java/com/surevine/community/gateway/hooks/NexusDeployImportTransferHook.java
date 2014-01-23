@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.surevine.community.gateway.properties.NexusProperties;
 
@@ -54,12 +55,17 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 				}
 				flags.add(String.format("-Dfile=%s", target.getAbsolutePath()));
 				
-				final String[] mvnArgs = new String[(2 +flags.size())];
-				mvnArgs[0] = "mvn";
-				mvnArgs[1] = "deploy:deploy-file";
+				final String[] mvnArgs = new String[(4 +flags.size())];
+				mvnArgs[0] = NexusProperties.get(NexusProperties.DEPLOY_SCRIPT);
+				mvnArgs[1] = target.getParentFile().toString();
+				mvnArgs[2] = "mvn";
+				mvnArgs[3] = "deploy:deploy-file";
 				for (int i = 0; i<flags.size(); i++) {
-					mvnArgs[i+2] = flags.get(i);
+					mvnArgs[i+4] = flags.get(i);
 				}
+
+				LOG.info("Running command:");
+				LOG.info(Joiner.on(" ").join(mvnArgs));
 				
 				try {
 					final Process p = Runtime.getRuntime().exec(

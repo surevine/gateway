@@ -139,33 +139,35 @@ public class FileImportContextHook implements GatewayContextHook {
 					Hooks.callImportTransfer(received, properties);
 					
 					// Remove.
-					Files.delete(target);
-					Files.walkFileTree(workingDirectory, new SimpleFileVisitor<Path>() {
-						@Override
-						public FileVisitResult visitFile(final Path file,
-								final BasicFileAttributes attrs) throws IOException {
-							Files.delete(file);
-							return FileVisitResult.CONTINUE;
-						}
-
-						@Override
-						public FileVisitResult visitFileFailed(final Path file,
-								final IOException exc) throws IOException {
-							Files.delete(file);
-							return FileVisitResult.CONTINUE;
-						}
-
-						@Override
-						public FileVisitResult postVisitDirectory(final Path dir,
-								final IOException exc) throws IOException {
-							if (exc == null) {
-								Files.delete(dir);
+					if (GatewayProperties.doCleanUp()) {
+						Files.delete(target);
+						Files.walkFileTree(workingDirectory, new SimpleFileVisitor<Path>() {
+							@Override
+							public FileVisitResult visitFile(final Path file,
+									final BasicFileAttributes attrs) throws IOException {
+								Files.delete(file);
 								return FileVisitResult.CONTINUE;
-							} else {
-								throw exc;
 							}
-						}
-					});
+	
+							@Override
+							public FileVisitResult visitFileFailed(final Path file,
+									final IOException exc) throws IOException {
+								Files.delete(file);
+								return FileVisitResult.CONTINUE;
+							}
+	
+							@Override
+							public FileVisitResult postVisitDirectory(final Path dir,
+									final IOException exc) throws IOException {
+								if (exc == null) {
+									Files.delete(dir);
+									return FileVisitResult.CONTINUE;
+								} else {
+									throw exc;
+								}
+							}
+						});
+					}
 
 					History.getInstance().add(String.format("Finished importing %s.", target.getFileName()));
 				}

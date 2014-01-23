@@ -20,14 +20,17 @@ public class JavaScriptExportFilterTest {
 		
 		properties.put("filename", "test");
 		properties.put("organisation", "local");
+		properties.put("groups", "COMMERCIAL,IN CONFIDENCE,STAFF");
 		
 		final List<URI> destinations = new ArrayList<URI>(Arrays.asList(new URI[] {
 				new URI("ftp://host/path"),
-				new URI("scp://host/path")
+				new URI("scp://host/path"),
+				new URI("file:///tmp/foreign"),
+				new URI("file:///tmp/domestic")
 		}));
 		
 		new JavascriptPreExportHook().call(null, properties, destinations);
 		
-		assertEquals(1, destinations.size());
+		assertEquals(2, destinations.size());
 	}
 }

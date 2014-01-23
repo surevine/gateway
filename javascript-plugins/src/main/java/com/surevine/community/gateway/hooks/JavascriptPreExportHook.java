@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.script.ScriptEngine;
@@ -31,9 +32,9 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 		} catch (final IOException e1) {
 			e1.printStackTrace(); // FIXME: Handle
 		}
-	    
+
+    	final Set<URI> toRemove = new HashSet<URI>(destinations.size());
 	    final String[] hooks = config.getProperty("preexport.configurations").split(",");
-	    Collection<URI> toRemove = new ArrayList<URI>(destinations.size());
 	    for (final String hook : hooks) {
 	    	LOG.info(String.format("STARTING javascript hook [%s].", hook));
 	    	
@@ -54,11 +55,14 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 				}
 			    
 			    if (!rule.isAllowed() & destinations.contains(destination)) {
+			    	System.out.println(String.format(
+			    			"Destination %s did not pass export rules for %s.",
+			    			destination, source));
 			    	toRemove.add(destination);
 			    }
 		    }
+    	  LOG.info(String.format("COMPLETE javascript hook [%s].", hook));
 	    }
-    	LOG.info(String.format("COMPLETE javascript hook [%s].", hook));
     	destinations.removeAll(toRemove);
 	}
 }

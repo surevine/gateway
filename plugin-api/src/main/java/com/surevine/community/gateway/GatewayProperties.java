@@ -13,7 +13,8 @@ public enum GatewayProperties {
 	EXPORT_QUARANTINE_DIR,
 	EXPORT_DESTINATIONS,
 	IMPORT_WATCH_DIR,
-	IMPORT_WORKING_DIR;
+	IMPORT_WORKING_DIR,
+	IMPORT_CLEANUP;
 	
 	private static final ResourceBundle BUNDLE;
 	
@@ -23,5 +24,9 @@ public enum GatewayProperties {
 	
 	public static String get(final GatewayProperties property) {
 		return BUNDLE.getString(String.format("gateway.%s", property.toString().toLowerCase().replaceAll("_", ".")));
+	}
+	
+	public static boolean doCleanUp() {
+		return !get(GatewayProperties.IMPORT_CLEANUP).equalsIgnoreCase("false");
 	}
 }
