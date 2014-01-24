@@ -144,5 +144,6 @@
 		<module>gateway-web</module>
 		<module>gateway-jedis</module>
 		<module>javascript-plugins</module>
+		<module>sftp-transfer-plugin</module>
 	</modules>
 </project>
