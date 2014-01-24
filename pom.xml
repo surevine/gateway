@@ -137,13 +137,13 @@
 	<modules>
 		<module>gateway-model</module>
 		<module>plugin-api</module>
-		<module>filecopy-transfer-plugin</module>
-		<module>nexus-deploy-plugin</module>
-		<module>shell-transfer-plugin</module>
 		<module>gitlab-plugin</module>
 		<module>gateway-web</module>
 		<module>gateway-jedis</module>
 		<module>javascript-plugins</module>
-		<module>sftp-transfer-plugin</module>
+		<module>transfer-plugins/filecopy-transfer-plugin</module>
+		<module>transfer-plugins/nexus-deploy-plugin</module>
+		<module>transfer-plugins/shell-transfer-plugin</module>
+		<module>transfer-plugins/sftp-transfer-plugin</module>
 	</modules>
 </project>
