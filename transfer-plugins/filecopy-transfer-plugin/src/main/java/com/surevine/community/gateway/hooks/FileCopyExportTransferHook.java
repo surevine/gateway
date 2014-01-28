@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.surevine.community.gateway.GatewayProperties;
+
 /**
  * Copies an imported file to a file:// destination. 
  * 
@@ -29,12 +31,24 @@ public class FileCopyExportTransferHook implements GatewayExportTransferHook {
 							Paths.get(Paths.get(uri).toString(),
 									source.getFileName().toString())));
 					
-					// FIXME: FileImport picks up the start of a copy, so we
-					// use a move to prevent extracting partial files. But this
-					// prevents further hooks using the original, so in future
-					// we should copy to a tmp directory, move, then cleanup.
-					Files.move(source, Paths.get(Paths.get(uri).toString(),
-							source.getFileName().toString()), StandardCopyOption.REPLACE_EXISTING);
+					// We copy to a temporary location then move. This ensures
+					// (i) any watching import doesn't start while a copy has
+					// not completed for a large file and (ii) the move doesn't
+					// prevent subsequent transfer plugins finding the source.
+					
+					final Path temporaryFile = Paths.get(Paths.get(uri).toString(),
+							source.getFileName().toString()
+							+GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION));
+					final Path destination = Paths.get(Paths.get(uri).toString(), source.getFileName().toString());
+					
+					// Ensure the temporary and destination directories exist
+					Files.createDirectories(destination);
+					
+					// Copy source to temporary
+					Files.copy(source, temporaryFile);
+					
+					// Move from temporary to export
+					Files.move(temporaryFile, destination, StandardCopyOption.REPLACE_EXISTING);
 					
 					LOG.info("Copy complete.");
 				} catch (final IOException e) {

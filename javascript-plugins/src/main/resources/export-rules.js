@@ -23,7 +23,6 @@ Rules.mandate(destination.indexOf("ftp://") !== 0);
 
 Rules.mandate(function() {
 	if (Arrays.asList(metadata.get("groups").split(",")).indexOf("STAFF") >= 0) {
-		System.out.println("Groups contains STAFF");
 		return !destination.equals("file:///tmp/foreign");
 	}
 	return true;

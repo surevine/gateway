@@ -14,7 +14,8 @@ public enum GatewayProperties {
 	EXPORT_DESTINATIONS,
 	IMPORT_WATCH_DIR,
 	IMPORT_WORKING_DIR,
-	IMPORT_CLEANUP;
+	IMPORT_CLEANUP,
+	TRANSFER_EXTENSION;
 	
 	private static final ResourceBundle BUNDLE;
 	
