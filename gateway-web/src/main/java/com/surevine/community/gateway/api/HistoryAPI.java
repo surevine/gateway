@@ -3,7 +3,7 @@ package com.surevine.community.gateway.api;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.ManagedBean;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,11 +13,11 @@ import javax.ws.rs.core.MediaType;
 import com.google.common.collect.Lists;
 import com.surevine.community.gateway.history.History;
 
-//@ManagedBean
+//@RequestScoped
 @Path("/history")
 public class HistoryAPI {
 
-//	@Inject
+	@Inject
 	private History history;
 
 	@GET

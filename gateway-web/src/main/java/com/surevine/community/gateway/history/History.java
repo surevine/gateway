@@ -6,15 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Default;
-import javax.inject.Named;
+import javax.inject.Singleton;
 
 import com.surevine.community.gateway.model.collection.CircularFIFOQueue;
 
-//@Named
-//@Default
-//@ApplicationScoped
+//@Singleton
 public class History {
 	
 	private static History history;
