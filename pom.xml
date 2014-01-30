@@ -8,12 +8,6 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>gateway</name>
 	<url>http://maven.apache.org</url>
-	<repositories>
-		<repository>
-			<id>tpsc</id>
-			<url>https://nexus.surevine.net/content/repositories/TPS/</url>
-		</repository>
-	</repositories>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<drools.version>5.5.0.Final</drools.version>
@@ -152,4 +146,10 @@
 		<module>transfer-plugins/shell-transfer-plugin</module>
 		<module>transfer-plugins/sftp-transfer-plugin</module>
 	</modules>
+	<distributionManagement>
+		<repository>
+			<id>TPS</id>
+			<url>https://nexus.surevine.net/content/repositories/TPS/</url>
+		</repository>
+	</distributionManagement>
 </project>
