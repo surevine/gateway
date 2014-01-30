@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>javax.enterprise</groupId>
 			<artifactId>cdi-api</artifactId>
-<!-- 			<scope>provided</scope> -->
+			<!-- <scope>provided</scope> -->
 		</dependency>
 
 		<!-- TEST -->
@@ -104,6 +104,16 @@
 						<java.awt.headless>true</java.awt.headless>
 					</systemProperties>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-deploy</id>
+						<phase>deploy</phase>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
