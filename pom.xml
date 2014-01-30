@@ -159,7 +159,7 @@
 		<module>transfer-plugins/sftp-transfer-plugin</module>
 	</modules>
   <scm>
-    <connection>scm:git:https://github.com/surevine/gateway.git</connection>
+    <connection>scm:git:ssh://git@github.com/surevine/gateway.git</connection>
   </scm>
 	<distributionManagement>
 		<repository>
