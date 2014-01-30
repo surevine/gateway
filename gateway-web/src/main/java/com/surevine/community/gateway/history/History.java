@@ -12,9 +12,9 @@ import javax.inject.Named;
 
 import com.surevine.community.gateway.model.collection.CircularFIFOQueue;
 
-@Named
-@Default
-@ApplicationScoped
+//@Named
+//@Default
+//@ApplicationScoped
 public class History {
 	
 	private static History history;

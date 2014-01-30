@@ -8,7 +8,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
@@ -31,18 +30,22 @@ public class SftpExportTransferHook implements GatewayExportTransferHook {
 
 	public void call(final Path source, final Map<String, String> properties,
 			final URI... destinations) {
+		final String transferExtension = GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION);
 		for (final URI uri : destinations) {
 			if ("sftp".equals(uri.getScheme())) {
-				final String intermediate = Paths.get(uri.getPath(),
-						source.getFileName().toString() +GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION)).toString();
+				final String intermediateFileName = source.getFileName().toString()
+						+transferExtension;
+				final String intermediatePath = Paths.get(uri.getPath().toString(), intermediateFileName).toString();
+				final String destinationPath = intermediatePath.substring(
+						0, (intermediatePath.length() - transferExtension.length()));
 				
 				LOG.info(String.format(
 						"Calling sftp for %s to %s@%s:%s",
-						source, uri.getUserInfo(), uri.getHost(), intermediate));
+						source, uri.getUserInfo(), uri.getHost(), intermediatePath));
 	
 				final JSch jsch = new JSch();
 				try {
-					jsch.addIdentity(get(uri.getHost(), "key"));
+					jsch.addIdentity(getIdentity(uri));
 					final Session session = jsch.getSession(
 							uri.getUserInfo(),
 							uri.getHost());
@@ -54,20 +57,13 @@ public class SftpExportTransferHook implements GatewayExportTransferHook {
 					sftpChannel.setInputStream(System.in);
 					sftpChannel.setOutputStream(System.out);
 					sftpChannel.connect();
-					sftpChannel.put(source.toString(), intermediate);
+					sftpChannel.put(source.toString(), intermediatePath);
+					
+					LOG.info(String.format("Calling move from %s to %s.",
+							intermediatePath, destinationPath));
+					
+					sftpChannel.rename(intermediatePath, destinationPath);
 					sftpChannel.disconnect();
-					
-					final String move = String.format("mv %s %s",
-							Paths.get(uri.getPath(), source.toString()
-									+GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION)).toString(),
-							Paths.get(uri.getPath(), source.toString()).toString());
-					
-					LOG.info("Calling remote move command: " +move);
-					
-					// Move from temporary location to destination
-					final ChannelExec execChannel = (ChannelExec) session.openChannel("exec");
-					execChannel.setCommand(move);
-					execChannel.disconnect();
 					
 					session.disconnect();
 				} catch (final Exception e) {
@@ -78,7 +74,18 @@ public class SftpExportTransferHook implements GatewayExportTransferHook {
 		}
 	}
 	
-	public String get(final String host, final String key) {
-		return config.getString(String.format("gateway.sftp.%s.%s", host, key));
+	private String getIdentity(final URI uri) {
+		final String identity = get(uri.getHost(), "key");
+		
+		// Defaults to ~/.ssh/id_rsa if no key specified for the given host(uri).
+		return identity != null ?
+				identity : Paths.get(System.getProperty("user.home"),
+						".ssh", "id_rsa").toString();
+	}
+	
+	private String get(final String host, final String key) {
+		final String bundleKey = String.format("gateway.sftp.%s.%s", host, key);
+		
+		return config.containsKey(bundleKey) ? config.getString(bundleKey) : null;
 	}
 }

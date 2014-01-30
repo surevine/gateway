@@ -20,7 +20,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 
 import org.codehaus.jackson.JsonFactory;
@@ -88,9 +87,15 @@ public class FileImportContextHook implements GatewayContextHook {
 				final WatchEvent.Kind<?> kind = event.kind();
 				
 				if (StandardWatchEventKinds.ENTRY_CREATE.equals(kind)) {
-					LOG.info("New file detected.");
 					final Path directory = (Path) key.watchable();
 					final Path target = directory.resolve((Path) event.context());
+
+					LOG.info("New file detected: " +target.getFileName());
+					
+					// Skip any incomplete transfers.
+					if (target.getFileName().toString().endsWith(GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION))) {
+						break;
+					}
 					
 					History.getInstance().add(String.format("Received file %s for import.", target.getFileName()));
 					

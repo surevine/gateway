@@ -13,11 +13,11 @@ import javax.ws.rs.core.MediaType;
 import com.google.common.collect.Lists;
 import com.surevine.community.gateway.history.History;
 
-@ManagedBean
+//@ManagedBean
 @Path("/history")
 public class HistoryAPI {
 
-	@Inject
+//	@Inject
 	private History history;
 
 	@GET

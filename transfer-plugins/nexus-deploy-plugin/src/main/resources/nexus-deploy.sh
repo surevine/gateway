@@ -14,4 +14,4 @@ for ((i=2; i<=$#; i++)); do
   CMD="${CMD} ${!i}"
 done
 
-$CMD &>> $LOG
+$CMD 2>&1 >> $LOG
