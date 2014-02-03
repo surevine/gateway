@@ -48,6 +48,10 @@ public class FileImportContextHook implements GatewayContextHook {
 	
 	@Override
 	public void init(final ServletContextEvent event) {
+		LOG.info("Listening for filesystem imports in " +GatewayProperties.get(GatewayProperties.IMPORT_WATCH_DIR));
+		
+		LOG.info("List of export destinations: " +GatewayProperties.get(GatewayProperties.EXPORT_DESTINATIONS));
+		
 		fileImporter = new Thread() {
 			{
 				setDaemon(true);
