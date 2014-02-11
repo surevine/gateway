@@ -46,9 +46,9 @@ public class SftpExportTransferHook implements GatewayExportTransferHook {
 				final JSch jsch = new JSch();
 				try {
 					jsch.addIdentity(getIdentity(uri));
-					final Session session = jsch.getSession(
-							uri.getUserInfo(),
-							uri.getHost());
+					final Session session = uri.getUserInfo() == null ?
+							jsch.getSession(uri.getHost()) : jsch.getSession(
+							uri.getUserInfo(), uri.getHost());
 					session.setConfig("StrictHostKeyChecking", "no");
 					session.connect();
 					
@@ -61,7 +61,8 @@ public class SftpExportTransferHook implements GatewayExportTransferHook {
 					
 					LOG.info(String.format("Calling move from %s to %s.",
 							intermediatePath, destinationPath));
-					
+
+					sftpChannel.chmod(Integer.parseInt("644", 8), intermediatePath);
 					sftpChannel.rename(intermediatePath, destinationPath);
 					sftpChannel.disconnect();
 					

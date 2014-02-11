@@ -51,6 +51,8 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 			    try {
 					jsEngine.eval(new InputStreamReader(getClass().getResourceAsStream(hook)));
 				} catch (final ScriptException e) {
+					rule.mandate(false, "Marking rule as failed due to " +e.getMessage());
+					
 					e.printStackTrace(); // FIXME: Handle
 				}
 			    

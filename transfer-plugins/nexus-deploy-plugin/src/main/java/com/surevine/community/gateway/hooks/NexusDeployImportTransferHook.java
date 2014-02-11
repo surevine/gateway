@@ -37,9 +37,6 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 			
 			for (final String destination : NexusProperties.listDestinations()) {
 				LOG.info("File is for Nexus deploy. Executing.");
-
-				// FIXME: Temporarily override repository
-//				properties.put(MavenKey.REPOSITORY_ID.toString(), "theirsnapshots");
 				
 				final String url = getRepositoryUrl(destination)
 						+properties.get(MavenKey.REPOSITORY_ID.toString());
@@ -54,6 +51,16 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 					}
 				}
 				flags.add(String.format("-Dfile=%s", target.getAbsolutePath()));
+				
+				final String filename = target.getAbsolutePath();
+				
+				if (filename.endsWith("-bundle.zip")) {
+					flags.add(String.format("-Dclassifier=%s", "bundle"));
+				} else if (filename.endsWith("-sources.jar")) {
+					flags.add(String.format("-Dclassifier=%s", "sources"));
+				} else if (filename.endsWith("-securitylabel.xml")) {
+					flags.add(String.format("-Dclassifier=%s", "securitylabel"));
+				}
 				
 				final String[] mvnArgs = new String[(4 +flags.size())];
 				mvnArgs[0] = NexusProperties.get(NexusProperties.DEPLOY_SCRIPT);

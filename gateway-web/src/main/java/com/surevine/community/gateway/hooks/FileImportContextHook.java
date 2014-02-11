@@ -90,7 +90,9 @@ public class FileImportContextHook implements GatewayContextHook {
 			for (final WatchEvent<?> event : key.pollEvents()) {
 				final WatchEvent.Kind<?> kind = event.kind();
 				
-				if (StandardWatchEventKinds.ENTRY_CREATE.equals(kind)) {
+				if (StandardWatchEventKinds.OVERFLOW.equals(kind)) {
+					LOG.warning("Overflow watching import directory.");
+				} else if (StandardWatchEventKinds.ENTRY_CREATE.equals(kind)) {
 					final Path directory = (Path) key.watchable();
 					final Path target = directory.resolve((Path) event.context());
 
@@ -181,6 +183,8 @@ public class FileImportContextHook implements GatewayContextHook {
 					History.getInstance().add(String.format("Finished importing %s.", target.getFileName()));
 				}
 			}
+			
+			LOG.info("Resetting watch key.");
 			
 			key.reset();
 		}

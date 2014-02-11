@@ -15,25 +15,36 @@
 importClass(java.util.Arrays);
 importClass(java.lang.System);
 
-// Print out initial variables for debugging.
-System.out.println("Running export rules against:");
-for (var key in metadata.keySet()) {
-	System.out.println(key +" " +metadata.get(key));
+// Debug: Print out initial variables for debugging.
+var it = metadata.keySet().iterator();
+while (it.hasNext()) {
+	var key = it.next();
+	System.out.println(key +" : " +metadata.get(key));
 }
 
+// Rule: Don't send auxiliary files as these currently break Nexus import.
+Rules.mandate(!metadata.get("name").endsWith("-bundle.zip"), "Refusing to export bundle.");
+Rules.mandate(!metadata.get("name").endsWith("-sources.jar"), "Refusing to export sources.");
+
+// Rule: Only send items with a valid security label.
+Rules.mandate(metadata.get("classification") != null, "Classification is required.");
+Rules.mandate(metadata.get("decorator") != null, "Decorator is required.");
+Rules.mandate(metadata.get("groups") != null && metadata.get("groups").split(",").length > 0, "Group metadata is required.");
+
 // Rule: Only send locally-sourced produce.
-//Rules.mandate(metadata.get("organisation") == "local");
+//Rules.mandate(metadata.get("organisation") == "local", "Organisation must be local");
 
 // Rule: Do not send anything over FTP.
-Rules.mandate(destination.indexOf("ftp://") !== 0);
+Rules.mandate(destination.indexOf("ftp://") !== 0, "Destination scheme cannot be FTP.");
 
-// Rule: Do not send STAFF labelled data to foreign destinations.
+// Rule: Do not send STAFF labelled data.
 Rules.mandate(function() {
-        if (Arrays.asList(metadata.get("groups").split(",")).indexOf("STAFF") >= 0) {
-                return !destination.equals("file:///tmp/foreign");
-        }
-        return true;
-}());
+	if (destination.equals("file:///tmp/foreign")) {
+		return !Arrays.asList(metadata.get("groups").split(",")).contains("STAFF");
+	} else {
+		return true;
+	}
+}(), "STAFF group cannot be applied to foreign destination.");
 
 // Rule: File copy only.
 //Rules.mandate(destination.indexOf("file://") === 0)
