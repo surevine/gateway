@@ -35,11 +35,11 @@ public class FileCopyExportTransferHook implements GatewayExportTransferHook {
 					// (i) any watching import doesn't start while a copy has
 					// not completed for a large file and (ii) the move doesn't
 					// prevent subsequent transfer plugins finding the source.
-					
 					final Path temporaryFile = Paths.get(Paths.get(uri).toString(),
 							source.getFileName().toString()
 							+GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION));
-					final Path destination = Paths.get(Paths.get(uri).toString(), source.getFileName().toString());
+					final Path destination = Paths.get(Paths.get(uri).toString(),
+							properties.containsKey("destinationFilename") ? properties.get("destinationFilename") : source.getFileName().toString());
 					
 					// Ensure the temporary and destination directories exist
 					Files.createDirectories(destination);

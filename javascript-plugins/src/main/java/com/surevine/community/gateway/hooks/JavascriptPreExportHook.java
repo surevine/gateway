@@ -16,6 +16,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import com.surevine.community.gateway.model.Rule;
+import com.surevine.community.gateway.util.Redis;
 
 public class JavascriptPreExportHook implements GatewayPreExportHook {
 	
@@ -35,6 +36,9 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 
     	final Set<URI> toRemove = new HashSet<URI>(destinations.size());
 	    final String[] hooks = config.getProperty("preexport.configurations").split(",");
+	    
+	    // FIXME: Is this the wrong way round, should loop through destinations then hooks?
+	    // That way we could skip other hooks if one fails.
 	    for (final String hook : hooks) {
 	    	LOG.info(String.format("STARTING javascript hook [%s].", hook));
 	    	
@@ -44,6 +48,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 			    final Rule rule = new Rule();
 			    
 			    jsEngine.put("Rules", rule);
+			    jsEngine.put("Redis", new Redis("localhost"));
 			    jsEngine.put("source", source);
 			    jsEngine.put("metadata", properties);
 			    jsEngine.put("destination", destination.toString());
