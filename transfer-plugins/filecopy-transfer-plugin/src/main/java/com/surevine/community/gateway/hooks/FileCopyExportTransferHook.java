@@ -38,17 +38,18 @@ public class FileCopyExportTransferHook implements GatewayExportTransferHook {
 					final Path temporaryFile = Paths.get(Paths.get(uri).toString(),
 							source.getFileName().toString()
 							+GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION));
-					final Path destination = Paths.get(Paths.get(uri).toString(),
-							properties.containsKey("destinationFilename") ? properties.get("destinationFilename") : source.getFileName().toString());
-					
-					// Ensure the temporary and destination directories exist
-					Files.createDirectories(destination);
 					
 					// Copy source to temporary
 					Files.copy(source, temporaryFile);
 					
 					// Move from temporary to export
-					Files.move(temporaryFile, destination, StandardCopyOption.REPLACE_EXISTING);
+					if (properties.containsKey("destinationFilename")) {
+						move(temporaryFile, uri, properties.get("destinationFilename").split(","));
+					} else {
+						move(temporaryFile, uri, new String[] { Paths.get(uri).toString(), source.getFileName().toString() });
+					}
+					
+					Files.delete(temporaryFile);
 					
 					LOG.info("Copy complete.");
 				} catch (final IOException e) {
@@ -57,6 +58,18 @@ public class FileCopyExportTransferHook implements GatewayExportTransferHook {
 			} else {
 				LOG.warning(String.format("Unable to perform file copy for the %s scheme.", uri.getScheme()));
 			}
+		}
+	}
+	
+	private void move(final Path temporaryFile, final URI destinationFolder, final String[] destinationFilenames) throws IOException {
+		// Ensure the temporary and destination directories exist
+		Files.createDirectories(Paths.get(destinationFolder));
+		
+		for (final String destinationFilename : destinationFilenames) {
+			Files.copy(temporaryFile,
+					Paths.get(Paths.get(destinationFolder).toString(),
+							destinationFilename),
+							StandardCopyOption.REPLACE_EXISTING);
 		}
 	}
 }

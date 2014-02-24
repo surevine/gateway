@@ -17,6 +17,10 @@ if (destination.equals("file:///tmp/transportX")) {
   // Data type
   filename += "FG";
 
+  var filename2 = "ABCDF4" +((Redis.getIncr("transport1")).toString(36)).slice(-3) +"01FG";
+
   // Set the filename for the file copy transfer plugin to pick up
-  metadata.put("destinationFilename", filename);
+  metadata.put("destinationFilename", (filename +"," +filename2).toUpperCase());
+
+//  java.lang.System.out.println("Using filenames: " +metadata.get("destinationFilename"));
 }
