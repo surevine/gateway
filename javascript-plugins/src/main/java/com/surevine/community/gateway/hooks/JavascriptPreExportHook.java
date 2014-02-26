@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,18 +40,24 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 	    
 	    // FIXME: Is this the wrong way round, should loop through destinations then hooks?
 	    // That way we could skip other hooks if one fails.
-	    for (final String hook : hooks) {
-	    	LOG.info(String.format("STARTING javascript hook [%s].", hook));
+	    for (final URI destination : destinations) {
+	    	LOG.info("Processing destination " +destination);
 	    	
-		    for (final URI destination : destinations) {
-		    	LOG.info("Processing destination " +destination);
+	    	// Metadata is from scratch per destination.
+	    	// This means we can sanitize it (e.g. remove security groups) for one destination
+	    	// but still use them for the next.
+	    	final Map<String, String> metadata = new HashMap<>();
+	    	metadata.putAll(properties);
+	    	
+	    	for (final String hook : hooks) {
+	    		LOG.info(String.format("STARTING javascript hook [%s].", hook));
 		    	
 			    final Rule rule = new Rule();
 			    
 			    jsEngine.put("Rules", rule);
 			    jsEngine.put("Redis", new Redis("localhost"));
 			    jsEngine.put("source", source);
-			    jsEngine.put("metadata", properties);
+			    jsEngine.put("metadata", metadata);
 			    jsEngine.put("destination", destination.toString());
 			    
 			    try {
@@ -66,9 +73,12 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 			    			"Destination %s did not pass export rules for %s.",
 			    			destination, source));
 			    	toRemove.add(destination);
+			    	
+			    	break; // Do not continue evaluating hook scripts for this destination, we're not sending the artifact.
 			    }
+
+		    	LOG.info(String.format("COMPLETE javascript hook [%s].", hook));
 		    }
-    	  LOG.info(String.format("COMPLETE javascript hook [%s].", hook));
 	    }
     	destinations.removeAll(toRemove);
 	}

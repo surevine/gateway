@@ -29,7 +29,8 @@ Rules.mandate(!metadata.get("name").endsWith("-sources.jar"), "Refusing to expor
 // Rule: Only send items with a valid security label.
 Rules.mandate(metadata.get("classification") != null, "Classification is required.");
 Rules.mandate(metadata.get("decorator") != null, "Decorator is required.");
-Rules.mandate(metadata.get("groups") != null && metadata.get("groups").split(",").length > 0, "Group metadata is required.");
+Rules.mandate(metadata.get("groups") != null && metadata.get("groups").split(",").length > 0,
+		"Group metadata is invalid: " +metadata.get("groups"));
 
 // Rule: Only send locally-sourced produce.
 //Rules.mandate(metadata.get("organisation") == "local", "Organisation must be local");
