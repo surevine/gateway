@@ -39,14 +39,19 @@ public class FileCopyExportTransferHook implements GatewayExportTransferHook {
 							source.getFileName().toString()
 							+GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION));
 					
+					// Create parent directories
+					Files.createDirectories(Paths.get(uri));
+					
 					// Copy source to temporary
 					Files.copy(source, temporaryFile);
 					
 					// Move from temporary to export
 					if (properties.containsKey("destinationFilename")) {
-						move(temporaryFile, uri, properties.get("destinationFilename").split(","));
+						LOG.info("Using destinationFilename key: " +properties.get("destinationFilename"));
+						copy(temporaryFile, uri, properties.get("destinationFilename").split(","));
 					} else {
-						move(temporaryFile, uri, new String[] { Paths.get(uri).toString(), source.getFileName().toString() });
+						LOG.info("No destinationFilename key. Preserving existing filename.");
+						copy(temporaryFile, uri, new String[] { source.getFileName().toString() });
 					}
 					
 					Files.delete(temporaryFile);
@@ -61,11 +66,22 @@ public class FileCopyExportTransferHook implements GatewayExportTransferHook {
 		}
 	}
 	
-	private void move(final Path temporaryFile, final URI destinationFolder, final String[] destinationFilenames) throws IOException {
+	private void copy(final Path temporaryFile, final URI destinationFolder, final String[] destinationFilenames) throws IOException {
+		LOG.info("Copy " +temporaryFile +" to " +destinationFolder);
+		
 		// Ensure the temporary and destination directories exist
 		Files.createDirectories(Paths.get(destinationFolder));
 		
 		for (final String destinationFilename : destinationFilenames) {
+			LOG.info(String.format("Split destination copying %s from %s to %s",
+					destinationFilename,
+					temporaryFile.toString(),
+					Paths.get(Paths.get(destinationFolder).toString(),
+							destinationFilename)));
+
+			// Create parent directories
+			Files.createDirectories(Paths.get(destinationFolder));
+			
 			Files.copy(temporaryFile,
 					Paths.get(Paths.get(destinationFolder).toString(),
 							destinationFilename),
