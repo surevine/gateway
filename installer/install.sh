@@ -82,7 +82,7 @@ id -u $WILDFLY_USER 1>> $LOG_FILE 2>> $LOG_FILE || useradd $WILDFLY_USER >> $LOG
 print_progress 33
 ln -sf "$INSTALL_DIR/nexus/bin/nexus" "/etc/init.d/nexus" >> $LOG_FILE
 sed -i "s/#RUN_AS_USER=/RUN_AS_USER=$NEXUS_USER/g" "/etc/init.d/nexus" >> $LOG_FILE
-sed -i "12i\\\nJAVA_HOME=$INSTALL_DIR/java/jre\nPATH=\$PATH:\$JAVA_HOME/bin" "/etc/init.d/nexus" >> $LOG_FILE
+sed -i "12i\\\nJAVA_HOME=$INSTALL_DIR/java/jre\nPATH=\$JAVA_HOME/bin:\$PATH" "/etc/init.d/nexus" >> $LOG_FILE
 chkconfig --add nexus >> $LOG_FILE
 chkconfig --levels 345 nexus on >> $LOG_FILE
 chown -R $NEXUS_USER:$NEXUS_USER "$INSTALL_DIR/nexus-2.7.2-03" >> $LOG_FILE
