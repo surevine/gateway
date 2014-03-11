@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export PATH=$PATH:/opt/gateway/maven/bin
+
 CMD=""
 LOG="/tmp/nexus-deploy.log"
 
