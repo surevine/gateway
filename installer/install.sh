@@ -96,6 +96,10 @@ chkconfig --levels 345 wildfly on >> $LOG_FILE
 sed -i "11i\\\nexport JBOSS_USER=$WILDFLY_USER\nJBOSS_HOME=$INSTALL_DIR/wildfly\nJAVA_HOME=$INSTALL_DIR/java/jre" "/etc/init.d/wildfly" >> $LOG_FILE
 chown -R "$WILDFLY_USER:$WILDFLY_USER" "$INSTALL_DIR/wildfly-8.0.0.Final" >> $LOG_FILE
 
+# Install nexus-deploy
+cp "packages/nexus-deploy.sh" $INSTALL_DIR/ >> $LOG_FILE
+ln -sf $INSTALL_DIR/nexus-deploy.sh /tmp/nexus-deploy.sh >> $LOG_FILE
+
 # System configuration
 
 # Application configuration
