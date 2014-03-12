@@ -1,0 +1,12 @@
+README
+======
+
+# Installation
+
+Simply run ./install.sh and provide a root directory to install components underneath.
+
+# Information
+
+The install script only alters components outside this path for the purposes of (i) creating users and (ii) creating service scripts.
+
+Two service scripts are provided; nexus for the Nexus Sonatype service and wildfly for the gateway component which handles export and import of releases according to defined rules. These rules are defined in the configuration files under the config directory within your chosen installation root.
