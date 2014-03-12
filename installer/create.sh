@@ -46,5 +46,5 @@ curl -sk "https://nexus.surevine.net/service/local/artifact/maven/redirect?r=TPS
 
 
 # Create archive
-tar czvf tps-releases-installer-$(date +%Y%m%d).tar.gz
+tar czvf tps-releases-installer-$(date +%Y%m%d).tar.gz installer
 
