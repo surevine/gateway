@@ -4,10 +4,6 @@
 # Shell script to create an installer package for release manangement
 #
 
-# Ensure vanilla installers are in place
-#mkdir /mnt/fbd
-#mountpoint -q /mnt/fbd || mount 10.66.2.16:/fbd /mnt/fbd
-
 STATIC_ROOT="/var/lib/jenkins/tps/installer"
 
 # Create installer structure
@@ -42,7 +38,8 @@ chmod +x installer/install.sh
 
 # Suck down release files
 curl -sk "https://nexus.surevine.net/service/local/artifact/maven/redirect?r=TPS&g=com.surevine.community&a=gateway-web&p=war&v=LATEST" -o "installer/packages/gateway.war"
-curl -sk "https://nexus.surevine.net/service/local/artifact/maven/redirect?r=TPS&g=com.surevine.community&a=gateway-web&p=war&v=LATEST" -o "installer/packages/gateway.war"
+# nexus-gateway-plugin needed here:
+#curl -sk "https://nexus.surevine.net/service/local/artifact/maven/redirect?r=TPS&g=com.surevine.community&a=gateway-web&p=war&v=LATEST" -o "installer/packages/gateway.war"
 
 
 # Create archive
