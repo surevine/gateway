@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,6 +39,7 @@ import com.surevine.community.gateway.hooks.GatewayTransferException;
 import com.surevine.community.gateway.hooks.Hooks;
 import com.surevine.community.gateway.model.Project;
 import com.surevine.community.gateway.model.Projects;
+import com.surevine.community.gateway.model.TransferItem;
 
 @Path("/export")
 public class GatewayAPI {
@@ -130,13 +133,20 @@ public class GatewayAPI {
 			}
 		});
 		
+		// Setup transfer queue
+		final Set<TransferItem> transferQueue = new HashSet<TransferItem>();
+		for (final URI destination : destinations) {
+			transferQueue.add(new TransferItem(destination, source,
+					new HashMap<String, String>(properties)));
+		}
+		
 		// Call preExport hooks.
-		Hooks.callPreExport(source, properties, destinations);
+		Hooks.callPreExport(transferQueue);
 		
 		// Configurable delay?
 		
 		// Call export transfer hooks
-		Hooks.callExportTransfer(source, properties, destinations.toArray(new URI[]{}));
+		Hooks.callExportTransfer(transferQueue);
 		
 		// Clean up quarantine.
 		Quarantine.remove(source);

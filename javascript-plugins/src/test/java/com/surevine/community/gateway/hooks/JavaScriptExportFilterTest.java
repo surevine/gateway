@@ -8,10 +8,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
+
+import com.surevine.community.gateway.model.TransferItem;
 
 //@Ignore
 public class JavaScriptExportFilterTest {
@@ -34,8 +38,18 @@ public class JavaScriptExportFilterTest {
 				new URI("file:///tmp/domestic")
 		}));
 		
-		new JavascriptPreExportHook().call(Paths.get("/tmp"), properties, destinations);
+		final Set<TransferItem> transferQueue = new HashSet<TransferItem>(4);
+		for (final URI destination : destinations) {
+			transferQueue.add(new TransferItem(destination, Paths.get("/tmp"), properties));
+		}
 		
-		assertEquals(2, destinations.size());
+		new JavascriptPreExportHook().call(transferQueue);
+		
+		int exportable = 0;
+		for (final TransferItem item : transferQueue) {
+			if (item.isExportable()) exportable ++;
+		}
+		
+		assertEquals(1, exportable);
 	}
 }

@@ -7,10 +7,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.surevine.community.gateway.GatewayProperties;
+import com.surevine.community.gateway.model.TransferItem;
 
 /**
  * Copies an imported file to a file:// destination. 
@@ -21,37 +23,40 @@ public class FileCopyExportTransferHook implements GatewayExportTransferHook {
 	
 	private static final Logger LOG = Logger.getLogger(FileCopyExportTransferHook.class.getName());
 
-	public void call(final Path source, final Map<String, String> properties,
-			final URI... destinations) {
-		for (final URI uri : destinations) {
-			if ("file".equals(uri.getScheme())) {
+	public void call(final Set<TransferItem> transferQueue) {
+		for (final TransferItem item : transferQueue) {
+			final Path source = item.getSource();
+			final Map<String, String> metadata = item.getMetadata();
+			final URI destination = item.getDestination();
+			
+			if ("file".equals(destination.getScheme()) && item.isExportable()) {
 				try {
 					LOG.info(String.format("Copying from %s to %s",
 							source.toString(),
-							Paths.get(Paths.get(uri).toString(),
+							Paths.get(Paths.get(destination).toString(),
 									source.getFileName().toString())));
 					
 					// We copy to a temporary location then move. This ensures
 					// (i) any watching import doesn't start while a copy has
 					// not completed for a large file and (ii) the move doesn't
 					// prevent subsequent transfer plugins finding the source.
-					final Path temporaryFile = Paths.get(Paths.get(uri).toString(),
+					final Path temporaryFile = Paths.get(Paths.get(destination).toString(),
 							source.getFileName().toString()
 							+GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION));
 					
 					// Create parent directories
-					Files.createDirectories(Paths.get(uri));
+					Files.createDirectories(Paths.get(item.getDestination()));
 					
 					// Copy source to temporary
 					Files.copy(source, temporaryFile);
 					
 					// Move from temporary to export
-					if (properties.containsKey("destinationFilename")) {
-						LOG.info("Using destinationFilename key: " +properties.get("destinationFilename"));
-						copy(temporaryFile, uri, properties.get("destinationFilename").split(","));
+					if (metadata.containsKey("destinationFilename")) {
+						LOG.info("Using destinationFilename key: " +metadata.get("destinationFilename"));
+						copy(temporaryFile, destination, metadata.get("destinationFilename").split(","));
 					} else {
 						LOG.info("No destinationFilename key. Preserving existing filename.");
-						copy(temporaryFile, uri, new String[] { source.getFileName().toString() });
+						copy(temporaryFile, destination, new String[] { source.getFileName().toString() });
 					}
 					
 					Files.delete(temporaryFile);
@@ -61,7 +66,7 @@ public class FileCopyExportTransferHook implements GatewayExportTransferHook {
 					LOG.log(Level.SEVERE, e.getMessage(), e);
 				}
 			} else {
-				LOG.warning(String.format("Unable to perform file copy for the %s scheme.", uri.getScheme()));
+				LOG.warning(String.format("Unable to perform file copy for the %s scheme.", destination.getScheme()));
 			}
 		}
 	}

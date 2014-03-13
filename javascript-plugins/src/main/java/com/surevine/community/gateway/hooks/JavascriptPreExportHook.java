@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -14,9 +11,9 @@ import java.util.logging.Logger;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 import com.surevine.community.gateway.model.Rule;
+import com.surevine.community.gateway.model.TransferItem;
 import com.surevine.community.gateway.util.Redis;
 
 public class JavascriptPreExportHook implements GatewayPreExportHook {
@@ -24,8 +21,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 	private static final Logger LOG = Logger.getLogger(JavascriptPreExportHook.class.getName());
 
 	@Override
-	public void call(final Path source, final Map<String, String> properties,
-			final List<URI> destinations) {
+	public void call(final Set<TransferItem> transferQueue) {
 	    final ScriptEngineManager manager = new ScriptEngineManager();
 	    final ScriptEngine jsEngine = manager.getEngineByName("JavaScript");
 	    final Properties config = new Properties();
@@ -35,19 +31,13 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 			e1.printStackTrace(); // FIXME: Handle
 		}
 
-    	final Set<URI> toRemove = new HashSet<URI>(destinations.size());
 	    final String[] hooks = config.getProperty("preexport.configurations").split(",");
 	    
-	    // FIXME: Is this the wrong way round, should loop through destinations then hooks?
-	    // That way we could skip other hooks if one fails.
-	    for (final URI destination : destinations) {
+	    for (final TransferItem item : transferQueue) {
+			final Path source = item.getSource();
+			final Map<String, String> metadata = item.getMetadata();
+			final URI destination = item.getDestination();
 	    	LOG.info("Processing destination " +destination);
-	    	
-	    	// Metadata is from scratch per destination.
-	    	// This means we can sanitize it (e.g. remove security groups) for one destination
-	    	// but still use them for the next.
-	    	final Map<String, String> metadata = new HashMap<>();
-	    	metadata.putAll(properties);
 	    	
 	    	for (final String hook : hooks) {
 	    		LOG.info(String.format("STARTING javascript hook [%s].", hook));
@@ -68,11 +58,11 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 					e.printStackTrace(); // FIXME: Handle
 				}
 			    
-			    if (!rule.isAllowed() & destinations.contains(destination)) {
-			    	System.out.println(String.format(
+			    if (!rule.isAllowed()) {
+			    	LOG.info(String.format(
 			    			"Destination %s did not pass export rules for %s.",
 			    			destination, source));
-			    	toRemove.add(destination);
+			    	item.setNotExportable();
 			    	
 			    	break; // Do not continue evaluating hook scripts for this destination, we're not sending the artifact.
 			    }
@@ -80,6 +70,5 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 		    	LOG.info(String.format("COMPLETE javascript hook [%s].", hook));
 		    }
 	    }
-    	destinations.removeAll(toRemove);
 	}
 }

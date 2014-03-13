@@ -1,9 +1,9 @@
 package com.surevine.community.gateway.hooks;
 
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
+
+import com.surevine.community.gateway.model.TransferItem;
+
 
 /**
  * Implementations of {@link GatewayPreExportHook} are called to examine a file
@@ -15,5 +15,5 @@ import java.util.Map;
  */
 public interface GatewayPreExportHook {
 
-	void call(Path source, Map<String, String> properties, List<URI> destinations);
+	void call(Set<TransferItem> transferQueue);
 }

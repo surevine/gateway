@@ -1,17 +1,17 @@
 package com.surevine.community.gateway.hooks;
 
 import java.io.File;
-import java.net.URI;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletContextEvent;
 
 import com.google.common.base.Joiner;
 import com.surevine.community.gateway.history.History;
+import com.surevine.community.gateway.model.TransferItem;
 
 public class Hooks {
 	
@@ -24,17 +24,36 @@ public class Hooks {
 	 * @param properties Metadata associated with the file.
 	 * @throws GatewayTransferException If submission should be rejected.
 	 */
-	public static void callPreExport(final Path source,
-			final Map<String, String> properties, final List<URI> destinations) {
+	public static void callPreExport(final Set<TransferItem> transferQueue) {
         final ServiceLoader<GatewayPreExportHook> hooks = ServiceLoader.load(GatewayPreExportHook.class);
         
         for (final GatewayPreExportHook hook : hooks) {
         	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
-    		History.getInstance().add(String.format("Running %s against %s.",
-    				hook.getClass().getSimpleName(),
-    				source.getName(source.getNameCount()-1)));
+    		History.getInstance().add(String.format("Running %s.",
+    				hook.getClass().getSimpleName()));
         	
-            hook.call(source, properties, destinations);
+            hook.call(transferQueue);
+            
+        	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
+        }
+	}
+	
+	/**
+	 * Call all hooks which transfer files.
+	 * 
+	 * @param source The file to transfer.
+	 * @param properties The whitelisted properties to transfer with the file.
+	 * @param destinations An array of URIs to transfer to.
+	 */
+	public static void callExportTransfer(final Set<TransferItem> transferQueue) {
+        final ServiceLoader<GatewayExportTransferHook> hooks = ServiceLoader.load(GatewayExportTransferHook.class);
+        
+        for (final GatewayExportTransferHook hook : hooks) {
+        	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+    		History.getInstance().add(String.format("Running %s.",
+    				hook.getClass().getSimpleName()));
+        	
+            hook.call(transferQueue);
             
         	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
         }
@@ -80,29 +99,6 @@ public class Hooks {
     				Joiner.on(",").join(received)));
         	
             hook.call(received, properties);
-            
-        	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
-        }
-	}
-	
-	/**
-	 * Call all hooks which transfer files.
-	 * 
-	 * @param source The file to transfer.
-	 * @param properties The whitelisted properties to transfer with the file.
-	 * @param destinations An array of URIs to transfer to.
-	 */
-	public static void callExportTransfer(final Path source,
-			final Map<String, String> properties, final URI... destinations) {
-        final ServiceLoader<GatewayExportTransferHook> hooks = ServiceLoader.load(GatewayExportTransferHook.class);
-        
-        for (final GatewayExportTransferHook hook : hooks) {
-        	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
-    		History.getInstance().add(String.format("Running %s against %s.",
-    				hook.getClass().getSimpleName(),
-    				source.getName(source.getNameCount()-1)));
-        	
-            hook.call(source, properties, destinations);
             
         	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
         }

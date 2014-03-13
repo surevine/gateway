@@ -3,8 +3,8 @@ package com.surevine.community.gateway.hooks;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,6 +12,7 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.surevine.community.gateway.GatewayProperties;
+import com.surevine.community.gateway.model.TransferItem;
 
 /**
  * Passes imported file details to scp.
@@ -28,27 +29,30 @@ public class SftpExportTransferHook implements GatewayExportTransferHook {
 		config = ResourceBundle.getBundle("sftp-plugin");
 	}
 
-	public void call(final Path source, final Map<String, String> properties,
-			final URI... destinations) {
+	public void call(final Set<TransferItem> transferQueue) {
 		final String transferExtension = GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION);
-		for (final URI uri : destinations) {
-			if ("sftp".equals(uri.getScheme())) {
+		for (final TransferItem item : transferQueue) {
+			final Path source = item.getSource();
+//			final Map<String, String> metadata = item.getMetadata(); // TODO: Add support for destinationFilename
+			final URI destination = item.getDestination();
+			
+			if ("sftp".equals(destination.getScheme()) && item.isExportable()) {
 				final String intermediateFileName = source.getFileName().toString()
 						+transferExtension;
-				final String intermediatePath = Paths.get(uri.getPath().toString(), intermediateFileName).toString();
+				final String intermediatePath = Paths.get(destination.getPath().toString(), intermediateFileName).toString();
 				final String destinationPath = intermediatePath.substring(
 						0, (intermediatePath.length() - transferExtension.length()));
 				
 				LOG.info(String.format(
 						"Calling sftp for %s to %s@%s:%s",
-						source, uri.getUserInfo(), uri.getHost(), intermediatePath));
+						source, destination.getUserInfo(), destination.getHost(), intermediatePath));
 	
 				final JSch jsch = new JSch();
 				try {
-					jsch.addIdentity(getIdentity(uri));
-					final Session session = uri.getUserInfo() == null ?
-							jsch.getSession(uri.getHost()) : jsch.getSession(
-							uri.getUserInfo(), uri.getHost());
+					jsch.addIdentity(getIdentity(destination));
+					final Session session = destination.getUserInfo() == null ?
+							jsch.getSession(destination.getHost()) : jsch.getSession(
+							destination.getUserInfo(), destination.getHost());
 					session.setConfig("StrictHostKeyChecking", "no");
 					session.connect();
 					

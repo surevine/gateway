@@ -1,8 +1,8 @@
 package com.surevine.community.gateway.hooks;
 
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.Map;
+import java.util.Set;
+
+import com.surevine.community.gateway.model.TransferItem;
 
 /**
  * Implementations of {@link GatewayExportTransferHook} are called to send received
@@ -15,5 +15,5 @@ import java.util.Map;
  */
 public interface GatewayExportTransferHook {
 
-	void call(Path source, Map<String, String> properties, URI... destinations);
+	void call(Set<TransferItem> transferQueue);
 }
