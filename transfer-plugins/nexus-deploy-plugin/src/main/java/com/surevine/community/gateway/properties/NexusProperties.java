@@ -4,11 +4,7 @@ import java.util.ResourceBundle;
 
 public enum NexusProperties {
 
-	SCHEME,
-	HOSTNAME,
-	PORT,
-	USERNAME,
-	PASSWORD,
+	URL_BASE,
 	DEPLOY_SCRIPT,
 	DESTINATIONS;
 	

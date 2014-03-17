@@ -95,12 +95,8 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 	}
 	
 	protected String getRepositoryUrl(final String destination) {
-		return String.format("%s://%s:%s@%s:%s/nexus/content/repositories/",
-				NexusProperties.get(destination, NexusProperties.SCHEME),
-				NexusProperties.get(destination, NexusProperties.USERNAME),
-				NexusProperties.get(destination, NexusProperties.PASSWORD),
-				NexusProperties.get(destination, NexusProperties.HOSTNAME),
-				NexusProperties.get(destination, NexusProperties.PORT));
+		return String.format("%s/nexus/content/repositories/",
+				NexusProperties.get(destination, NexusProperties.URL_BASE));
 	}
 
 	@Override

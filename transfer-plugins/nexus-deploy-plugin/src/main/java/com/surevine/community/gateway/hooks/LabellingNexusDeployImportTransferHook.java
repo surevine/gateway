@@ -10,24 +10,9 @@ import java.util.logging.Logger;
 public class LabellingNexusDeployImportTransferHook extends NexusDeployImportTransferHook {
 	
 	private static final Logger LOG = Logger.getLogger(LabellingNexusDeployImportTransferHook.class.getName());
-
-	/**
-	 * mvn deploy:deploy-file -DgroupId=com.somecompany \
-		-DartifactId=project \
-		-Dversion=1.0 \
-		-Dpackaging=n3 \
-		-Dclassifier=metadata \
-		-Dfile=metadata.n3 \
-		-DrepositoryId=releases \
-		-Durl=http://localhost:8081/nexus/content/repositories/releases \
-		-DgeneratePom=false
-	 */
-
 	@Override
 	public void call(final File[] received, final Map<String, String> properties) {
 		deployMainArtifact(received, properties);
-				//FIXME: For pushing a label
-	//			flags.add("-DgeneratePom=false");
 		
 		deployLabelArtifact(received, properties);
 	}
