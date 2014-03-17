@@ -8,6 +8,7 @@ STATIC_ROOT="/var/lib/jenkins/tps/installer"
 
 # Create installer structure
 mkdir -p installer/packages
+mkdir -p installer/sources
 mkdir -p installer/config
 
 # Copy static files into place
@@ -35,6 +36,10 @@ curl -sk "https://raw.github.com/surevine/gateway/master/installer/README" -o "i
 curl -sk "https://raw.github.com/surevine/gateway/master/installer/install.sh" -o "installer/install.sh"
 chmod +x installer/packages/nexus-deploy.sh
 chmod +x installer/install.sh
+
+# Source tarballs
+curl -skL "https://github.com/surevine/gateway/archive/master.zip" -o "installer/sources/gateway.src.zip"
+curl -skL "https://github.com/surevine/nexus-gateway-plugin/archive/master.zip" -o "installer/sources/nexus-gateway-plugin.src.zip"
 
 # Suck down release files
 curl -sk "https://nexus.surevine.net/service/local/artifact/maven/redirect?r=TPS&g=com.surevine.community&a=gateway-web&p=war&v=LATEST" -o "installer/packages/gateway.war"
