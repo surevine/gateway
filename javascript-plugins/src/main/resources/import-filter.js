@@ -5,5 +5,5 @@
 
 if (metadata.get("source_type").toUpperCase() == "NEXUS") {
 	// Munge external artifacts into a separate repository from our own.
-	metadata.put("repositoryId", "theirsnapshots");
+	metadata.put("repository", "theirsnapshots");
 }*/

@@ -6,7 +6,7 @@ public enum MavenKey {
 	VERSION("version"),
 	CLASSIFIER("classifier"),
 	FILE("file"),
-	REPOSITORY_ID("repositoryId"),
+	REPOSITORY("repository"),
 	SOURCE_TYPE("source_type"),
 	URL("url");
 	

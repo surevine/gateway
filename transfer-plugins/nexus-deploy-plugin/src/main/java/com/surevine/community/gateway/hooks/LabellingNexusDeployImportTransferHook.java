@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 public class LabellingNexusDeployImportTransferHook extends NexusDeployImportTransferHook {
 	
 	private static final Logger LOG = Logger.getLogger(LabellingNexusDeployImportTransferHook.class.getName());
+	
 	@Override
 	public void call(final File[] received, final Map<String, String> properties) {
 		deployMainArtifact(received, properties);

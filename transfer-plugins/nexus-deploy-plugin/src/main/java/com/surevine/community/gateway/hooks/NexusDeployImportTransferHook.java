@@ -39,7 +39,7 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 				LOG.info("File is for Nexus deploy. Executing.");
 				
 				final String url = getRepositoryUrl(destination)
-						+properties.get(MavenKey.REPOSITORY_ID.toString());
+						+properties.get(MavenKey.REPOSITORY.toString());
 						
 				properties.put(MavenKey.URL.toString(), url);
 				
