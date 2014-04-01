@@ -37,12 +37,9 @@ public class FileImportContextHook implements GatewayContextHook {
 	
 	@Override
 	public void init(final ServletContextEvent event) {
-
-        try
-        {
+        try {
             processFilesOnStartup();
-        } catch (final IOException | InterruptedException e)
-        {
+        } catch (final IOException | InterruptedException e) {
             LOG.log(Level.SEVERE, "Failure importing files at startup: " +e.getMessage());
             LOG.log(Level.FINEST, "Failure importing files at startup.", e);
         }
@@ -50,8 +47,7 @@ public class FileImportContextHook implements GatewayContextHook {
         LOG.info("Listening for filesystem imports in " + GatewayProperties.get(GatewayProperties.IMPORT_WATCH_DIR));
 		LOG.info("List of export destinations: " +GatewayProperties.get(GatewayProperties.EXPORT_DESTINATIONS));
 		
-		fileImporter = new Thread() {
-			{
+		fileImporter = new Thread() {{
 				setDaemon(true);
 				setName("FileImportContextHook");
 			}
@@ -76,11 +72,10 @@ public class FileImportContextHook implements GatewayContextHook {
      * @param dir the Path representation of the dir to check
      */
     private boolean checkPathExistsAndIsReadable(Path dir) {
+    	boolean result = Files.isDirectory(dir);
+    	result &= Files.isReadable(dir);
 
-        boolean result = Files.isDirectory(dir);
-       result &= Files.isReadable(dir);
-
-       return result;
+    	return result;
     }
 
 
@@ -117,10 +112,11 @@ public class FileImportContextHook implements GatewayContextHook {
 					final Path target = directory.resolve((Path) event.context());
 
 					LOG.info(String.format("New file detected via event %s and with name %s: ",kind.name(),target.getFileName()));
-                    final Path workingDirectory = importFileAtPath(target);
 
-                    if (workingDirectory == null) return;
-                    cleanupImport(target, workingDirectory);
+					final Path workingDirectory = importFileAtPath(target);
+                    if (workingDirectory != null) {
+                    	cleanupImport(target, workingDirectory);
+                    }
 
                     History.getInstance().add(String.format("Finished importing %s.", target.getFileName()));
 				}
@@ -138,11 +134,9 @@ public class FileImportContextHook implements GatewayContextHook {
      *  This handles the case where files have been delivered into the directory, when the FileSystem WatchService hasn't been running
      */
     private void processFilesOnStartup() throws IOException, InterruptedException {
-
         final Path importWatchDirectory = Paths.get(GatewayProperties.get(GatewayProperties.IMPORT_WATCH_DIR));
 
-        if (!checkPathExistsAndIsReadable(importWatchDirectory))
-        {
+        if (!checkPathExistsAndIsReadable(importWatchDirectory)) {
             Files.createDirectories(Paths.get(GatewayProperties.get(GatewayProperties.IMPORT_WATCH_DIR)));
         }
 
@@ -150,8 +144,7 @@ public class FileImportContextHook implements GatewayContextHook {
 
         DirectoryStream<Path> stream = Files.newDirectoryStream(importWatchDirectory);
 
-        for (Path target: stream)
-        {
+        for (Path target: stream) {
             // loop over the files in the import watch dir, and process them
             LOG.info(String.format("Processing file with name %s on service init.",target.getFileName()));
 
@@ -173,8 +166,6 @@ public class FileImportContextHook implements GatewayContextHook {
      * @throws IOException
      */
     private void cleanupImport(Path target, Path workingDirectory) throws IOException {
-
-
         LOG.info(String.format("Cleaning up processing of filename %s: ",target.getFileName()));
 
         // Remove.
@@ -217,9 +208,9 @@ public class FileImportContextHook implements GatewayContextHook {
      * @throws InterruptedException
      */
     private Path importFileAtPath(Path target) throws IOException, InterruptedException {
-
         // Skip any incomplete transfers.
         if (target.getFileName().toString().endsWith(GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION))) {
+        	LOG.info("Skipping processing of " +target.getFileName());
             return null;
         }
 

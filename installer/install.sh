@@ -98,7 +98,6 @@ chown -R "$WILDFLY_USER:$WILDFLY_USER" "$INSTALL_DIR/wildfly-8.0.0.Final" >> $LO
 
 # Install nexus-deploy
 cp "packages/nexus-deploy.sh" $INSTALL_DIR/ >> $LOG_FILE
-ln -sf $INSTALL_DIR/nexus-deploy.sh /tmp/nexus-deploy.sh >> $LOG_FILE
 
 # System configuration
 

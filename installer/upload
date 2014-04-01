@@ -3,8 +3,8 @@ set -e
 
 # These values are hard coded to the script
 NEXUS_USER="admin"
-NEXUS_PASS="password"
-NEXUS_HOST="127.0.0.1"
+NEXUS_PASS="admin123"
+NEXUS_HOST="10.66.2.218"
 NEXUS_REPOSITORY="releases"
 LABEL_FILE="$HOME/.securitylabel.xml.tmp"
 
