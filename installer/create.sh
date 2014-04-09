@@ -43,7 +43,7 @@ curl -skL "https://github.com/surevine/gateway/archive/master.zip" -o "installer
 curl -skL "https://github.com/surevine/nexus-gateway-plugin/archive/master.zip" -o "installer/sources/nexus-gateway-plugin.src.zip"
 
 # Suck down release files
-curl -sk "https://nexus.surevine.net/service/local/artifact/maven/redirect?r=TPS&g=com.surevine.community&a=gateway-web&p=war&v=LATEST" -o "installer/packages/gateway.war"
+curl -skL "https://nexus.surevine.net/service/local/artifact/maven/redirect?r=TPS&g=com.surevine.community&a=gateway-web&p=war&v=LATEST" -o "installer/packages/gateway.war"
 # nexus-gateway-plugin needed here:
 #curl -sk "https://nexus.surevine.net/service/local/artifact/maven/redirect?r=TPS&g=com.surevine.community&a=gateway-web&p=war&v=LATEST" -o "installer/packages/gateway.war"
 
