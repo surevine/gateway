@@ -4,6 +4,7 @@ require 'data_magic'
 require 'fig_newton'
 require 'require_all'
 require 'faker'
+require 'net/ssh'
 
 if ENV['HEADLESS']
   require 'headless'
