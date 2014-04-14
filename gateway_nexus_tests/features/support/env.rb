@@ -15,4 +15,7 @@ if ENV['HEADLESS']
   end
 end
 
+require_all File.dirname(__FILE__) + '/pages'
+require_all File.dirname(__FILE__) + '/helpers'
+
 World(PageObject::PageFactory)

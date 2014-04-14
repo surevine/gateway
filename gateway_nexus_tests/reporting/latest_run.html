@@ -469,70 +469,4 @@ e&&e.document?e.document.compatMode==="CSS1Compat"&&e.document.documentElement["
     $('#'+element_id).css('color', '#000000');
   }
 
-</script></head><body><!-- Step count 2--><div class="cucumber"><div id="cucumber-header"><div id="label"><h1>Cucumber Features</h1></div><div id="summary"><p id="totals"></p><p id="duration"></p><div id="expand-collapse"><p id="expander">Expand All</p><p id="collapser">Collapse All</p></div></div></div><div class="feature"><h2><span class="val">Feature: Upload a Release Using Maven</span></h2><p class="narrative"></p><div class='scenario'><span class="tag">@rm_3</span> <span class="tag">@happy_path</span><span class="scenario_file">features/upload_release_simple.feature:9</span><h3 id="scenario_1"><span class="keyword">Scenario:</span> <span class="val">Upload a simple binary file to Nexus alongside a valid security marking metadata file using the Maven “deploy:file” target.</span></h3><ol><li id='features_upload_release_simple_feature_10' class='step passed'><div class="step_name"><span class="keyword">Given </span><span class="step val">a file is uploaded into the correct repository and package with a correctly generated pom.xml file alongside a valid security marking metadata file</span></div><div class="step_file"><span>features/step_definitions/upload_release_simple_steps.rb:20</span></div></li><li class="step message">[INFO] Scanning for projects...
-[WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.surevine.tps:sample_matt:jar:1.2-SNAPSHOT
-[WARNING] 'build.plugins.plugin.version' for org.sonatype.nexus:nexus-plugin-bundle-maven-plugin is missing. @ line 25, column 33
-[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ line 30, column 33
-[WARNING] 
-[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
-[WARNING] 
-[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
-[WARNING] 
-[INFO] 
-[INFO] Using the builder org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder with a thread count of 1
-[INFO]                                                                         
-[INFO] ------------------------------------------------------------------------
-[INFO] Building sample_matt 1.2-SNAPSHOT
-[INFO] ------------------------------------------------------------------------
-[INFO] 
-[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ sample_matt ---
-[INFO] Using 'UTF-8' encoding to copy filtered resources.
-[INFO] skip non existing resourceDirectory /root/sample/sample_matt/src/main/resources
-[INFO] 
-[INFO] --- maven-compiler-plugin:2.5.1:compile (default-compile) @ sample_matt ---
-[INFO] No sources to compile
-[INFO] 
-[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ sample_matt ---
-[INFO] Using 'UTF-8' encoding to copy filtered resources.
-[INFO] skip non existing resourceDirectory /root/sample/sample_matt/src/test/resources
-[INFO] 
-[INFO] --- maven-compiler-plugin:2.5.1:testCompile (default-testCompile) @ sample_matt ---
-[INFO] No sources to compile
-[INFO] 
-[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ sample_matt ---
-[INFO] No tests to run.
-[INFO] 
-[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ sample_matt ---
-[WARNING] JAR will be empty - no content was marked for inclusion!
-[INFO] 
-[INFO] --- build-helper-maven-plugin:1.8:attach-artifact (attach-artifacts) @ sample_matt ---
-[INFO] 
-[INFO] --- maven-install-plugin:2.4:install (default-install) @ sample_matt ---
-[INFO] Installing /root/sample/sample_matt/target/sample_matt-1.2-SNAPSHOT.jar to /root/.m2/repository/com/surevine/tps/sample_matt/1.2-SNAPSHOT/sample_matt-1.2-SNAPSHOT.jar
-[INFO] Installing /root/sample/sample_matt/pom.xml to /root/.m2/repository/com/surevine/tps/sample_matt/1.2-SNAPSHOT/sample_matt-1.2-SNAPSHOT.pom
-[INFO] Installing /root/sample/sample_matt/securitylabel.xml to /root/.m2/repository/com/surevine/tps/sample_matt/1.2-SNAPSHOT/sample_matt-1.2-SNAPSHOT-securitylabel.xml
-[INFO] 
-[INFO] --- maven-deploy-plugin:2.7:deploy (default-deploy) @ sample_matt ---
-Downloading: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/1.2-SNAPSHOT/maven-metadata.xml
-Uploading: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/1.2-SNAPSHOT/sample_matt-1.2-20140414.101901-1.jar
-2/2 KB            Uploaded: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/1.2-SNAPSHOT/sample_matt-1.2-20140414.101901-1.jar (2 KB at 8.5 KB/sec)
-Uploading: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/1.2-SNAPSHOT/sample_matt-1.2-20140414.101901-1.pom
-2/3 KB   3/3 KB            Uploaded: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/1.2-SNAPSHOT/sample_matt-1.2-20140414.101901-1.pom (3 KB at 21.1 KB/sec)
-Downloading: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/maven-metadata.xml
-         Uploading: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/1.2-SNAPSHOT/maven-metadata.xml
-771/771 B               Uploaded: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/1.2-SNAPSHOT/maven-metadata.xml (771 B at 8.8 KB/sec)
-Uploading: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/maven-metadata.xml
-285/285 B               Uploaded: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/maven-metadata.xml (285 B at 4.2 KB/sec)
-Uploading: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/1.2-SNAPSHOT/sample_matt-1.2-20140414.101901-1-securitylabel.xml
-285/285 B               Uploaded: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/1.2-SNAPSHOT/sample_matt-1.2-20140414.101901-1-securitylabel.xml (285 B at 0.5 KB/sec)
-Uploading: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/1.2-SNAPSHOT/maven-metadata.xml
-989/989 B               Uploaded: http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/1.2-SNAPSHOT/maven-metadata.xml (989 B at 10.1 KB/sec)
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 7.068 s
-[INFO] Finished at: 2014-04-14T06:19:03-05:00
-[INFO] Final Memory: 9M/23M
-[INFO] ------------------------------------------------------------------------
-</li> <script type="text/javascript">moveProgressBar('50.0');</script><li id='features_upload_release_simple_feature_11' class='step passed'><div class="step_name"><span class="keyword">Then </span><span class="step val">checksums are generated, the security marking metadata file is present and the release can be downloaded by another user with access to the relevant repository</span></div><div class="step_file"><span>features/step_definitions/upload_release_simple_steps.rb:29</span></div></li> <script type="text/javascript">moveProgressBar('100.0');</script></ol></div></div><script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>0m15.653s seconds</strong>";</script><script type="text/javascript">document.getElementById('totals').innerHTML = "1 scenario (1 passed)<br />2 steps (2 passed)";</script></div></body></html>
+</script></head><body><!-- Step count 2--><div class="cucumber"><div id="cucumber-header"><div id="label"><h1>Cucumber Features</h1></div><div id="summary"><p id="totals"></p><p id="duration"></p><div id="expand-collapse"><p id="expander">Expand All</p><p id="collapser">Collapse All</p></div></div></div><div class="feature"><h2><span class="val">Feature: Upload a Release Using Maven</span></h2><p class="narrative"></p><div class='scenario'><span class="tag">@rm_1</span> <span class="tag">@happy_path</span><span class="scenario_file">features/upload_release_simple.feature:4</span><h3 id="scenario_1"><span class="keyword">Scenario:</span> <span class="val">Upload a simple binary file to Nexus (with no special security metadata) using the Maven “deploy:file” target.</span></h3><ol><li id='features_upload_release_simple_feature_5' class='step passed'><div class="step_name"><span class="keyword">Given </span><span class="step val">a file is uploaded into the correct repository and package with a correctly generated pom.xml file</span></div><div class="step_file"><span>features/step_definitions/upload_release_simple_steps.rb:1</span></div></li> <script type="text/javascript">moveProgressBar('50.0');</script><li id='features_upload_release_simple_feature_6' class='step passed'><div class="step_name"><span class="keyword">Then </span><span class="step val">checksums are generated and the release can be downloaded by another user with access to the relevant repository</span></div><div class="step_file"><span>features/step_definitions/upload_release_simple_steps.rb:6</span></div></li> <script type="text/javascript">moveProgressBar('100.0');</script></ol></div></div><script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>0m15.839s seconds</strong>";</script><script type="text/javascript">document.getElementById('totals').innerHTML = "1 scenario (1 passed)<br />2 steps (2 passed)";</script></div></body></html>

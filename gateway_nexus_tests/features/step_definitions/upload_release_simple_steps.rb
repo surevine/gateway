@@ -1,10 +1,6 @@
 Given /^a file is uploaded into the correct repository and package with a correctly generated pom.xml file$/ do
-   HOST = '10.66.2.196'
-   USER = 'root'
-   Net::SSH.start(HOST, USER, :keys => "~/.ssh/VPCDevInstanceDefault.pem") do|ssh|
-     @result = ssh.exec!('cd ~/sample/sample_matt_no_sec && mvn deploy')
-   end
-   puts @result
+   visit(WelcomePage)
+   on(WelcomePage).upload_to_source "sample_matt_no_sec"
 end
 
 Then /^checksums are generated and the release can be downloaded by another user with access to the relevant repository$/ do
