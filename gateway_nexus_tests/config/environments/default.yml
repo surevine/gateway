@@ -4,5 +4,9 @@ nexus_one_ip: 10.66.2.196
 nexus_one_uname: root
 nexus_one_key: ~/.ssh/VPCDevInstanceDefault.pem
 
+nexus_two_ip: 10.66.2.195
+nexus_two_uname: root
+nexus_two_key: ~/.ssh/VPCDevInstanceDefault.pem
+
 admin_uname: admin
 admin_pswrd: admin123
