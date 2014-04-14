@@ -27,12 +27,13 @@ Given /^a file is uploaded into the correct repository and package with a correc
 end
  
 Then /^checksums are generated, the security marking metadata file is present and the release can be downloaded by another user with access to the relevant repository$/ do
-  # Need to add a check for the securitylabel.xml
   @browser.goto("http://10.66.2.195:8081/nexus/content/repositories/snapshots/")
   @browser.link(:href => "http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/").click
   @browser.link(:href => "http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/").click
   @browser.link(:href => "http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/").click
   @browser.link(:href => "http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/").click
-  fail "MD5 checksum not present" unless @browser.html.include? "http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/maven-metadata.xml.md5"
-  fail "SHA1 checksum not present" unless @browser.html.include? "http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/maven-metadata.xml.sha1"
+  @browser.link(:href => "http://10.66.2.195:8081/nexus/content/repositories/snapshots/com/surevine/tps/sample_matt/1.2-SNAPSHOT/").click
+  fail "MD5 checksum not present" unless @browser.html.include? "xml.md5"
+  fail "SHA1 checksum not present" unless @browser.html.include? "xml.sha1"
+  fail "Security Label .xml not present" unless @browser.html.include? "securitylabel.xml"
 end

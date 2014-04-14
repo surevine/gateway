@@ -1,6 +1,6 @@
 Feature: Upload a Release Using Maven
 
-  @rm_1 @happy_path
+  @rm_1 @happy_path @wip
   Scenario: Upload a simple binary file to Nexus (with no special security metadata) using the Maven “deploy:file” target.
     Given a file is uploaded into the correct repository and package with a correctly generated pom.xml file 
 	Then checksums are generated and the release can be downloaded by another user with access to the relevant repository
