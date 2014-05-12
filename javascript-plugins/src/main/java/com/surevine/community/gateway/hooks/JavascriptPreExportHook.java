@@ -59,11 +59,11 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 					e.printStackTrace(); // FIXME: Handle
 				}
 			    
-				final Map<String, String> metadata = item.getMetadata();
-				Iterator<Sting> keySet = metadata.keySet().iterator();
+				final Map<String, String> metadataAfter = item.getMetadata();
+				Iterator<Sting> keySet = metadataAfter.keySet().iterator();
 				while (keySet.hasNext()) {
 					String key = keySet.next();
-					LOG.info("Metadata field: "+key+" : "+metadata.get(key));
+					LOG.info("Metadata field: "+key+" : "+metadataAfter.get(key));
 				}
 			    
 			    
