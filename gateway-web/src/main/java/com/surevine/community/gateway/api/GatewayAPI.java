@@ -187,7 +187,10 @@ public class GatewayAPI {
 	        // Look for existing metdata.json file
 	        LOG.info("Finding existing metadata file.");
 	        File metadataFile = new File(source.toFile(), ".metadata.json");
+	        
+	        
 	        if (metadataFile.exists()) {
+	        	//Create new metadata file
 	        	metadataFile.delete();
 	        	metadataFile.createNewFile();
 	        	PrintStream ps = new PrintStream(new FileOutputStream(metadataFile));
@@ -203,6 +206,13 @@ public class GatewayAPI {
 	        	finally {
 	        		ps.close();
 	       		}
+	        	
+	        	//Replace file in gzip bundle
+		        source.toFile().delete();
+		        Runtime.getRuntime().exec(
+		                new String[] {"tar", "czvf", source.toString(), "-C", source.getParent().toString(), "*"},
+		                new String[] {},
+		                source.toFile().getAbsoluteFile().getParentFile()).waitFor();
 	        }
 	        else {
 	        	LOG.fine("Metadata file does not exist");
