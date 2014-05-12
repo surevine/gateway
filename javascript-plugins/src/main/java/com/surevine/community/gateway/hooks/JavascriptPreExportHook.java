@@ -60,7 +60,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 				}
 			    
 				final Map<String, String> metadataAfter = item.getMetadata();
-				Iterator<Sting> keySet = metadataAfter.keySet().iterator();
+				Iterator<String> keySet = metadataAfter.keySet().iterator();
 				while (keySet.hasNext()) {
 					String key = keySet.next();
 					LOG.info("Metadata field: "+key+" : "+metadataAfter.get(key));
