@@ -186,7 +186,7 @@ public class GatewayAPI {
 	
 	        // Look for existing metdata.json file
 	        LOG.info("Finding existing metadata file.");
-	        File metadataFile = new File(source.toFile(), ".metadata.json");
+	        File metadataFile = new File(source.toFile().getParentFile(), ".metadata.json");
 	        
 	        
 	        if (metadataFile.exists()) {
