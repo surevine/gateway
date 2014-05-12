@@ -154,6 +154,10 @@ public class GatewayAPI {
 			LOG.warning("Encountered IOException when attempting to replace metadata files.  Aborting transfer");
 			return;
 		}
+		catch (InterruptedException e) {
+			LOG.warning("Encountered InterruptedException when attempting to replace metadata files.  Aborting transfer");
+			return;
+		}
 		
 		// Configurable delay?
 		
@@ -167,7 +171,7 @@ public class GatewayAPI {
 		//FIXME: Send notifications, add UI hooks. 
 	}
 	
-	protected void replaceMetadataFiles(Set<TransferItem> transferQueue) throws IOException {
+	protected void replaceMetadataFiles(Set<TransferItem> transferQueue) throws IOException, InterruptedException {
 	    for (final TransferItem item : transferQueue) {
 			final java.nio.file.Path source = item.getSource();
 			final Map<String, String> metadata = item.getMetadataForModification();
