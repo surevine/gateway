@@ -147,7 +147,13 @@ public class GatewayAPI {
 		// Call preExport hooks.
 		Hooks.callPreExport(transferQueue);
 		
-		replaceMetadataFiles(transferQueue);
+		try {
+			replaceMetadataFiles(transferQueue);
+		}
+		catch (IOException e) {
+			LOG.warning("Encountered IOException when attempting to replace metadata files.  Aborting transfer");
+			return;
+		}
 		
 		// Configurable delay?
 		
@@ -161,7 +167,7 @@ public class GatewayAPI {
 		//FIXME: Send notifications, add UI hooks. 
 	}
 	
-	protected void replaceMetadataFiles(Set<TransferItem> transferQueue) {
+	protected void replaceMetadataFiles(Set<TransferItem> transferQueue) throws IOException {
 	    for (final TransferItem item : transferQueue) {
 			final java.nio.file.Path source = item.getSource();
 			final Map<String, String> metadata = item.getMetadataForModification();
