@@ -1,5 +1,6 @@
 package com.surevine.community.gateway;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,6 +39,9 @@ public class Quarantine {
 		}
 		
 		if (Files.exists(target.getParent())) {
+			for (File f : target.getParent().toFile().listFiles()) {
+				f.delete();
+			}
 			Files.delete(target.getParent());
 		}
 	}
