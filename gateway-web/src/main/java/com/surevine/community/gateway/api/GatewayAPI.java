@@ -165,7 +165,7 @@ public class GatewayAPI {
 		Hooks.callExportTransfer(transferQueue);
 		
 		// Clean up quarantine.
-		Quarantine.remove(source);
+		//Quarantine.remove(source);
 		History.getInstance().add(String.format("Finished exporting %s.", properties.get("filename")));
 		
 		//FIXME: Send notifications, add UI hooks. 
