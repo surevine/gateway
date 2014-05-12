@@ -1,7 +1,10 @@
 package com.surevine.community.gateway.api;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -9,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -143,6 +147,8 @@ public class GatewayAPI {
 		// Call preExport hooks.
 		Hooks.callPreExport(transferQueue);
 		
+		replaceMetadataFile(source, transferQueue);
+		
 		// Configurable delay?
 		
 		// Call export transfer hooks
@@ -153,5 +159,44 @@ public class GatewayAPI {
 		History.getInstance().add(String.format("Finished exporting %s.", properties.get("filename")));
 		
 		//FIXME: Send notifications, add UI hooks. 
+	}
+	
+	protected void replaceMetadataFiles(Set<TransferItem> transferQueue) {
+	    for (final TransferItem item : transferQueue) {
+			final java.nio.file.Path source = item.getSource();
+			final Map<String, String> metadata = item.getMetadataForModification();
+		    
+	        // Extract.
+	        LOG.info("Extracting received file.");
+	        
+	        Runtime.getRuntime().exec(
+	                new String[] {"tar", "xzvf", source.toString(), "-C", source.getParent().toString()},
+	                new String[] {},
+	                source.toFile().getAbsoluteFile().getParentFile()).waitFor();
+	
+	        // Look for existing metdata.json file
+	        LOG.info("Finding existing metadata file.");
+	        File metadataFile = new File(source.toFile(), ".metadata.json");
+	        if (metadataFile.exists()) {
+	        	metadataFile.delete();
+	        	metadataFile.createNewFile();
+	        	PrintStream ps = new PrintStream(new FileOutputStream(metadataFile));
+	        	try {
+	        		Iterator<String> metadataKeys = metadata.keySet().iterator();
+	        		while (metadataKeys.hasNext()) {
+	        			String key = metadataKeys.next();
+	        			StringBuilder sb = new StringBuilder();
+	        			sb.append(key).append('=').append(metadata.get(key));
+	        			ps.println(key);
+	        		}
+	        	}
+	        	finally {
+	        		ps.close();
+	       		}
+	        }
+	        else {
+	        	LOG.fine("Metadata file does not exist");
+	        }
+	    }
 	}
 }
