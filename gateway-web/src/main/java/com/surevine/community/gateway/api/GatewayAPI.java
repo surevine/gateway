@@ -190,6 +190,8 @@ public class GatewayAPI {
 	        
 	        
 	        if (metadataFile.exists()) {
+		        LOG.info("Existing metadata file exists.");
+
 	        	//Create new metadata file
 	        	metadataFile.delete();
 	        	metadataFile.createNewFile();
