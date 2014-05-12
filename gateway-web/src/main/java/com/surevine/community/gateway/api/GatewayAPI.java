@@ -147,7 +147,7 @@ public class GatewayAPI {
 		// Call preExport hooks.
 		Hooks.callPreExport(transferQueue);
 		
-		replaceMetadataFile(source, transferQueue);
+		replaceMetadataFiles(transferQueue);
 		
 		// Configurable delay?
 		
