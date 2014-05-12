@@ -35,7 +35,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 	    
 	    for (final TransferItem item : transferQueue) {
 			final Path source = item.getSource();
-			final Map<String, String> metadata = item.getMetadata();
+			final Map<String, String> metadata = item.getMetadataForModification();
 			final URI destination = item.getDestination();
 	    	LOG.info("Processing destination " +destination);
 	    	
