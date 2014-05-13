@@ -174,7 +174,7 @@ public class GatewayAPI {
 	protected void replaceMetadataFiles(Set<TransferItem> transferQueue) throws IOException, InterruptedException {
 	    for (final TransferItem item : transferQueue) {
 			final java.nio.file.Path source = item.getSource();
-			final Map<String, String> metadata = item.getMetadataForModification();
+			final Map<String, String> metadata = item.getMetadata();
 		    
 	        // Extract.
 	        LOG.info("Extracting received file.");

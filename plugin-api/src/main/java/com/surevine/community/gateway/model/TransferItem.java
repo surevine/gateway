@@ -39,10 +39,6 @@ public class TransferItem {
 		exportable = false;
 	}
 	
-	public Map<String, String> getMetadataForModification() {
-		return metadata;
-	}
-	
 	// Eclipse generated hashCode and equals:
 
 	@Override
