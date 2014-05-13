@@ -197,24 +197,21 @@ public class GatewayAPI {
 	        	metadataFile.createNewFile();
 	        	PrintStream ps = new PrintStream(new FileOutputStream(metadataFile));
 	        	try {
-	        		Iterator<String> metadataKeys = metadata.keySet().iterator();
-	        		while (metadataKeys.hasNext()) {
-	        			String key = metadataKeys.next();
-	    				final StringBuilder metadataStr = new StringBuilder();
-	    				metadataStr.append("{");
-	    				metadataStr.append(String.format("\"repository\": \"%s\",", metadata.get("repository")));
-	    				metadataStr.append(String.format("\"groupId\": \"%s\",", metadata.get("groupId")));
-	    				metadataStr.append(String.format("\"artifactId\": \"%s\",", metadata.get("artifactId")));
-	    				metadataStr.append(String.format("\"version\": \"%s\",", metadata.get("version")));
-	    				metadataStr.append(String.format("\"packaging\": \"%s\",", metadata.get("packaging")));
-	    				metadataStr.append(String.format("\"classification\": \"%s\",", metadata.get("classification")));
-	    				metadataStr.append(String.format("\"decorator\": \"%s\",", metadata.get("decorator")));
-	    				metadataStr.append(String.format("\"groups\": \"%s\",", metadata.get("groups")));
-	    				metadataStr.append(String.format("\"countries\": \"%s\",", metadata.get("countries")));
-	    				metadataStr.append(String.format("\"name\": \"%s\",", metadata.get("name")));
-	    				metadataStr.append(String.format("\"source_type\": \"%s\",", metadata.get("source_type")));
-	    				metadataStr.append("}");
-	        		}
+    				final StringBuilder metadataStr = new StringBuilder();
+    				metadataStr.append("{");
+    				metadataStr.append(String.format("\"repository\": \"%s\",", metadata.get("repository")));
+    				metadataStr.append(String.format("\"groupId\": \"%s\",", metadata.get("groupId")));
+    				metadataStr.append(String.format("\"artifactId\": \"%s\",", metadata.get("artifactId")));
+    				metadataStr.append(String.format("\"version\": \"%s\",", metadata.get("version")));
+    				metadataStr.append(String.format("\"packaging\": \"%s\",", metadata.get("packaging")));
+    				metadataStr.append(String.format("\"classification\": \"%s\",", metadata.get("classification")));
+    				metadataStr.append(String.format("\"decorator\": \"%s\",", metadata.get("decorator")));
+    				metadataStr.append(String.format("\"groups\": \"%s\",", metadata.get("groups")));
+    				metadataStr.append(String.format("\"countries\": \"%s\",", metadata.get("countries")));
+    				metadataStr.append(String.format("\"name\": \"%s\",", metadata.get("name")));
+    				metadataStr.append(String.format("\"source_type\": \"%s\",", metadata.get("source_type")));
+    				metadataStr.append("}");
+    				ps.println(metadataStr);
 	        	}
 	        	finally {
 	        		ps.close();
@@ -223,7 +220,7 @@ public class GatewayAPI {
 	        	//Replace file in gzip bundle
 		        source.toFile().delete();
 		        Runtime.getRuntime().exec(
-		                new String[] {"tar", "czvf", source.toString(), "-C", source.getParent().toString(), "*"},
+		                new String[] {"tar", "czvf", source.toString(), "-C", source.getParent().toString(), source.toString(), source.getParent().toString()+"/.metadata.json"},
 		                new String[] {},
 		                source.toFile().getAbsoluteFile().getParentFile()).waitFor();
 	        }
