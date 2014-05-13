@@ -221,11 +221,12 @@ public class GatewayAPI {
 		        source.toFile().delete();
 		        
 		        String[] baseParams=new String[] {"tar", "czvf", source.toString(), "-C", source.getParent().toString()};
-		        List<String> gzipParams = Arrays.asList(baseParams);
+		        List<String> gzipParams = new ArrayList<String>(Arrays.asList(baseParams));
 		        File[] children = source.getParent().toFile().listFiles();
 		        for (File f : children) {
 		        	gzipParams.add(f.getAbsolutePath());
 		        }
+		        
 		        LOG.info("Packing command: "+gzipParams.toString());
 		        Runtime.getRuntime().exec(
 		        		gzipParams.toArray(new String[1]),
