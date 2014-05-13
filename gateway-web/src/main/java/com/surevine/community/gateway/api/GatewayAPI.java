@@ -219,8 +219,16 @@ public class GatewayAPI {
 	        	
 	        	//Replace file in gzip bundle
 		        source.toFile().delete();
+		        
+		        String[] baseParams=new String[] {"tar", "czvf", source.toString(), "-C", source.getParent().toString()};
+		        List<String> gzipParams = Arrays.asList(baseParams);
+		        File[] children = source.getParent().toFile().listFiles();
+		        for (File f : children) {
+		        	gzipParams.add(f.getAbsolutePath());
+		        }
+		        LOG.info("Packing command: "+gzipParams.toString());
 		        Runtime.getRuntime().exec(
-		                new String[] {"tar", "czvf", source.toString(), "-C", source.getParent().toString(), source.toString(), source.getParent().toString()+"/.metadata.json"},
+		        		gzipParams.toArray(new String[1]),
 		                new String[] {},
 		                source.toFile().getAbsoluteFile().getParentFile()).waitFor();
 	        }
