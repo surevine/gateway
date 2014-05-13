@@ -224,7 +224,7 @@ public class GatewayAPI {
 		        List<String> gzipParams = new ArrayList<String>(Arrays.asList(baseParams));
 		        File[] children = source.getParent().toFile().listFiles();
 		        for (File f : children) {
-		        	gzipParams.add(f.getAbsolutePath());
+		        	gzipParams.add(f.getName());
 		        }
 		        
 		        LOG.info("Packing command: "+gzipParams.toString());
