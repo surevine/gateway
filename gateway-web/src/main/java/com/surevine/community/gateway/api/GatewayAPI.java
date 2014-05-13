@@ -209,7 +209,7 @@ public class GatewayAPI {
     				metadataStr.append(String.format("\"groups\": \"%s\",", metadata.get("groups")));
     				metadataStr.append(String.format("\"countries\": \"%s\",", metadata.get("countries")));
     				metadataStr.append(String.format("\"name\": \"%s\",", metadata.get("name")));
-    				metadataStr.append(String.format("\"source_type\": \"%s\",", metadata.get("source_type")));
+    				metadataStr.append(String.format("\"source_type\": \"%s\"", metadata.get("source_type")));
     				metadataStr.append("}");
     				ps.println(metadataStr);
 	        	}
