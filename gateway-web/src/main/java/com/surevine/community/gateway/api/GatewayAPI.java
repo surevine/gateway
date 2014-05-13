@@ -200,9 +200,20 @@ public class GatewayAPI {
 	        		Iterator<String> metadataKeys = metadata.keySet().iterator();
 	        		while (metadataKeys.hasNext()) {
 	        			String key = metadataKeys.next();
-	        			StringBuilder sb = new StringBuilder();
-	        			sb.append(key).append('=').append(metadata.get(key));
-	        			ps.println(key);
+	    				final StringBuilder metadataStr = new StringBuilder();
+	    				metadataStr.append("{");
+	    				metadataStr.append(String.format("\"repository\": \"%s\",", metadata.get("repository")));
+	    				metadataStr.append(String.format("\"groupId\": \"%s\",", metadata.get("groupId")));
+	    				metadataStr.append(String.format("\"artifactId\": \"%s\",", metadata.get("artifactId")));
+	    				metadataStr.append(String.format("\"version\": \"%s\",", metadata.get("version")));
+	    				metadataStr.append(String.format("\"packaging\": \"%s\",", metadata.get("packaging")));
+	    				metadataStr.append(String.format("\"classification\": \"%s\",", metadata.get("classification")));
+	    				metadataStr.append(String.format("\"decorator\": \"%s\",", metadata.get("decorator")));
+	    				metadataStr.append(String.format("\"groups\": \"%s\",", metadata.get("groups")));
+	    				metadataStr.append(String.format("\"countries\": \"%s\",", metadata.get("countries")));
+	    				metadataStr.append(String.format("\"name\": \"%s\",", metadata.get("name")));
+	    				metadataStr.append(String.format("\"source_type\": \"%s\",", metadata.get("source_type")));
+	    				metadataStr.append("}");
 	        		}
 	        	}
 	        	finally {
