@@ -2,6 +2,8 @@ package com.surevine.community.gateway.hooks;
 
 import com.surevine.community.gateway.GatewayProperties;
 import com.surevine.community.gateway.history.History;
+
+import org.apache.commons.logging.Log;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -208,57 +210,76 @@ public class FileImportContextHook implements GatewayContextHook {
      * @throws InterruptedException
      */
     private Path importFileAtPath(Path target) throws IOException, InterruptedException {
-        // Skip any incomplete transfers.
-        if (target.getFileName().toString().endsWith(GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION))) {
-        	LOG.info("Skipping processing of " +target.getFileName());
-            return null;
-        }
-
-        History.getInstance().add(String.format("Received file %s for import.", target.getFileName()));
-
-        // Create a working directory
-        LOG.info("Creating working directory");
-        final Path workingDirectory = Paths.get(
-                GatewayProperties.get(GatewayProperties.IMPORT_WORKING_DIR),
-                UUID.randomUUID().toString());
-        Files.createDirectories(workingDirectory);
-
-        // Extract.
-        LOG.info("Extracting received file.");
-        Runtime.getRuntime().exec(
-                new String[] {"tar", "xzvf", target.toAbsolutePath().toString(),
-                        "-C", workingDirectory.toString()},
-                new String[] {},
-                target.toFile().getAbsoluteFile().getParentFile()).waitFor();
-
-        // Read the metadata.json file.
-        LOG.info("Reading metadata file.");
-        final TypeReference<HashMap<String,String>> typeRef = new TypeReference<HashMap<String,String>
-                   >() {};
-        final HashMap<String,String> properties = new ObjectMapper(
-                new JsonFactory()).readValue(
-                Paths.get(workingDirectory.toString(),
-                ".metadata.json").toFile(), typeRef);
-
-        // FIXME: This should be in a Git / Gitlab post-receive hook
-        // Add git remote if we're doing a push.
-					/*Runtime.getRuntime().exec(
-							new String[] {"git", "remote", target.getFileName().toString()},
-							new String[] {},
-							target.getParent().toFile()).waitFor();*/
-
-        // Run import hooks with metadata and file
-        final File[] received = workingDirectory.toFile().listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(final File dir, final String name) {
-                return !name.equals(".metadata.json");
-            }});
-
-        for (final File file : received) {
-            Hooks.callPreImport(file.toPath(), properties);
-        }
-
-        Hooks.callImportTransfer(received, properties);
-        return workingDirectory;
+    	try {
+	        // Skip any incomplete transfers.
+	        if (target.getFileName().toString().endsWith(GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION))) {
+	        	LOG.info("Skipping processing of " +target.getFileName()+" as the transfer is incomplete");
+	            return null;
+	        }
+	        
+	        // On some systems, this method is getting called via a modified event during cleanup - detect incomplete directories and skip processing
+	        if (!target.toFile().exists()) {
+	        	LOG.info("Skipping processing of "+target.getFileName()+" as the transfer file no longer exists (is it being cleaned up?)");
+	        	return null;
+	        }
+	
+	        History.getInstance().add(String.format("Received file %s for import.", target.getFileName()));
+	
+	        UUID randomUUID = UUID.randomUUID();
+	        
+	        // Create a working directory
+	        LOG.info("Creating working directory under randomly generated uuid: "+randomUUID);
+	        final Path workingDirectory = Paths.get(
+	                GatewayProperties.get(GatewayProperties.IMPORT_WORKING_DIR), randomUUID.toString());
+	        Files.createDirectories(workingDirectory);
+	
+	        // Extract.
+	        LOG.info("Extracting received file: "+target.toAbsolutePath());
+	        Runtime.getRuntime().exec(
+	        		new String[] 	{	"tar", 
+	        							"xzvf", target.toAbsolutePath().toString(),
+	        							"-C", workingDirectory.toString()
+	                        		},
+	                        		new String[] {},
+	                        		target.toFile().getAbsoluteFile().getParentFile()
+	                        		).waitFor();
+	
+	        // Read the metadata.json file.
+	        LOG.info("Reading metadata file.");
+	        final TypeReference<HashMap<String,String>> typeRef = new TypeReference<HashMap<String,String>>() {};
+	        
+	        File metadataFile =  Paths.get(workingDirectory.toString(), ".metadata.json").toFile();
+	        if (!metadataFile.exists()) {
+	        	LOG.info("Skipping processing of "+target.getFileName()+" as the metadata file no longer exists (is it being cleaned up?)");
+	        	return null;
+	        }
+	        
+	        final HashMap<String,String> properties = new ObjectMapper(new JsonFactory()).readValue(metadataFile, typeRef);
+	
+	        // FIXME: This should be in a Git / Gitlab post-receive hook
+	        // Add git remote if we're doing a push.
+						/*Runtime.getRuntime().exec(
+								new String[] {"git", "remote", target.getFileName().toString()},
+								new String[] {},
+								target.getParent().toFile()).waitFor();*/
+	
+	        // Run import hooks with metadata and file
+	        final File[] received = workingDirectory.toFile().listFiles(new FilenameFilter() {
+	            @Override
+	            public boolean accept(final File dir, final String name) {
+	                return !name.equals(".metadata.json");
+	            }});
+	
+	        for (final File file : received) {
+	            Hooks.callPreImport(file.toPath(), properties);
+	        }
+	
+	        Hooks.callImportTransfer(received, properties);
+	        return workingDirectory;
+    	}
+    	catch (Exception e) {
+    		LOG.log(Level.WARNING, "Processing of input file at "+target+" aborted abnormally due to the following exception: "+e);
+    		return null;	
+    	}
     }
 }
