@@ -12,13 +12,13 @@ import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.surevine.community.gateway.properties.AlfrescoProperties;
+import com.surevine.community.gateway.properties.CMISProperties;
 
-public class TestAlfrescoUploadImportTransportHook {
+public class TestCMISUploadImportTransportHook {
 
 	private static File OUTPUT_DIR=new File("/tmp/alfresco_gateway_test");
 	static {
-		String outputDirFromProps=System.getProperty(TestAlfrescoUploadImportTransportHook.class.getName().concat(".OUTPUT_DIR"));
+		String outputDirFromProps=System.getProperty(TestCMISUploadImportTransportHook.class.getName().concat(".OUTPUT_DIR"));
 		if (outputDirFromProps!=null) {
 			OUTPUT_DIR=new File(outputDirFromProps);
 		}
@@ -58,6 +58,6 @@ public class TestAlfrescoUploadImportTransportHook {
 	public void testBasicTransfer() throws IOException {
 		File[] files = new File[1];
 		files[0]=createFileToTransfer("Sometimes I wish I had a cat. All I’ve ever had was a head, and that the seagulls took", "testBasicTransfer");
-		new AlfrescoUploadImportTransportHook().deployMainArtifact(files, getTestProperties());
+		new CMISUploadImportTransportHook().deployMainArtifact(files, getTestProperties());
 	}
 }

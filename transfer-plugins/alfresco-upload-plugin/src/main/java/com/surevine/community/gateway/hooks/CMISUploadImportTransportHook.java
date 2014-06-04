@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
-import com.surevine.community.gateway.properties.AlfrescoProperties;
+import com.surevine.community.gateway.properties.CMISProperties;
 
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
@@ -27,9 +27,9 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
  
-public class AlfrescoUploadImportTransportHook implements GatewayImportTransferHook {
+public class CMISUploadImportTransportHook implements GatewayImportTransferHook {
 	
-	private static final Logger LOG = Logger.getLogger(AlfrescoUploadImportTransportHook.class.getName());
+	private static final Logger LOG = Logger.getLogger(CMISUploadImportTransportHook.class.getName());
 	
 	protected void deployMainArtifact(final File[] received, final Map<String, String> propertiesIn) {
 		
@@ -39,13 +39,13 @@ public class AlfrescoUploadImportTransportHook implements GatewayImportTransferH
 		
 		Preconditions.checkArgument(received.length > 0, "No files recieved.  Must be one file to deploy to Alfresco");
 		
-		for (final String destination : AlfrescoProperties.listDestinations()) {
+		for (final String destination : CMISProperties.listDestinations()) {
 			try {
-				String target= "http://"+AlfrescoProperties.get(destination, AlfrescoProperties.HOST)+":"+AlfrescoProperties.get(destination, AlfrescoProperties.PORT)+"/alfresco/service/api/cmis";
-				String userName = AlfrescoProperties.get(destination, AlfrescoProperties.USERNAME);
-				String password = AlfrescoProperties.get(destination, AlfrescoProperties.PASSWORD);
-	            String siteId = AlfrescoProperties.get(destination, AlfrescoProperties.SITE);
-	            String uploadDir=AlfrescoProperties.get(destination, AlfrescoProperties.FOLDER);
+				String target= "http://"+CMISProperties.get(destination, CMISProperties.HOST)+":"+CMISProperties.get(destination, CMISProperties.PORT)+"/alfresco/service/api/cmis";
+				String userName = CMISProperties.get(destination, CMISProperties.USERNAME);
+				String password = CMISProperties.get(destination, CMISProperties.PASSWORD);
+	            String siteId = CMISProperties.get(destination, CMISProperties.SITE);
+	            String uploadDir=CMISProperties.get(destination, CMISProperties.FOLDER);
 	            if (uploadDir==null) {
 	            	uploadDir="";
 	            }
