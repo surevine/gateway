@@ -9,8 +9,8 @@
 		<version>1.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
 	</parent>
-	<artifactId>alfresco-upload-plugin</artifactId>
-	<name>alfresco-upload-plugin</name>
+	<artifactId>cmis-upload-plugin</artifactId>
+	<name>cmis-upload-plugin</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>
 		<!-- GATEWAY -->
