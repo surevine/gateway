@@ -166,6 +166,7 @@
 		<module>transfer-plugins/nexus-deploy-plugin</module>
 		<module>transfer-plugins/shell-transfer-plugin</module>
 		<module>transfer-plugins/sftp-transfer-plugin</module>
+		<module>transfer-plugins/cmis-upload-plugin</module>
     	<module>jboss-module</module>
 		<module>gateway-web</module>
   </modules>
