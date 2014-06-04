@@ -80,7 +80,7 @@ public class GatewayAPI {
 	 * 
 	 * Uses a multipart form upload. Invokeable:
 	 * 
-	 * curl -X POST -F "filename=myproject.tar.gz" -F "file=@myproject.tar.gz" http://gateway/gateway/api/export/
+	 * curl -XPOST -F "filename=myproject.tar.gz" -F "file=@myproject.tar.gz" http://gateway/gateway/api/export/
 	 * 
 	 * The content must be a gzipped tarball and must contain a file named
 	 * .metadata.json with key-value metadata properties in it.

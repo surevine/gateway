@@ -29,8 +29,7 @@ public class Hooks {
         
         for (final GatewayPreExportHook hook : hooks) {
         	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
-    		History.getInstance().add(String.format("Running %s.",
-    				hook.getClass().getSimpleName()));
+    		History.getInstance().add(String.format("Running %s.", hook.getClass().getSimpleName()));
         	
             hook.call(transferQueue);
             
@@ -66,15 +65,12 @@ public class Hooks {
 	 * @param properties Metadata associated with the file.
 	 * @throws GatewayTransferException If submission should be rejected.
 	 */
-	public static void callPreImport(final Path source,
-			final Map<String, String> properties) {
+	public static void callPreImport(final Path source, final Map<String, String> properties) {
         final ServiceLoader<GatewayPreImportHook> hooks = ServiceLoader.load(GatewayPreImportHook.class);
         
         for (final GatewayPreImportHook hook : hooks) {
         	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
-    		History.getInstance().add(String.format("Running %s against %s.",
-    				hook.getClass().getSimpleName(),
-    				source.getName(source.getNameCount()-1)));
+    		History.getInstance().add(String.format("Running %s against %s.", hook.getClass().getSimpleName(), source.getName(source.getNameCount()-1)));
         	
             hook.call(source, properties);
             
@@ -94,9 +90,7 @@ public class Hooks {
         
         for (final GatewayImportTransferHook hook : hooks) {
         	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
-    		History.getInstance().add(String.format("Running %s against %s.",
-    				hook.getClass().getSimpleName(),
-    				Joiner.on(",").join(received)));
+    		History.getInstance().add(String.format("Running %s against %s.", hook.getClass().getSimpleName(), Joiner.on(",").join(received)));
         	
             hook.call(received, properties);
             

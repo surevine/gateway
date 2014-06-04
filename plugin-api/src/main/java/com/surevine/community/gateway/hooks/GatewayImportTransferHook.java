@@ -14,4 +14,6 @@ import java.util.Map;
 public interface GatewayImportTransferHook {
 
 	void call(File[] received, Map<String, String> properties);
+	
+	boolean supports(Map<String, String> properties);
 }

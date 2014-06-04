@@ -21,16 +21,12 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 		LOG.info("Checking properties for Nexus deployment.");
 		
 		// Generic
-		Preconditions.checkArgument(received.length == 1,
-				String.format("%d files received. I only know how to deploy 1 to Nexus.", received.length));
+		Preconditions.checkArgument(received.length == 1, String.format("%d files received. I only know how to deploy 1 to Nexus.", received.length));
 		
 		// Maven-specific
-		Preconditions.checkNotNull(properties.get(MavenKey.GROUP_ID.toString()),
-				"Group ID must be specified to deploy to Nexus.");
-		Preconditions.checkNotNull(properties.get(MavenKey.ARTIFACT_ID.toString()),
-				"Artifact ID must be specified to deploy to Nexus.");
-		Preconditions.checkNotNull(properties.get(MavenKey.SOURCE_TYPE.toString()),
-				"Source type must be specified to deploy to Nexus.");
+		Preconditions.checkNotNull(properties.get(MavenKey.GROUP_ID.toString()), "Group ID must be specified to deploy to Nexus.");
+		Preconditions.checkNotNull(properties.get(MavenKey.ARTIFACT_ID.toString()), "Artifact ID must be specified to deploy to Nexus.");
+		Preconditions.checkNotNull(properties.get(MavenKey.SOURCE_TYPE.toString()), "Source type must be specified to deploy to Nexus.");
 		
 		if (properties.get(MavenKey.SOURCE_TYPE.toString()).equalsIgnoreCase("NEXUS")) {
 			final File target = received[0];
@@ -102,5 +98,10 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 	@Override
 	public void call(final File[] received, final Map<String, String> properties) {
 		deployMainArtifact(received, properties);
+	}
+
+	@Override
+	public boolean supports(Map<String, String> properties) {
+		return properties.get(MavenKey.SOURCE_TYPE.toString()).equalsIgnoreCase("NEXUS");
 	}
 }
