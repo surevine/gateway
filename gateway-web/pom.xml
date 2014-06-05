@@ -32,6 +32,11 @@
 			<artifactId>nexus-deploy-plugin</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+                <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>cmis-upload-plugin</artifactId>
+                        <version>${project.version}</version>
+                </dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sftp-transfer-plugin</artifactId>

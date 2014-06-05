@@ -102,6 +102,13 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 
 	@Override
 	public boolean supports(Map<String, String> properties) {
-		return properties.get(MavenKey.SOURCE_TYPE.toString()).equalsIgnoreCase("NEXUS");
+		LOG.info("Does this bundle support nexus transfer?");
+		try {
+			return properties.get(MavenKey.SOURCE_TYPE.toString()).equalsIgnoreCase("NEXUS");
+		}
+		catch (Exception e) {
+			LOG.info("Exception during support method: "+e);
+			return false;
+		}
 	}
 }

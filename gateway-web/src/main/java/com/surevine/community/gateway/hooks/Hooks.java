@@ -89,12 +89,19 @@ public class Hooks {
         final ServiceLoader<GatewayImportTransferHook> hooks = ServiceLoader.load(GatewayImportTransferHook.class);
         
         for (final GatewayImportTransferHook hook : hooks) {
-        	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
-    		History.getInstance().add(String.format("Running %s against %s.", hook.getClass().getSimpleName(), Joiner.on(",").join(received)));
-        	
-            hook.call(received, properties);
-            
-        	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
+        	try {
+	        	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
+	    		History.getInstance().add(String.format("Running %s against %s.", hook.getClass().getSimpleName(), Joiner.on(",").join(received)));
+	        	if (hook.supports(properties)) {
+	        		hook.call(received, properties);
+	        	}
+	            
+	        	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
+	        	}
+        	catch (Exception e) {
+        		LOG.warning("Exception "+e+" during processing of "+hook.getClass().getName());
+        		e.printStackTrace();
+        	}
         }
 	}
 	
