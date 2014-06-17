@@ -41,6 +41,14 @@ public class CMISUploadImportTransportHook implements GatewayImportTransferHook 
 		
 		for (final String destination : CMISProperties.listDestinations()) {
 			try {
+		           File file = received[0];
+		            
+		            for (int i=0; i < received.length; i++) {
+		            	if (received[i].isFile() && !received[i].getName().startsWith(".")) {
+		            		file=received[i];
+		            	}
+		            }
+		            
 				String target= "http://"+CMISProperties.get(destination, CMISProperties.HOST)+":"+CMISProperties.get(destination, CMISProperties.PORT)+"/alfresco/service/api/cmis";
 				String userName = CMISProperties.get(destination, CMISProperties.USERNAME);
 				String password = CMISProperties.get(destination, CMISProperties.PASSWORD);
@@ -51,7 +59,7 @@ public class CMISUploadImportTransportHook implements GatewayImportTransferHook 
 	            }
 	            String targetFolder="/Sites/"+siteId+"/documentLibrary/"+uploadDir;
 	            
-	            LOG.info("Sending "+received[0]+" to "+target+":"+targetFolder);
+	            LOG.info("Sending "+file+" to "+target+":"+targetFolder);
 	            
 	            // default factory implementation
 	            SessionFactory factory = SessionFactoryImpl.newInstance();
@@ -71,13 +79,15 @@ public class CMISUploadImportTransportHook implements GatewayImportTransferHook 
 	            
 	            // properties 
 	            // (minimal set: name and object type id)
-	            String name = received[0].getName();
+	            String name = file.getName();
 	            Map<String, Object> CMISProperties = new HashMap<String, Object>();
 	            CMISProperties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
 	            CMISProperties.put(PropertyIds.NAME, name);
 	
+	 
+	            
 	            try {
-	            	byte[] content = Files.toByteArray(received[0]); 
+	            	byte[] content = Files.toByteArray(file); 
 	            	InputStream stream = new ByteArrayInputStream(content);
 	            	ContentStream contentStream = new ContentStreamImpl(name, BigInteger.valueOf(content.length), "text/plain", stream);
 	
@@ -85,22 +95,20 @@ public class CMISUploadImportTransportHook implements GatewayImportTransferHook 
 	
 	            	//TODO:  Find a better way than exception handling to determine if this exists
 	            	try {
-	            		Document existing = (Document)(session.getObjectByPath(targetFolder+"/"+received[0].getName()));
+	            		Document existing = (Document)(session.getObjectByPath(targetFolder+"/"+file.getName()));
 	            		existing.setContentStream(contentStream, true);
-	            		
 	            	}
 	            	catch (CmisObjectNotFoundException e) { //Means object does not exist, so create it
 	                	parent.createDocument(CMISProperties, contentStream, VersioningState.MAJOR);
 	            	}
-	            	
 	            }
 	            catch (IOException e) {
-	            		LOG.warning("Could not read from content file "+received[0]+" due to: "+e);
+	            		LOG.warning("Could not read from content file due to: "+e);
 	            		e.printStackTrace();
 	            }
 			}
 			catch (CmisBaseException e) {
-				LOG.warning("CMIS exception when attempting to upload "+received[0]+" to destination "+destination+".  See stderr for details");
+				LOG.warning("CMIS exception when attempting to upload to destination "+destination+".  See stderr for details");
 				e.printStackTrace();
 			}
 		}
@@ -113,7 +121,8 @@ public class CMISUploadImportTransportHook implements GatewayImportTransferHook 
 
 	@Override
 	public boolean supports(Map<String, String> properties) {
-		boolean rV= properties.get("source_type").toString().equalsIgnoreCase("ALFRESCO");
+		LOG.info("Source type is: "+properties.get("SOURCE_TYPE"));
+		boolean rV= properties.get("SOURCE_TYPE").toString().equalsIgnoreCase("ALFRESCO");
 		LOG.info("Does this class support this artifact? "+rV);
 		return rV;
 	}

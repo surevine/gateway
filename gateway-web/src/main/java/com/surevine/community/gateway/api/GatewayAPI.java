@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.json.JSONObject;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -131,17 +133,22 @@ public class GatewayAPI {
 				try {
 					return new URI(uri);
 				} catch (final URISyntaxException e) {
-					throw new RuntimeException(String.format(
-							"The supplied URI [%s] is invalid.", uri), e);
+					throw new RuntimeException(String.format("The supplied URI [%s] is invalid.", uri), e);
 				}
 			}
 		});
 		
+		HashMap<String, String> metadata = new HashMap<String, String>();
+		try {
+			metadata = readMetadata(source);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		
 		// Setup transfer queue
 		final Set<TransferItem> transferQueue = new HashSet<TransferItem>();
 		for (final URI destination : destinations) {
-			transferQueue.add(new TransferItem(destination, source,
-					new HashMap<String, String>(properties)));
+			transferQueue.add(new TransferItem(destination, source, metadata));
 		}
 		
 		// Call preExport hooks.
@@ -169,6 +176,33 @@ public class GatewayAPI {
 		History.getInstance().add(String.format("Finished exporting %s.", properties.get("filename")));
 		
 		//FIXME: Send notifications, add UI hooks. 
+	}
+	
+	protected HashMap<String, String> readMetadata(java.nio.file.Path source) throws IOException, InterruptedException {
+		HashMap<String, String> rV = new HashMap<String, String>();
+		
+        LOG.info("Extracting received file for metadata import");
+		
+        File extractMetadata = new File(source.getParent().toFile(), ".extract_metadata");
+        LOG.info("Extracting metadata to: "+extractMetadata);
+        extractMetadata.mkdirs();
+        Runtime.getRuntime().exec(
+                new String[] {"tar", "xzvf", source.toString(), "-C", extractMetadata.toString()},
+                new String[] {},
+                source.toFile().getAbsoluteFile().getParentFile()).waitFor();
+
+        java.nio.file.Path metadataFile = new File(extractMetadata, ".metadata.json").toPath();
+        
+        byte[] encoded = Files.readAllBytes(metadataFile);
+        String jsonString = new String(encoded);
+        LOG.info("Metadata String: "+jsonString);
+        JSONObject json = new JSONObject(jsonString);
+
+        for (Object o : json.keySet()) {
+        	rV.put(o.toString(), json.getString(o.toString()));
+        }
+        
+		return rV;
 	}
 	
 	protected void replaceMetadataFiles(Set<TransferItem> transferQueue) throws IOException, InterruptedException {
@@ -199,17 +233,14 @@ public class GatewayAPI {
 	        	try {
     				final StringBuilder metadataStr = new StringBuilder();
     				metadataStr.append("{");
-    				metadataStr.append(String.format("\"repository\": \"%s\",", metadata.get("repository")));
-    				metadataStr.append(String.format("\"groupId\": \"%s\",", metadata.get("groupId")));
-    				metadataStr.append(String.format("\"artifactId\": \"%s\",", metadata.get("artifactId")));
-    				metadataStr.append(String.format("\"version\": \"%s\",", metadata.get("version")));
-    				metadataStr.append(String.format("\"packaging\": \"%s\",", metadata.get("packaging")));
-    				metadataStr.append(String.format("\"classification\": \"%s\",", metadata.get("classification")));
-    				metadataStr.append(String.format("\"decorator\": \"%s\",", metadata.get("decorator")));
-    				metadataStr.append(String.format("\"groups\": \"%s\",", metadata.get("groups")));
-    				metadataStr.append(String.format("\"countries\": \"%s\",", metadata.get("countries")));
-    				metadataStr.append(String.format("\"name\": \"%s\",", metadata.get("name")));
-    				metadataStr.append(String.format("\"source_type\": \"%s\"", metadata.get("source_type")));
+    				Iterator<String> props = metadata.keySet().iterator();
+    				while (props.hasNext()) {
+    					String s = props.next();
+    					metadataStr.append("\"").append(s).append("\" : \"").append(metadata.get(s)).append("\"");
+    					if (props.hasNext()) {
+    						metadataStr.append(",");
+    					}
+    				}
     				metadataStr.append("}");
     				ps.println(metadataStr);
 	        	}

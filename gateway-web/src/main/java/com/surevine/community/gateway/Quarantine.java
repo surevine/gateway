@@ -25,8 +25,7 @@ public class Quarantine {
 			Files.createDirectories(quarantine);
 		}
 		
-		final Path target = Paths.get(quarantine.toString(),
-				properties.get("filename"));
+		final Path target = Paths.get(quarantine.toString(), properties.get("filename"));
 		
 		Files.write(target, file, StandardOpenOption.CREATE);
 		
