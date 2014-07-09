@@ -78,8 +78,8 @@ ln -sf "$INSTALL_DIR/apache-maven-3.1.1" "$INSTALL_DIR/maven" >> $LOG_FILE
 
 # NAT Nexus to port 80 using iptables
 print_progress 25
-iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8081
-iptables-save
+iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8081 >> $LOG_FILE
+service iptables save >> $LOG_FILE
 
 # Customise Nexus
 print_progress 30
