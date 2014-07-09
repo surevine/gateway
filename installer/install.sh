@@ -76,6 +76,11 @@ print_progress 20
 tar xzvf "packages/apache-maven-3.1.1-bin.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
 ln -sf "$INSTALL_DIR/apache-maven-3.1.1" "$INSTALL_DIR/maven" >> $LOG_FILE
 
+# NAT Nexus to port 80 using iptables
+print_progress 25
+iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8081
+iptables-save
+
 # Customise Nexus
 print_progress 30
 cp "packages/fluent-hc-4.2.5.jar" "$INSTALL_DIR/nexus/nexus/WEB-INF/lib/" >> $LOG_FILE
