@@ -6,6 +6,8 @@ LOG_FILE="install.log"
 INSTALL_DIR="/opt/gateway"
 NEXUS_USER="nexus"
 WILDFLY_USER="gateway"
+CREATEREPO_RPM="packages/createrepo-0.4.11-3.el5.noarch.rpm" # For Centos 5.10
+# CREATEREPO_RPM="packages/createrepo-0.9.9-18.el6.noarch.rpm" # For Centos 6
 
 # Run script with umask 0022 but reset umask to original value on
 # exit, even if an error occurs during installation
@@ -80,6 +82,16 @@ ln -sf "$INSTALL_DIR/apache-maven-3.1.1" "$INSTALL_DIR/maven" >> $LOG_FILE
 print_progress 25
 iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8081 >> $LOG_FILE
 service iptables save >> $LOG_FILE
+
+# Install createrepo dependency
+print_progress 27
+IS_AMZN=`uname -a | grep amzn | wc -l`
+if [ $IS_AMZN -ne 0 ]
+then
+	yum -y install createrepo >> $LOG_FILE
+else
+	rpm -ivh CREATEREPO_RPM >> $LOG_FILE
+fi
 
 # Customise Nexus
 print_progress 30
