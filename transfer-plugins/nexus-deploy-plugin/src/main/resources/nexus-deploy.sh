@@ -1,6 +1,8 @@
 #!/bin/sh
 
 export PATH=$PATH:/opt/gateway/maven/bin
+export JAVA_HOME=/opt/gateway/java/jre
+export PATH=/opt/gateway/java/jre/bin:$PATH
 
 CMD=""
 LOG="/tmp/nexus-deploy.log"
