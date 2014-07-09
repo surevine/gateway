@@ -7,6 +7,19 @@ INSTALL_DIR="/opt/gateway"
 NEXUS_USER="nexus"
 WILDFLY_USER="gateway"
 
+# Run script with umask 0022 but reset umask to original value on
+# exit, even if an error occurs during installation
+INITIAL_UMASK=`umask`
+function reset_umask {
+	umask $INITIAL_UMASK
+}
+trap reset_umask EXIT
+
+LOG_FILE="install.log"
+INSTALL_DIR="/opt/gateway"
+NEXUS_USER="nexus"
+WILDFLY_USER="gateway"
+
 clear
 
 function print_progress() {
