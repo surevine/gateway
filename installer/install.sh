@@ -79,7 +79,7 @@ tar xzvf "packages/apache-maven-3.1.1-bin.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
 ln -sf "$INSTALL_DIR/apache-maven-3.1.1" "$INSTALL_DIR/maven" >> $LOG_FILE
 
 # Create keystore and configure Nexus' Jetty for SSL
-cat << EOF |  /opt/gateway/java/jre/bin/keytool -genkey -alias `hostname` -keyalg RSA -keystore keystore.jks -keysize 2048
+cat << EOF |  /opt/gateway/java/jre/bin/keytool -genkey -alias `hostname` -keyalg RSA -keystore /opt/gateway/nexus/conf/keystore.jks -keysize 2048
 changeit
 changeit
 `hostname`
