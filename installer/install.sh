@@ -92,8 +92,8 @@ yes
 
 EOF >> $LOG_FILE
 
-cp -f "packages/nexus_jetty.xml" "$INSTALL_DIR/nexus/config/jetty.xml" >> $LOG_FILE
-echo "application-port-ssl=8443" > "INSTALL_DIR/nexus/config/nexus.properties" 
+cp -f "packages/nexus_jetty.xml" "$INSTALL_DIR/nexus/conf/jetty.xml" >> $LOG_FILE
+echo "application-port-ssl=8443" > "INSTALL_DIR/nexus/conf/nexus.properties" 
 
 # NAT Nexus to port 80/443 using iptables
 print_progress 25
