@@ -6,8 +6,17 @@ LOG_FILE="install.log"
 INSTALL_DIR="/opt/gateway"
 NEXUS_USER="nexus"
 WILDFLY_USER="gateway"
+
+# Adjust the below rpm paths depending on your version of CENTOS
+
 CREATEREPO_RPM="packages/createrepo-0.4.11-3.el5.noarch.rpm" # For Centos 5.10
 # CREATEREPO_RPM="packages/createrepo-0.9.9-18.el6.noarch.rpm" # For Centos 6
+
+LIBXML_RPM="packages/libxml2-python-2.6.26-2.1.21.el5_9.3.x86_64.rpm" # For Centos 5.10
+#LIBXML_RPM="packages/libxml2-python-2.7.6-14.el6_5.2.x86_64.rpm"
+
+PYTHON_DELTA_RPM="packages/python-deltarpm-3.5-0.5.20090913git.el6.x86_64.rpm"
+LIBXML="packages/libxml2-2.7.6-14.el6_5.2.x86_64.rpm"
 
 # Run script with umask 0022 but reset umask to original value on
 # exit, even if an error occurs during installation
@@ -97,7 +106,9 @@ if [ $IS_AMZN -ne 0 ]
 then
 	yum -y install createrepo >> $LOG_FILE
 else
+        rpm -ivh $LIBXML_RPM >> $LOG_FILE
 	rpm -ivh $CREATEREPO_RPM >> $LOG_FILE
+	
 fi
 
 # Customise Nexus
@@ -142,8 +153,7 @@ cp "packages/nexus-deploy.sh" $INSTALL_DIR/ >> $LOG_FILE
 print_progress 35
 sed -i "s/jboss.bind.address:127.0.0.1}\"/jboss.bind.address:0.0.0.0}\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
 sed -i "s/jboss.bind.address.management:127.0.0.1}\"/jboss.bind.address.management:0.0.0.0}\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
-sed -i "s/socket-binding=.http./socket-binding=\"http\" max-post-size=\"2147483648\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/sta
-ndalone.xml" >> $LOG_FILE 
+sed -i "s/socket-binding=.http./socket-binding=\"http\" max-post-size=\"2147483648\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/sta ndalone.xml" >> $LOG_FILE 
 sed -i "s/-Xmx512m/-Xmx2048m/g" "$INSTALL_DIR/wildfly/standalone.conf" >> $LOG_FILE
 mkdir -p "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" >> $LOG_FILE
 ln -sf "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" "$INSTALL_DIR/config" >> $LOG_FILE
