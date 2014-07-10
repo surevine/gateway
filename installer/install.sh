@@ -97,7 +97,7 @@ if [ $IS_AMZN -ne 0 ]
 then
 	yum -y install createrepo >> $LOG_FILE
 else
-	rpm -ivh CREATEREPO_RPM >> $LOG_FILE
+	rpm -ivh $CREATEREPO_RPM >> $LOG_FILE
 fi
 
 # Customise Nexus
