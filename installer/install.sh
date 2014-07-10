@@ -81,7 +81,7 @@ ln -sf "$INSTALL_DIR/apache-maven-3.1.1" "$INSTALL_DIR/maven" >> $LOG_FILE
 # Create keystore and configure Nexus' Jetty for SSL
 /opt/gateway/java/jre/bin/keytool -genkey -noprompt -alias `hostname` -dname "cn=`hostname`" -storepass changeit -keyalg RSA -keystore /opt/gateway/nexus/conf/keystore.jks -keysize 2048 -keypass changeit >> $LOG_FILE
 
-cp -f "packages/nexus_jetty.xml" "$INSTALL_DIR/nexus/conf/jetty.xml" >> $LOG_FILE
+cp -f "nexus_jetty.xml" "$INSTALL_DIR/nexus/conf/jetty.xml" >> $LOG_FILE
 echo "application-port-ssl=8443" > "INSTALL_DIR/nexus/conf/nexus.properties" 
 
 # NAT Nexus to port 80/443 using iptables
