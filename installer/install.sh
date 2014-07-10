@@ -78,9 +78,26 @@ print_progress 20
 tar xzvf "packages/apache-maven-3.1.1-bin.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
 ln -sf "$INSTALL_DIR/apache-maven-3.1.1" "$INSTALL_DIR/maven" >> $LOG_FILE
 
-# NAT Nexus to port 80 using iptables
+# Create keystore and configure Nexus' Jetty for SSL
+cat << EOF |  /opt/gateway/java/jre/bin/keytool -genkey -alias `hostname` -keyalg RSA -keystore keystore.jks -keysize 2048
+changeit
+changeit
+`hostname`
+
+
+
+
+
+yes
+
+EOF >> $LOG_FILE
+
+cp -f "packages/nexus_jetty.xml" "$INSTALL_DIR/nexus/config/jetty.xml"
+
+# NAT Nexus to port 80/443 using iptables
 print_progress 25
 iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8081 >> $LOG_FILE
+iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 8443 >> $LOG_FILE
 service iptables save >> $LOG_FILE
 
 # Install createrepo dependency

@@ -46,6 +46,9 @@ curl -skL "https://github.com/surevine/nexus-gateway-plugin/archive/master.zip" 
 curl -skL "https://nexus.surevine.net/content/repositories/thirdparty/centos/createrepo/0.4.11-3.el5.noarch/createrepo-0.4.11-3.el5.noarch.rpm" -o installer/packages/createrepo-0.4.11-3.el5.noarch.rpm
 curl -skL "https://nexus.surevine.net/content/repositories/thirdparty/centos/createrepo/0.9.9-18.el6.noarch/createrepo-0.9.9-18.el6.noarch.rpm" -o installer/packages/createrepo-0.9.9-18.el6.noarch.rpm
 
+# Nexus jetty config
+curl -skL "https://raw.githubusercontent.com/surevine/gateway/master/installer/nexus_jetty.xml" -o installer.packages/nexus_jetty.xml
+
 # Suck down release files
 curl -skL "https://nexus.surevine.net/service/local/artifact/maven/redirect?r=TPS&g=com.surevine.community&a=gateway-web&p=war&v=LATEST" -o "installer/packages/gateway.war"
 # nexus-gateway-plugin needed here:
