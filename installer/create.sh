@@ -25,16 +25,16 @@ cat > installer/config/module.xml << EOF
 EOF
 
 # Suck down source control files
-curl -sk "https://raw.github.com/surevine/gateway/master/gateway-web/src/main/resources/gateway.properties" -o "installer/config/gateway.properties"
-curl -sk "https://raw.github.com/surevine/gateway/master/javascript-plugins/src/main/resources/export-rules.js" -o "installer/config/export-rules.js"
-curl -sk "https://raw.github.com/surevine/gateway/master/javascript-plugins/src/main/resources/import-filter.js" -o "installer/config/import-filter.js"
-curl -sk "https://raw.github.com/surevine/gateway/master/javascript-plugins/src/main/resources/javascript-hook.properties" -o "installer/config/javascript-hook.properties"
-curl -sk "https://raw.github.com/surevine/gateway/master/javascript-plugins/src/main/resources/metadata-filter.js" -o "installer/config/metadata-filter.js"
-curl -sk "https://raw.github.com/surevine/gateway/master/javascript-plugins/src/main/resources/transport1.js" -o "installer/config/transport1.js"
-curl -sk "https://raw.github.com/surevine/gateway/master/transfer-plugins/nexus-deploy-plugin/src/main/resources/nexus.properties" -o "installer/config/nexus.properties"
-curl -sk "https://raw.github.com/surevine/gateway/master/transfer-plugins/nexus-deploy-plugin/src/main/resources/nexus-deploy.sh" -o "installer/packages/nexus-deploy.sh"
-curl -sk "https://raw.github.com/surevine/gateway/master/installer/README" -o "installer/README"
-curl -sk "https://raw.github.com/surevine/gateway/master/installer/install.sh" -o "installer/install.sh"
+curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/gateway-web/src/main/resources/gateway.properties" -o "installer/config/gateway.properties"
+curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/javascript-plugins/src/main/resources/export-rules.js" -o "installer/config/export-rules.js"
+curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/javascript-plugins/src/main/resources/import-filter.js" -o "installer/config/import-filter.js"
+curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/javascript-plugins/src/main/resources/javascript-hook.properties" -o "installer/config/javascript-hook.properties"
+curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/javascript-plugins/src/main/resources/metadata-filter.js" -o "installer/config/metadata-filter.js"
+curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/javascript-plugins/src/main/resources/transport1.js" -o "installer/config/transport1.js"
+curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/transfer-plugins/nexus-deploy-plugin/src/main/resources/nexus.properties" -o "installer/config/nexus.properties"
+curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/transfer-plugins/nexus-deploy-plugin/src/main/resources/nexus-deploy.sh" -o "installer/packages/nexus-deploy.sh"
+curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/installer/README" -o "installer/README"
+curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/installer/install.sh" -o "installer/install.sh"
 chmod +x installer/packages/nexus-deploy.sh
 chmod +x installer/install.sh
 
