@@ -91,7 +91,7 @@ ln -sf "$INSTALL_DIR/apache-maven-3.1.1" "$INSTALL_DIR/maven" >> $LOG_FILE
 /opt/gateway/java/jre/bin/keytool -genkey -noprompt -alias `hostname` -dname "cn=`hostname`" -storepass changeit -keyalg RSA -keystore /opt/gateway/nexus/conf/keystore.jks -keysize 2048 -keypass changeit >> $LOG_FILE
 
 cp -f "nexus_jetty.xml" "$INSTALL_DIR/nexus/conf/jetty.xml" >> $LOG_FILE
-echo "application-port-ssl=8443" > "$INSTALL_DIR/nexus/conf/nexus.properties" 
+echo "application-port-ssl=8443" >> "$INSTALL_DIR/nexus/conf/nexus.properties" 
 
 # NAT Nexus to port 80/443 using iptables
 print_progress 25
@@ -106,6 +106,7 @@ if [ $IS_AMZN -ne 0 ]
 then
 	yum -y install createrepo >> $LOG_FILE
 else
+	#rpm -ivh $LIBXML >> $LOG_FILE  # Centos 6 only
         rpm -ivh $LIBXML_RPM >> $LOG_FILE
 	rpm -ivh $CREATEREPO_RPM >> $LOG_FILE
 	
