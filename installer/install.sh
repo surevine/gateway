@@ -111,9 +111,9 @@ if [ $IS_AMZN -ne 0 ]
 then
 	yum -y install createrepo >> $LOG_FILE
 else
-	#rpm -Uvh $LIBXML >> $LOG_FILE  # Centos 6 only
-        rpm -Uvh $LIBXML_RPM >> $LOG_FILE
-	rpm -Uvh $CREATEREPO_RPM >> $LOG_FILE
+	#rpm -Uvh $LIBXML || true 2>> $LOG_FILE >> $LOG_FILE  # Centos 6 only
+        rpm -Uvh $LIBXML_RPM  || true 2>> $LOG_FILE >> $LOG_FILE
+	rpm -Uvh $CREATEREPO_RPM  || true 2>> $LOG_FILE >> $LOG_FILE
 	
 fi
 
