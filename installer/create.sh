@@ -36,7 +36,6 @@ curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/transfer-plu
 curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/installer/README" -o "installer/README"
 curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/installer/install.sh" -o "installer/install.sh"
 curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/installer/maven_home.tar.gz" -o "installer/packages/maven_home.tar.gz"
-curl -sk "http://apache.mirrors.timporter.net/maven/maven-3/3.2.2/binaries/apache-maven-3.2.2-bin.tar.gz" -o "installer/packages/maven.tar.gz"
 
 chmod +x installer/packages/nexus-deploy.sh
 chmod +x installer/install.sh
