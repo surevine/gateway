@@ -34,7 +34,7 @@ public class CMISUploadImportTransportHook implements GatewayImportTransferHook 
 	protected void deployMainArtifact(final File[] received, final Map<String, String> propertiesIn) {
 		
 		if (received.length>1) {
-			LOG.warning(received.length+" files were found, but only one ("+received[0].getName()+") will be processed");
+			LOG.info(received.length+" files were found, but only one will be processed");
 		}
 		
 		Preconditions.checkArgument(received.length > 0, "No files recieved.  Must be one file to deploy to Alfresco");
@@ -83,8 +83,6 @@ public class CMISUploadImportTransportHook implements GatewayImportTransferHook 
 	            Map<String, Object> CMISProperties = new HashMap<String, Object>();
 	            CMISProperties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
 	            CMISProperties.put(PropertyIds.NAME, name);
-	
-	 
 	            
 	            try {
 	            	byte[] content = Files.toByteArray(file); 
