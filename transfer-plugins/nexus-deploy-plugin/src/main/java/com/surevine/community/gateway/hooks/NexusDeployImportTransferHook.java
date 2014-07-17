@@ -43,8 +43,8 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 				final List<String> flags = new ArrayList<String>();
 				
 				//If no repository ID is specified, default to the "local-releases" repository
-				if (!properties.containsKey(MavenKey.REPOSITORY_ID)) {
-					properties.put(MavenKey.REPOSITORY_ID, "local-releases");
+				if (!properties.containsKey(MavenKey.REPOSITORY_ID.toString())) {
+					properties.put(MavenKey.REPOSITORY_ID.toString(), "local-releases");
 				}
 				
 				for (final MavenKey key : MavenKey.values()) {
