@@ -26,11 +26,6 @@ function reset_umask {
 }
 trap reset_umask EXIT
 
-LOG_FILE="install.log"
-INSTALL_DIR="/opt/gateway"
-NEXUS_USER="nexus"
-WILDFLY_USER="gateway"
-
 clear
 
 function print_progress() {
@@ -82,6 +77,11 @@ print_progress 16
 tar xzvf "packages/wildfly-8.0.0.Final.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
 ln -sf "$INSTALL_DIR/wildfly-8.0.0.Final" "$INSTALL_DIR/wildfly" >> $LOG_FILE
 
+# System users
+print_progress 18
+id -u $NEXUS_USER 1>> $LOG_FILE 2>> $LOG_FILE || useradd $NEXUS_USER >> $LOG_FILE
+id -u $WILDFLY_USER 1>> $LOG_FILE 2>> $LOG_FILE || useradd $WILDFLY_USER >> $LOG_FILE
+
 # Extract Maven
 print_progress 20
 tar xzvf "packages/apache-maven-3.1.1-bin.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
@@ -126,11 +126,6 @@ cp "packages/nexus-gateway-plugin.jar" "$INSTALL_DIR/nexus/nexus/WEB-INF/lib/" >
 # Add gateway war
 print_progress 31
 cp "packages/gateway.war" "$INSTALL_DIR/wildfly/standalone/deployments/" >> $LOG_FILE
-
-# System users
-print_progress 32
-id -u $NEXUS_USER 1>> $LOG_FILE 2>> $LOG_FILE || useradd $NEXUS_USER >> $LOG_FILE
-id -u $WILDFLY_USER 1>> $LOG_FILE 2>> $LOG_FILE || useradd $WILDFLY_USER >> $LOG_FILE
 
 # Nexus service script
 print_progress 33
