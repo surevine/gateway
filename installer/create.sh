@@ -35,6 +35,8 @@ curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/transfer-plu
 curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/transfer-plugins/nexus-deploy-plugin/src/main/resources/nexus-deploy.sh" -o "installer/packages/nexus-deploy.sh"
 curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/installer/README" -o "installer/README"
 curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/installer/install.sh" -o "installer/install.sh"
+curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/installer/maven_home.tar.gz" -o "installer/packages/maven_home.tar.gz"
+
 chmod +x installer/packages/nexus-deploy.sh
 chmod +x installer/install.sh
 
