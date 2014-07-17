@@ -8,7 +8,8 @@ public enum MavenKey {
 	FILE("file"),
 	REPOSITORY("repository"),
 	SOURCE_TYPE("source_type"),
-	URL("url");
+	URL("url"),
+	REPOSITORY_ID("repositoryId");
 	
 	private String token;
 	

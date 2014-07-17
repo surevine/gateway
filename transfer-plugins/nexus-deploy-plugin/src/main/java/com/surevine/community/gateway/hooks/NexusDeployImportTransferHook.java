@@ -41,6 +41,12 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 				
 				// Push into Nexus
 				final List<String> flags = new ArrayList<String>();
+				
+				//If no repository ID is specified, default to the "local-releases" repository
+				if (!properties.containsKey(MavenKey.REPOSITORY_ID)) {
+					properties.put(MavenKey.REPOSITORY_ID, "local-releases");
+				}
+				
 				for (final MavenKey key : MavenKey.values()) {
 					if (properties.containsKey(key.toString())) {
 						flags.add(String.format("-D%s=%s", key.toString(), properties.get(key.toString())));
@@ -104,7 +110,10 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 	public boolean supports(Map<String, String> properties) {
 		LOG.info("Does this bundle support nexus transfer?");
 		try {
-			return properties.get(MavenKey.SOURCE_TYPE.toString()).equalsIgnoreCase("NEXUS");
+			LOG.info("Source type is: "+properties.get("SOURCE_TYPE"));
+			boolean rV= properties.get("SOURCE_TYPE").toString().equalsIgnoreCase("NEXUS");
+			LOG.info("Does this class support this artifact? "+rV);
+			return rV;
 		}
 		catch (Exception e) {
 			LOG.info("Exception during support method: "+e);
