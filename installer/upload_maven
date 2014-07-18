@@ -1,0 +1,160 @@
+#!/bin/sh
+set -e
+
+# These values are hard coded to the script
+NEXUS_USER="admin"
+NEXUS_PASS="admin123"
+NEXUS_HOST="10.66.2.218"
+NEXUS_PORT=8081
+NEXUS_REPOSITORY="releases"
+LABEL_FILE="$HOME/.securitylabel.xml.tmp"
+
+# These values are configured by script arguments
+TARGET_FILE="$1"
+
+NEXUS_GROUP_ID=
+NEXUS_ARTIFACT_ID=
+NEXUS_VERSION=
+NEXUS_PACKAGING=
+
+LABEL_CLASSIFICATION=
+LABEL_DECORATOR=
+LABEL_GROUPS=
+LABEL_COUNTRIES=
+
+# if there are no arguments, go interactive
+if [ $# == 0 ]; then
+  echo
+  echo "Usage:"
+  echo "    (interactive mode): ./upload [filename]"
+  echo "    (command flags):    ./upload -g [groupId] -a [artifactId] -v [version] -p [packaging] -C [classification] -D [decorator] -G [groups] -E [countries]"
+  echo
+  echo "    e.g. ./upload securitylabels-1.0.jar"
+  echo "         ./upload securitylabels-1.0.jar -g com.surevine.nexus -a securitylabels -v 1.0 -p rpm -C COMMERCIAL -D "IN CONFIDENCE" -G STAFF,FINANCE,HR -E UK,FR,BE"
+  echo
+  exit 1
+elif [ $# == 1 ]; then
+  echo "Entering interactive mode. Please define the following Nexus metadata for your upload:"
+  read -p "Group ID: "       NEXUS_GROUP_ID
+  read -p "Artifact ID: "    NEXUS_ARTIFACT_ID
+  read -p "Version: "        NEXUS_VERSION
+  read -p "Packaging: "      NEXUS_PACKAGING
+  echo
+  echo "And now the security label metadata:"
+  echo
+  read -p "Classification: " LABEL_CLASSIFICATION
+  read -p "Decorator: "      LABEL_DECORATOR
+  read -p "Groups: "         LABEL_GROUPS
+  read -p "Countries: "      LABEL_COUNTRIES
+  echo
+  echo "You've defined the following values:"
+  echo
+  echo "  Group ID:       $NEXUS_GROUP_ID"
+  echo "  Artifact ID:    $NEXUS_ARTIFACT_ID"
+  echo "  Version:        $NEXUS_VERSION"
+  echo "  Packaging:      $NEXUS_PACKAGING"
+  echo
+  echo "  Classification: $LABEL_CLASSIFICATION"
+  echo "  Decorator:      $LABEL_DECORATOR"
+  echo "  Groups:         $LABEL_GROUPS"
+  echo "  Countries:      $LABEL_COUNTRIES"
+  echo
+
+  read -p "Do you wish to continue with these values? (y/n) " CONTINUE
+  if [ "$CONTINUE" != "y" ]; then
+    echo "Aborting."
+    exit 1
+  fi
+# else use arguments provided
+else
+  while [[ $# > 1 ]]; do key="$1"; shift
+
+  case $key in
+    -g)
+    NEXUS_GROUP_ID="$1"
+    shift
+    ;;
+    -a)
+    NEXUS_ARTIFACT_ID="$1"
+    shift
+    ;;
+    -v)
+    NEXUS_VERSION="$1"
+    shift
+    ;;
+    -p)
+    NEXUS_PACKAGING="$1"
+    shift
+    ;;
+    -C)
+    LABEL_CLASSIFICATION="$1"
+    shift
+    ;;
+    -D)
+    LABEL_DECORATOR="$1"
+    shift
+    ;;
+    -G)
+    LABEL_GROUPS="$1"
+    shift
+    ;;
+    -E)
+    LABEL_COUNTRIES="$1"
+    shift
+    ;;
+    *)
+    ;;
+  esac
+  done
+fi
+
+# Write out security label to file
+cat > $LABEL_FILE <<EOF
+<?xml version="1.0" encoding="UTF-8" ?>
+<securitylabel>
+  <classification>$LABEL_CLASSIFICATION</classification>
+  <decorator>$LABEL_DECORATOR</decorator>
+  <groups>
+EOF
+
+for LABEL_GROUP in $(echo $LABEL_GROUPS | tr "," "\n"); do
+  echo "    <group>$LABEL_GROUP</group>" >> $LABEL_FILE
+done
+
+cat >> $LABEL_FILE <<EOF
+  </groups>
+  <countries>
+EOF
+
+for LABEL_COUNTRY in $(echo $LABEL_COUNTRIES | tr "," "\n"); do
+  echo "    <country>$LABEL_COUNTRY</country>" >> $LABEL_FILE
+done
+
+cat >> $LABEL_FILE <<EOF
+  </countries>
+</securitylabel>
+EOF
+
+# Upload file
+
+echo Deploying security label with maven
+mvn deploy:deploy-file \
+	-Dclassifier=securitylabel \
+        -DgroupId=${NEXUS_GROUP_ID} \
+        -DartifactId=${NEXUS_ARTIFACT_ID} \
+        -Dversion=${NEXUS_VERSION} \
+        -Drepository=${NEXUS_REPOSITORY} \
+        -Durl=http://${NEXUS_HOST}:${NEXUS_PORT}/nexus/content/repositories/${NEXUS_REPOSITORY} \
+        -Dfile=${LABEL_FILE}
+
+echo Uploading main artifact with maven
+mvn deploy:deploy-file \
+	-DgroupId=${NEXUS_GROUP_ID} \ 
+	-DartifactId=${NEXUS_ARTIFACT_ID} \
+	-Dversion=${NEXUS_VERSION} \
+	-Drepository=${NEXUS_REPOSITORY} \
+	-Durl=http://${NEXUS_HOST}:${NEXUS_PORT}/nexus/content/repositories/${NEXUS_REPOSITORY} \
+	-Dfile=${TARGET_FILE}
+
+# Upload security label
+curl -s -F hasPom=false -F r=$NEXUS_REPOSITORY -F e=xml -F g=$NEXUS_GROUP_ID -F a=$NEXUS_ARTIFACT_ID -F v=$NEXUS_VERSION -F c=securitylabel -F p=xml -F file=@$LABEL_FILE -u $NEXUS_USER:$NEXUS_PASS http://$NEXUS_HOST:8081/nexus/service/local/artifact/maven/content
