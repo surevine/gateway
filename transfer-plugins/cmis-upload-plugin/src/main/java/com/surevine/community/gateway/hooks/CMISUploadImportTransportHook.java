@@ -119,9 +119,20 @@ public class CMISUploadImportTransportHook implements GatewayImportTransferHook 
 
 	@Override
 	public boolean supports(Map<String, String> properties) {
-		LOG.info("Source type is: "+properties.get("SOURCE_TYPE"));
-		boolean rV= properties.get("SOURCE_TYPE").toString().equalsIgnoreCase("ALFRESCO");
-		LOG.info("Does this class support this artifact? "+rV);
-		return rV;
+		LOG.info("Does this bundle support nexus transfer?");
+		try {
+			String sourceType=properties.get("source_type");
+			if (sourceType==null) {
+				sourceType=properties.get("SOURCE_TYPE");
+			}
+			LOG.info("Source type is: "+sourceType);
+			boolean rV=sourceType.equalsIgnoreCase("NEXUS");
+			LOG.info("Does this class support this artifact? "+rV);
+			return rV;
+		}
+		catch (Exception e) {
+			LOG.info("Exception during support method: "+e);
+			return false;
+		}
 	}
 }

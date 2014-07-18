@@ -110,8 +110,12 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 	public boolean supports(Map<String, String> properties) {
 		LOG.info("Does this bundle support nexus transfer?");
 		try {
-			LOG.info("Source type is: "+properties.get("SOURCE_TYPE"));
-			boolean rV= properties.get("SOURCE_TYPE").toString().equalsIgnoreCase("NEXUS");
+			String sourceType=properties.get("source_type");
+			if (sourceType==null) {
+				sourceType=properties.get("SOURCE_TYPE");
+			}
+			LOG.info("Source type is: "+sourceType);
+			boolean rV=sourceType.equalsIgnoreCase("NEXUS");
 			LOG.info("Does this class support this artifact? "+rV);
 			return rV;
 		}
