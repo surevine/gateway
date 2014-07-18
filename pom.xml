@@ -176,7 +176,8 @@
 	<distributionManagement>
 		<repository>
 			<id>TPS</id>
-			<url>https://nexus.surevine.net/content/repositories/TPS/</url>
+<!--			<url>https://nexus.surevine.net/content/repositories/TPS/</url>-->
+			<url>http://10.66.2.136:8081/nexus/content/repositories/snapshots</url>
 		</repository>
 	</distributionManagement>
 </project>

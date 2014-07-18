@@ -187,7 +187,7 @@ public class GatewayAPI {
         LOG.info("Extracting metadata to: "+extractMetadata);
         extractMetadata.mkdirs();
         Runtime.getRuntime().exec(
-                new String[] {"tar", "xzvf", source.toString(), "-C", extractMetadata.toString()},
+                new String[] {"tar", "xzvf", source.toString(), ".metadata.json", "-C", extractMetadata.toString()},
                 new String[] {},
                 source.toFile().getAbsoluteFile().getParentFile()).waitFor();
 
@@ -201,6 +201,9 @@ public class GatewayAPI {
         for (Object o : json.keySet()) {
         	rV.put(o.toString(), json.getString(o.toString()));
         }
+        
+        metadataFile.toFile().delete();
+        extractMetadata.delete();
         
 		return rV;
 	}
