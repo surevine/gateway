@@ -110,7 +110,8 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 				lf.add(f);
 			}
 		}
-		deployMainArtifact(lf.toArray(received), properties);
+		File[] rV = new File[1];
+		deployMainArtifact(lf.toArray(rV), properties);
 	}
 
 	@Override
@@ -131,4 +132,5 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 			return false;
 		}
 	}
+	
 }
