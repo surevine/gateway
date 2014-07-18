@@ -93,7 +93,7 @@ mkdir ~gateway/.m2
 tar xzvf packages/maven_home.tar.gz -C ~gateway/.m2 >> $LOG_FILE
 
 # Create keystore and configure Nexus' Jetty for SSL
-/opt/gateway/java/jre/bin/keytool -genkey -noprompt -alias `hostname` -dname "cn=`hostname`" -storepass changeit -keyalg RSA -keystore /opt/gateway/nexus/conf/keystore.jks -keysize 2048 -keypass changeit >> $LOG_FILE
+$INSTALL_DIR/java/jre/bin/keytool -genkey -noprompt -alias `hostname` -dname "cn=`hostname`" -storepass changeit -keyalg RSA -keystore $INSTALL_DIR/nexus/conf/keystore.jks -keysize 2048 -keypass changeit >> $LOG_FILE
 
 cp -f "nexus_jetty.xml" "$INSTALL_DIR/nexus/conf/jetty.xml" >> $LOG_FILE
 echo "application-port-ssl=8443" >> "$INSTALL_DIR/nexus/conf/nexus.properties" 
