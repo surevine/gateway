@@ -86,6 +86,12 @@ id -u $WILDFLY_USER 1>> $LOG_FILE 2>> $LOG_FILE || useradd $WILDFLY_USER >> $LOG
 print_progress 20
 tar xzvf "packages/apache-maven-3.1.1-bin.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
 ln -sf "$INSTALL_DIR/apache-maven-3.1.1" "$INSTALL_DIR/maven" >> $LOG_FILE
+echo 'export M2_HOME=/opt/gateway/maven' >> /etc/bashrc
+echo 'export M2=$M2_HOME/bin' >> /etc/bashrc
+echo 'export PATH=$M2:$PATH' >> /etc/bashrc
+export M2_HOME=/opt/gateway/maven
+export M2=$M2_HOME/bin
+export PATH=$M2:$PATH
 
 # Configure Maven
 print_progress 21
