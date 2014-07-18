@@ -96,7 +96,8 @@ export PATH=$M2:$PATH
 # Configure Maven
 print_progress 21
 mkdir ~gateway/.m2
-tar xzvf packages/maven_home.tar.gz -C ~gateway/.m2 >> $LOG_FILE
+tar xzvf packages/maven_home.tar.gz -C ~${WILDFLY_USER}/.m2 >> $LOG_FILE
+chown -R ${WILDFLY_USER}:${WILDFLY_USER} /home/${WILDFLY_USER}/.m2 >> $LOG_FILE
 
 # Create keystore and configure Nexus' Jetty for SSL
 $INSTALL_DIR/java/jre/bin/keytool -genkey -noprompt -alias `hostname` -dname "cn=`hostname`" -storepass changeit -keyalg RSA -keystore $INSTALL_DIR/nexus/conf/keystore.jks -keysize 2048 -keypass changeit >> $LOG_FILE
