@@ -1,14 +1,6 @@
 #!/bin/sh
 set -e
 
-# These values are hard coded to the script
-NEXUS_USER="admin"
-NEXUS_PASS="admin123"
-NEXUS_HOST="10.66.2.218"
-NEXUS_PORT=8081
-NEXUS_REPOSITORY="releases"
-LABEL_FILE="$HOME/.securitylabel.xml.tmp"
-
 # These values are configured by script arguments
 TARGET_FILE="$1"
 
@@ -22,6 +14,13 @@ LABEL_DECORATOR=
 LABEL_GROUPS=
 LABEL_COUNTRIES=
 
+NEXUS_HOST=
+NEXUS_PORT=
+
+ # These values are hard-coded in the script
+NEXUS_REPOSITORY="releases"
+LABEL_FILE="$HOME/.securitylabel.xml"
+
 # if there are no arguments, go interactive
 if [ $# == 0 ]; then
   echo
@@ -34,13 +33,18 @@ if [ $# == 0 ]; then
   echo
   exit 1
 elif [ $# == 1 ]; then
-  echo "Entering interactive mode. Please define the following Nexus metadata for your upload:"
+  echo "Entering interactive mode. Please define the following Nexus metadata for your upload (Step 1 of 3):"
   read -p "Group ID: "       NEXUS_GROUP_ID
   read -p "Artifact ID: "    NEXUS_ARTIFACT_ID
   read -p "Version: "        NEXUS_VERSION
   read -p "Packaging: "      NEXUS_PACKAGING
   echo
-  echo "And now the security label metadata:"
+  echo "Please enter some details of the repository you wish to upload to (Step 2 of 3):"
+  read -p "Nexus Hostname: " 	NEXUS_HOST
+  read -p "Nexus Port: " 	NEXUS_PORT
+  read -p "Target Repository ID (from your maven settings file): " REPOSITORY_ID
+  echo
+  echo "And now the security label metadata (Step 3 of 3):"
   echo
   read -p "Classification: " LABEL_CLASSIFICATION
   read -p "Decorator: "      LABEL_DECORATOR
@@ -53,6 +57,10 @@ elif [ $# == 1 ]; then
   echo "  Artifact ID:    $NEXUS_ARTIFACT_ID"
   echo "  Version:        $NEXUS_VERSION"
   echo "  Packaging:      $NEXUS_PACKAGING"
+  echo
+  echo "  Nexus Hostname: $NEXUS_HOST"
+  echo "  Nexus Port:     $NEXUS_PORT"
+  echo "  Repository ID:  $REPOSITORY_ID"
   echo
   echo "  Classification: $LABEL_CLASSIFICATION"
   echo "  Decorator:      $LABEL_DECORATOR"
@@ -140,18 +148,21 @@ EOF
 echo Deploying security label with maven
 mvn deploy:deploy-file \
 	-Dclassifier=securitylabel \
-        -DgroupId=${NEXUS_GROUP_ID} \
+        -DgeneratePom=false \
+	-DgroupId=${NEXUS_GROUP_ID} \
         -DartifactId=${NEXUS_ARTIFACT_ID} \
         -Dversion=${NEXUS_VERSION} \
         -Drepository=${NEXUS_REPOSITORY} \
+        -DrepositoryId=${REPOSITORY_ID} \
         -Durl=http://${NEXUS_HOST}:${NEXUS_PORT}/nexus/content/repositories/${NEXUS_REPOSITORY} \
         -Dfile=${LABEL_FILE}
 
 echo Uploading main artifact with maven
 mvn deploy:deploy-file \
-	-DgroupId=${NEXUS_GROUP_ID} \ 
+	-DgroupId=${NEXUS_GROUP_ID} \
 	-DartifactId=${NEXUS_ARTIFACT_ID} \
 	-Dversion=${NEXUS_VERSION} \
 	-Drepository=${NEXUS_REPOSITORY} \
+        -DrepositoryId=${REPOSITORY_ID} \
 	-Durl=http://${NEXUS_HOST}:${NEXUS_PORT}/nexus/content/repositories/${NEXUS_REPOSITORY} \
 	-Dfile=${TARGET_FILE}
