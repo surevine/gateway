@@ -155,6 +155,3 @@ mvn deploy:deploy-file \
 	-Drepository=${NEXUS_REPOSITORY} \
 	-Durl=http://${NEXUS_HOST}:${NEXUS_PORT}/nexus/content/repositories/${NEXUS_REPOSITORY} \
 	-Dfile=${TARGET_FILE}
-
-# Upload security label
-curl -s -F hasPom=false -F r=$NEXUS_REPOSITORY -F e=xml -F g=$NEXUS_GROUP_ID -F a=$NEXUS_ARTIFACT_ID -F v=$NEXUS_VERSION -F c=securitylabel -F p=xml -F file=@$LABEL_FILE -u $NEXUS_USER:$NEXUS_PASS http://$NEXUS_HOST:8081/nexus/service/local/artifact/maven/content
