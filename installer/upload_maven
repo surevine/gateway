@@ -25,7 +25,7 @@ if [ $# == 0 ]; then
   echo
   echo "Usage:"
   echo "    (interactive mode): ./upload [filename]"
-  echo "    (command flags):    ./upload -g [groupId] -a [artifactId] -v [version] -C [classification] -D [decorator] -G [groups] -E [countries]"
+  echo "    (command flags):    ./upload -h [hostName] -p [port] -i [repositoryId] -g [groupId] -a [artifactId] -v [version] -C [classification] -D [decorator] -G [groups] -E [countries]"
   echo
   echo "    e.g. ./upload securitylabels-1.0.jar"
   echo "         ./upload securitylabels-1.0.jar -g com.surevine.nexus -a securitylabels -v 1.0 -p rpm -C COMMERCIAL -D "IN CONFIDENCE" -G STAFF,FINANCE,HR -E UK,FR,BE"
@@ -75,6 +75,18 @@ else
   while [[ $# > 1 ]]; do key="$1"; shift
 
   case $key in
+    -h)
+    NEXUS_HOST="$1"
+    shift
+    ;;
+    -p)
+    NEXUS_PORT="$1"
+    shift
+    ;;
+    -i)
+    REPOSITORY_ID="$1"
+    shift
+    ;;
     -g)
     NEXUS_GROUP_ID="$1"
     shift
