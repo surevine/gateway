@@ -126,7 +126,7 @@ public class CMISUploadImportTransportHook implements GatewayImportTransferHook 
 				sourceType=properties.get("SOURCE_TYPE");
 			}
 			LOG.info("Source type is: "+sourceType);
-			boolean rV=sourceType.equalsIgnoreCase("NEXUS");
+			boolean rV=sourceType.equalsIgnoreCase("ALFRESCO");
 			LOG.info("Does this class support this artifact? "+rV);
 			return rV;
 		}
