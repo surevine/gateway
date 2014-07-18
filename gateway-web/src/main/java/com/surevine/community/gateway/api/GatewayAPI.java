@@ -202,9 +202,6 @@ public class GatewayAPI {
         	rV.put(o.toString(), json.getString(o.toString()));
         }
         
-        metadataFile.toFile().delete();
-        extractMetadata.delete();
-        
 		return rV;
 	}
 	
