@@ -187,7 +187,7 @@ public class GatewayAPI {
         LOG.info("Extracting metadata to: "+extractMetadata);
         extractMetadata.mkdirs();
         Runtime.getRuntime().exec(
-                new String[] {"tar", "xzvf", source.toString(), ".metadata.json", "-C", extractMetadata.toString()},
+                new String[] {"tar", "xzvf", source.toString(), "-C", extractMetadata.toString()},
                 new String[] {},
                 source.toFile().getAbsoluteFile().getParentFile()).waitFor();
 

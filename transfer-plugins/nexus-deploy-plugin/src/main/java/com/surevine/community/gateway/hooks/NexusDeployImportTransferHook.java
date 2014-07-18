@@ -103,7 +103,14 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 
 	@Override
 	public void call(final File[] received, final Map<String, String> properties) {
-		deployMainArtifact(received, properties);
+		List<File> lf = new ArrayList<File>(1);
+		for (File f : received) {
+			System.out.println("Recieved : "+f);
+			if (!f.getName().startsWith(".")) {
+				lf.add(f);
+			}
+		}
+		deployMainArtifact(lf.toArray(received), properties);
 	}
 
 	@Override
