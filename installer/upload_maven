@@ -7,7 +7,6 @@ TARGET_FILE="$1"
 NEXUS_GROUP_ID=
 NEXUS_ARTIFACT_ID=
 NEXUS_VERSION=
-NEXUS_PACKAGING=
 
 LABEL_CLASSIFICATION=
 LABEL_DECORATOR=
@@ -26,7 +25,7 @@ if [ $# == 0 ]; then
   echo
   echo "Usage:"
   echo "    (interactive mode): ./upload [filename]"
-  echo "    (command flags):    ./upload -g [groupId] -a [artifactId] -v [version] -p [packaging] -C [classification] -D [decorator] -G [groups] -E [countries]"
+  echo "    (command flags):    ./upload -g [groupId] -a [artifactId] -v [version] -C [classification] -D [decorator] -G [groups] -E [countries]"
   echo
   echo "    e.g. ./upload securitylabels-1.0.jar"
   echo "         ./upload securitylabels-1.0.jar -g com.surevine.nexus -a securitylabels -v 1.0 -p rpm -C COMMERCIAL -D "IN CONFIDENCE" -G STAFF,FINANCE,HR -E UK,FR,BE"
@@ -37,7 +36,6 @@ elif [ $# == 1 ]; then
   read -p "Group ID: "       NEXUS_GROUP_ID
   read -p "Artifact ID: "    NEXUS_ARTIFACT_ID
   read -p "Version: "        NEXUS_VERSION
-  read -p "Packaging: "      NEXUS_PACKAGING
   echo
   echo "Please enter some details of the repository you wish to upload to (Step 2 of 3):"
   read -p "Nexus Hostname: " 	NEXUS_HOST
@@ -56,7 +54,6 @@ elif [ $# == 1 ]; then
   echo "  Group ID:       $NEXUS_GROUP_ID"
   echo "  Artifact ID:    $NEXUS_ARTIFACT_ID"
   echo "  Version:        $NEXUS_VERSION"
-  echo "  Packaging:      $NEXUS_PACKAGING"
   echo
   echo "  Nexus Hostname: $NEXUS_HOST"
   echo "  Nexus Port:     $NEXUS_PORT"
@@ -88,10 +85,6 @@ else
     ;;
     -v)
     NEXUS_VERSION="$1"
-    shift
-    ;;
-    -p)
-    NEXUS_PACKAGING="$1"
     shift
     ;;
     -C)
