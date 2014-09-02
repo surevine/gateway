@@ -21,6 +21,7 @@ LIBXML="packages/libxml2-2.7.6-14.el6_5.2.x86_64.rpm"
 # Run script with umask 0022 but reset umask to original value on
 # exit, even if an error occurs during installation
 INITIAL_UMASK=`umask`
+umask 0022
 function reset_umask {
 	umask $INITIAL_UMASK
 }
