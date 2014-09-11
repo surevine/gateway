@@ -4,7 +4,7 @@ title: Gateway by Surevine
 ## Welcome to the Gateway ##
 
 ### Overview ###
-Although these pages provide some general information about the Gateway
+Although these pages provide some general information about the Gateway,
 the primary purpose (for now) is to outline the test strategy and coding
 standards that will be adhered to, based on principles within the
 [Government Service Design Manual](https://www.gov.uk/service-manual).
