@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="/stylesheets/styles.css">
     <link rel="stylesheet" href="/stylesheets/pygment_trac.css">
+    <link rel="shortcut icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -29,56 +30,48 @@
         </ul>
       </header>
       <section>
-        <h2><a name="welcome-to-the-gateway" class="anchor" href="#welcome-to-the-gateway">
-  <span class="octicon octicon-link"></span></a>Welcome to the Gateway</h2>
+        <h2 id="welcome-to-the-gateway">Welcome to the Gateway</h2>
 
-<h3><a name="overview" class="anchor" href="#overview">
-  <span class="octicon octicon-link"></span></a>Overview</h3>
+<h3 id="overview">Overview</h3>
+<p>Although these pages provide some general information about the Gateway,
+(for now) the primary purpose is to outline the test strategy and coding
+standards that will be adhered to, based on principles within the
+<a href="https://www.gov.uk/service-manual">Government Service Design Manual</a>.</p>
 
-<p>Although these pages provide some general information about the Gateway, (for now) the
-  primary purpose is to outline the test strategy and coding standards that will be
-  adhered to, based on principles within the <a title="Government Service Design Manual" href="https://www.gov.uk/service-manual" target="_blank">Government Service Design Manual</a>.</p>
-
-<h3><a name="test-strategy" class="anchor" href="#test-strategy">
-  <span class="octicon octicon-link"></span></a>Test Strategy</h3>
-
+<h3 id="test-strategy">Test Strategy</h3>
 <p>Test effort will be applied at three key levels; unit, integration and a
-  combination of acceptance and exploratory testing, with the majority of
-  automated test effort applied during unit and integration testing.</p>
+combination of acceptance and exploratory testing, with the majority of
+automated test effort applied during unit and integration testing.</p>
 
 <p>Whilst unit tests are predominantly focused on testing individual units of
-  source code, integration tests will be written to verify combinations or
-  interactions between software modules, components and services. Both unit and
-  integration tests will become assets of the Gateway project, will be
-  self-documenting, and will be executed regularly (via shared continuous
-  integration tools) to provide fast and cost-effective feedback.</p>
+source code, integration tests will be written to verify combinations or
+interactions between software modules, components and services. Both unit and
+integration tests will become assets of the Gateway project, will be
+self-documenting, and will be executed regularly (via shared continuous
+integration tools) to provide fast and cost-effective feedback.</p>
 
-<p><p class="view"><a href="tests.html">Acceptance tests</a> will be written (documented) to verify high-level
-  functionality end-to-end (e.g. exercising key flows of a use case).
-  Acceptance tests may be automated (if appropriate) and will be provided to
-  aid in the delivery of SAT (Site Acceptance Testing).</p>
+<p><a href="/tests.html">Acceptance tests</a> will be written (documented) to
+verify high-level functionality end-to-end (e.g. exercising key flows of a use
+case). Acceptance tests may be automated (if appropriate) and will be provided
+to aid in the delivery of SAT (Site Acceptance Testing).</p>
 
 <p>To accompany unit, integration and acceptance tests, exploratory test
-  sessions will be conducted to find and test less obvious outcomes. These
-  sessions will be time-boxed, and where defects are uncovered, either
-  automated or manual tests will be written to ensure they are not repeated
-  in subsequent iterations.</p>
+sessions will be conducted to find and test less obvious outcomes. These
+sessions will be time-boxed, and where defects are uncovered, either
+automated or manual tests will be written to ensure they are not repeated
+in subsequent iterations.</p>
 
-<h3><a name="code-quality" class="anchor" href="#code-quality">
-  <span class="octicon octicon-link"></span></a>Code Quality</h3>
+<h3 id="code-quality">Code Quality</h3>
+<p>Alongside code quality standards, an appropriate code coverage metric will be
+established to guide the level of unit and integration testing. These metrics
+will be recorded and published as part of the project documentation and tracked
+via a continuous integration platform, along with other static analysis reports
+and measures to ensure the appropriate level of code quality is met. These
+measures will be established on a per project basis and reported on as part of
+a fortnightly sprint process.</p>
 
-<p>Alongside code quality standards, an appropriate code coverage
-  metric will be established to guide the level of unit and
-  integration testing. These metrics will be recorded and published
-  as part of the project documentation and tracked via
-  a continuous integration platform, along with other static
-  analysis reports and measures to ensure the appropriate level of
-  code quality is met. These measures will be established on a per
-  project basis and reported on as part of a fortnightly sprint
-  process.
-
-  Our configurations and templates for these measures will be made
-  available upon request.</p>
+<p>Our configurations and templates for these measures will be made available upon
+request.</p>
 
       </section>
       <footer>

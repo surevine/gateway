@@ -1,6 +1,5 @@
 ---
 title: Acceptance Tests
-layout: page
 ---
 
 ## Acceptance Tests ##
