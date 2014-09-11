@@ -21,7 +21,7 @@ integration tests will become assets of the Gateway project, will be
 self-documenting, and will be executed regularly (via shared continuous
 integration tools) to provide fast and cost-effective feedback.
 
-[Acceptance tests](/tests.html) will be written (documented) to
+[Acceptance tests](/tests) will be written (documented) to
 verify high-level functionality end-to-end (e.g. exercising key flows of a use
 case). Acceptance tests may be automated (if appropriate) and will be provided
 to aid in the delivery of SAT (Site Acceptance Testing).
