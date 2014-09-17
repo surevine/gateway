@@ -182,16 +182,6 @@ public class GatewayAPI {
 		HashMap<String, String> rV = new HashMap<String, String>();
 		
         LOG.info("Extracting received file for metadata import");
-		
-        File extractMetadata = new File(source.getParent().toFile(), ".extract_metadata");
-        LOG.info("Extracting metadata to: "+extractMetadata);
-        extractMetadata.mkdirs();
-        Runtime.getRuntime().exec(
-                new String[] {"tar", "xzvf", source.toString(), "-C", extractMetadata.toString()},
-                new String[] {},
-                source.toFile().getAbsoluteFile().getParentFile()).waitFor();
-
-        java.nio.file.Path metadataFile = new File(extractMetadata, ".metadata.json").toPath();
         
         byte[] encoded = Files.readAllBytes(metadataFile);
         String jsonString = new String(encoded);
