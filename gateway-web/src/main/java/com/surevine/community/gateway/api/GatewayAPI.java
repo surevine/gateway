@@ -31,6 +31,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.io.FileUtils;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.json.JSONObject;
@@ -197,7 +198,16 @@ public class GatewayAPI {
 		
         LOG.info("Extracting received file for metadata import");
         
-        java.nio.file.Path metadataFile = new File(source.getParent().toFile(), ".metadata.json").toPath();
+        File extractMetadata = new File(source.getParent().toFile(), ".extract_metadata");
+        LOG.info("Extracting metadata to: "+extractMetadata);
+        extractMetadata.mkdirs();
+        Runtime.getRuntime().exec(
+                new String[] {"tar", "xzvf", source.toString(), "-C", extractMetadata.toString()},
+                new String[] {},
+                source.toFile().getAbsoluteFile().getParentFile()).waitFor();
+
+        java.nio.file.Path metadataFile = new File(extractMetadata, ".metadata.json").toPath();
+        
         byte[] encoded = Files.readAllBytes(metadataFile);
         String jsonString = new String(encoded);
         LOG.info("Metadata String: "+jsonString);
@@ -206,6 +216,8 @@ public class GatewayAPI {
         for (Object o : json.keySet()) {
         	rV.put(o.toString(), json.getString(o.toString()));
         }
+        
+        FileUtils.deleteDirectory(extractMetadata);
         
 		return rV;
 	}

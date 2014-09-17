@@ -1,5 +1,8 @@
 #!/bin/sh
 
+NEXUS_USERNAME=svbuild
+NEXUS_PASSWORD=',6WRd7(pTLyArKQo'
+
 #
 # Shell script to create an installer package for release manangement
 #
