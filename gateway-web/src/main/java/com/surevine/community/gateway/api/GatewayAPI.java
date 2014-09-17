@@ -197,6 +197,7 @@ public class GatewayAPI {
 		
         LOG.info("Extracting received file for metadata import");
         
+        java.nio.file.Path metadataFile = new File(source.getParent().toFile(), ".metadata.json").toPath();
         byte[] encoded = Files.readAllBytes(metadataFile);
         String jsonString = new String(encoded);
         LOG.info("Metadata String: "+jsonString);
