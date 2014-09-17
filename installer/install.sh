@@ -181,7 +181,7 @@ echo
 echo "Installation complete. Services will be started shortly."
 echo
 echo
-echo "Please note:  Sample SSL keys have been placed into a keystor"e
+echo "Please note:  Sample SSL keys have been placed into a keystore"
 echo "              located at "$INSTALL_DIR"/nexus/config/keystore.jks"
 echo
 echo "              This keystore will need changing to match your environment"
