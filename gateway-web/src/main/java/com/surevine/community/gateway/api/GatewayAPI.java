@@ -148,7 +148,7 @@ public class GatewayAPI {
 		// Setup transfer queue
 		final Set<TransferItem> transferQueue = new HashSet<TransferItem>();
 		for (final URI destination : destinations) {
-			transferQueue.add(new TransferItem(destination, source, metadata));
+			transferQueue.add(new TransferItem(destination, source, cloneMetadata(metadata)));
 		}
 		
 		// Call preExport hooks.
@@ -176,6 +176,20 @@ public class GatewayAPI {
 		History.getInstance().add(String.format("Finished exporting %s.", properties.get("filename")));
 		
 		//FIXME: Send notifications, add UI hooks. 
+	}
+	
+	/**
+	 * Return a clone of the given metadata hash map.  We can modify the clone without modifying
+	 * the original hashmap
+	 * @param toClone Metadata Hashmap to clone
+	 * @return Clone of the original Hashmap
+	 */
+	protected Map<String, String> cloneMetadata(Map<String, String> toClone) {
+		Map<String, String> rV = new HashMap<String, String>();
+		for (String key : toClone.keySet()) {
+			rV.put(key, toClone.get(key)); //Note - this will work because Strings are immutable, if we ever put non-Strings in here we will need to clone the value
+		}
+		return rV;
 	}
 	
 	protected HashMap<String, String> readMetadata(java.nio.file.Path source) throws IOException, InterruptedException {
