@@ -1,4 +1,4 @@
 Gateway (GitHub Pages)
 ======================
 
-Please visit: [](http://surevine.github.io/gateway/)
+Please visit: http://surevine.github.io/gateway/
