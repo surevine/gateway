@@ -1,3 +1,0 @@
-default: FIG_NEWTON_FILE=default.yml --format pretty --tags ~@wip
-wip: FIG_NEWTON_FILE=default.yml --format pretty --tags @wip
-happy_path: FIG_NEWTON_FILE=default.yml --format pretty --tags @happy_path --tags ~@wip
