@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import com.surevine.community.gateway.GatewayProperties;
 import com.surevine.community.gateway.model.TransferItem;
+import com.surevine.community.gateway.hooks.MetadataPersistingTransportHook;
 
 /**
  * Copies an imported file to a file:// destination. 
