@@ -1,7 +1,14 @@
 package com.surevine.community.gateway.hooks;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -49,15 +56,13 @@ public class Hooks {
         
         for (final GatewayExportTransferHook hook : hooks) {
         	LOG.info(String.format("STARTING [%s]", hook.getClass().getName()));
-    		History.getInstance().add(String.format("Running %s.",
-    				hook.getClass().getSimpleName()));
-        	
+    		History.getInstance().add(String.format("Running %s.", hook.getClass().getSimpleName()));
             hook.call(transferQueue);
             
         	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
         }
 	}
-
+	
 	/**
 	 * Call all hooks which review files on receipt, bound for local import.
 	 * 

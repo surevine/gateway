@@ -19,56 +19,55 @@ import com.surevine.community.gateway.model.TransferItem;
  * 
  * @author rich.midwinter@gmail.com
  */
-public class FileCopyExportTransferHook implements GatewayExportTransferHook {
+public class FileCopyExportTransferHook extends MetadataPersistingTransportHook implements GatewayExportTransferHook {
 	
 	private static final Logger LOG = Logger.getLogger(FileCopyExportTransferHook.class.getName());
 
-	public void call(final Set<TransferItem> transferQueue) {
-		for (final TransferItem item : transferQueue) {
-			final Path source = item.getSource();
-			final Map<String, String> metadata = item.getMetadata();
-			final URI destination = item.getDestination();
-			
-			if ("file".equals(destination.getScheme()) && item.isExportable()) {
-				try {
-					LOG.info(String.format("Copying from %s to %s",
-							source.toString(),
-							Paths.get(Paths.get(destination).toString(),
-									source.getFileName().toString())));
-					
-					// We copy to a temporary location then move. This ensures
-					// (i) any watching import doesn't start while a copy has
-					// not completed for a large file and (ii) the move doesn't
-					// prevent subsequent transfer plugins finding the source.
-					final Path temporaryFile = Paths.get(Paths.get(destination).toString(),
-							source.getFileName().toString()
-							+GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION));
-					
-					// Create parent directories
-					Files.createDirectories(Paths.get(item.getDestination()));
-					
-					// Copy source to temporary
-					Files.copy(source, temporaryFile);
-					
-					// Move from temporary to export
-					if (metadata.containsKey("destinationFilename")) {
-						LOG.info("Using destinationFilename key: " +metadata.get("destinationFilename"));
-						copy(temporaryFile, destination, metadata.get("destinationFilename").split(","));
-					} else {
-						LOG.info("No destinationFilename key. Preserving existing filename.");
-						copy(temporaryFile, destination, new String[] { source.getFileName().toString() });
-					}
-					
-					Files.delete(temporaryFile);
-					
-					LOG.info("Copy complete.");
-				} catch (final IOException e) {
-					LOG.log(Level.SEVERE, e.getMessage(), e);
+	public void transferSingleItem(TransferItem item) {
+		final Path source = item.getSource();
+		final Map<String, String> metadata = item.getMetadata();
+		final URI destination = item.getDestination();
+		
+		if ("file".equals(destination.getScheme()) && item.isExportable()) {
+			try {
+				LOG.info(String.format("Copying from %s to %s",
+						source.toString(),
+						Paths.get(Paths.get(destination).toString(),
+								source.getFileName().toString())));
+				
+				// We copy to a temporary location then move. This ensures
+				// (i) any watching import doesn't start while a copy has
+				// not completed for a large file and (ii) the move doesn't
+				// prevent subsequent transfer plugins finding the source.
+				final Path temporaryFile = Paths.get(Paths.get(destination).toString(),
+						source.getFileName().toString()
+						+GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION));
+				
+				// Create parent directories
+				Files.createDirectories(Paths.get(item.getDestination()));
+				
+				// Copy source to temporary
+				Files.copy(source, temporaryFile);
+				
+				// Move from temporary to export
+				if (metadata.containsKey("destinationFilename")) {
+					LOG.info("Using destinationFilename key: " +metadata.get("destinationFilename"));
+					copy(temporaryFile, destination, metadata.get("destinationFilename").split(","));
+				} else {
+					LOG.info("No destinationFilename key. Preserving existing filename.");
+					copy(temporaryFile, destination, new String[] { source.getFileName().toString() });
 				}
-			} else {
-				LOG.warning(String.format("Unable to perform file copy for the %s scheme.", destination.getScheme()));
+				
+				Files.delete(temporaryFile);
+				
+				LOG.info("Copy complete.");
+			} catch (final IOException e) {
+				LOG.log(Level.SEVERE, e.getMessage(), e);
 			}
+		} else {
+			LOG.warning(String.format("Unable to perform file copy for the %s scheme.", destination.getScheme()));
 		}
+		
 	}
 	
 	private void copy(final Path temporaryFile, final URI destinationFolder, final String[] destinationFilenames) throws IOException {
