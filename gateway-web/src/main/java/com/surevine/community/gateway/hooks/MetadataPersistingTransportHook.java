@@ -26,7 +26,18 @@ public abstract class MetadataPersistingTransportHook implements GatewayExportTr
 			final Path source = item.getSource();
 			final Map<String, String> metadata = item.getMetadata();
 			final URI destination = item.getDestination();
-			replaceMetadataFiles(item);
+			try {
+				replaceMetadataFiles(item);
+			}
+			catch (IOException e) {
+				LOG.warning("Encountered IOException when attempting to replace metadata files.  Aborting transfer");
+				break;
+			}
+			catch (InterruptedException e) {
+				LOG.warning("Encountered InterruptedException when attempting to replace metadata files.  Aborting transfer");
+				break;
+			}
+
 			transferSingleItem(item);
 		}
 	}

@@ -154,19 +154,7 @@ public class GatewayAPI {
 		
 		// Call preExport hooks.
 		Hooks.callPreExport(transferQueue);
-		
-		try {
-			replaceMetadataFiles(transferQueue);
-		}
-		catch (IOException e) {
-			LOG.warning("Encountered IOException when attempting to replace metadata files.  Aborting transfer");
-			return;
-		}
-		catch (InterruptedException e) {
-			LOG.warning("Encountered InterruptedException when attempting to replace metadata files.  Aborting transfer");
-			return;
-		}
-		
+
 		// Configurable delay?
 		
 		// Call export transfer hooks
