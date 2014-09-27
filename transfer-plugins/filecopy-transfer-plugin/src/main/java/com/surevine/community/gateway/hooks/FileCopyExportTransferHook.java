@@ -13,17 +13,15 @@ import java.util.logging.Logger;
 
 import com.surevine.community.gateway.GatewayProperties;
 import com.surevine.community.gateway.model.TransferItem;
-//import com.surevine.community.gateway.hooks.MetadataPersistingTransportHook;
+import com.surevine.community.gateway.hooks.MetadataPersistingTransportHook;
 
 /**
  * Copies an imported file to a file:// destination. 
  * 
  * @author rich.midwinter@gmail.com
  */
-//public class FileCopyExportTransferHook extends MetadataPersistingTransportHook implements GatewayExportTransferHook {
+public class FileCopyExportTransferHook extends MetadataPersistingTransportHook implements GatewayExportTransferHook {
 	
-public class FileCopyExportTransferHook {
-
 	private static final Logger LOG = Logger.getLogger(FileCopyExportTransferHook.class.getName());
 
 	public void transferSingleItem(TransferItem item) {
