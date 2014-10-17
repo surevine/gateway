@@ -24,19 +24,19 @@ import java.util.logging.Logger;
  * Watches for new files within a directory. As and when they appear it then
  * extracts them, parses the metadata and calls available PostReceiveHooks for
  * them to distribute to LAN systems.
- * 
+ *
  * @author rich.midwinter@gmail.com
  */
 @RequestScoped
 public class FileImportContextHook implements GatewayContextHook {
-	
+
 	private static final Logger LOG = Logger.getLogger(FileImportContextHook.class.getName());
-	
+
 //	@Inject
 //	private History history;
-	
+
 	private static Thread fileImporter;
-	
+
 	@Override
 	public void init(final ServletContextEvent event) {
         try {
@@ -47,13 +47,12 @@ public class FileImportContextHook implements GatewayContextHook {
         }
 
         LOG.info("Listening for filesystem imports in " + GatewayProperties.get(GatewayProperties.IMPORT_WATCH_DIR));
-		LOG.info("List of export destinations: " +GatewayProperties.get(GatewayProperties.EXPORT_DESTINATIONS));
-		
+
 		fileImporter = new Thread() {{
 				setDaemon(true);
 				setName("FileImportContextHook");
 			}
-			
+
 			public void run() {
 				try {
 					listen();
@@ -63,7 +62,7 @@ public class FileImportContextHook implements GatewayContextHook {
 				}
 			}
 		};
-		
+
 		fileImporter.start();
 	}
 
@@ -96,14 +95,14 @@ public class FileImportContextHook implements GatewayContextHook {
 	private void listen() throws IOException, InterruptedException {
 		final Path importDirectory = Paths.get(GatewayProperties.get(GatewayProperties.IMPORT_WATCH_DIR));
 		Files.createDirectories(importDirectory);
-		
+
 		final WatchService watcher = FileSystems.getDefault().newWatchService();
 		importDirectory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
-		
+
 		while (true) {
 			LOG.info("Awaiting filesystem events.");
 			final WatchKey key = watcher.take();
-			
+
 			for (final WatchEvent<?> event : key.pollEvents()) {
 				final WatchEvent.Kind<?> kind = event.kind();
 
@@ -123,9 +122,9 @@ public class FileImportContextHook implements GatewayContextHook {
                     History.getInstance().add(String.format("Finished importing %s.", target.getFileName()));
 				}
 			}
-			
+
 			LOG.info("Resetting watch key.");
-			
+
 			key.reset();
 		}
 	}
@@ -216,70 +215,70 @@ public class FileImportContextHook implements GatewayContextHook {
 	        	LOG.info("Skipping processing of " +target.getFileName()+" as the transfer is incomplete");
 	            return null;
 	        }
-	        
+
 	        // On some systems, this method is getting called via a modified event during cleanup - detect incomplete directories and skip processing
 	        if (!target.toFile().exists()) {
 	        	LOG.info("Skipping processing of "+target.getFileName()+" as the transfer file no longer exists (is it being cleaned up?)");
 	        	return null;
 	        }
-	
+
 	        History.getInstance().add(String.format("Received file %s for import.", target.getFileName()));
-	
+
 	        UUID randomUUID = UUID.randomUUID();
-	        
+
 	        // Create a working directory
 	        LOG.info("Creating working directory under randomly generated uuid: "+randomUUID);
 	        final Path workingDirectory = Paths.get(
 	                GatewayProperties.get(GatewayProperties.IMPORT_WORKING_DIR), randomUUID.toString());
 	        Files.createDirectories(workingDirectory);
-	
+
 	        // Extract.
 	        LOG.info("Extracting received file: "+target.toAbsolutePath());
 	        Runtime.getRuntime().exec(
-	        		new String[] 	{	"tar", 
+	        		new String[] 	{	"tar",
 	        							"xzvf", target.toAbsolutePath().toString(),
 	        							"-C", workingDirectory.toString()
 	                        		},
 	                        		new String[] {},
 	                        		target.toFile().getAbsoluteFile().getParentFile()
 	                        		).waitFor();
-	
+
 	        // Read the metadata.json file.
 	        LOG.info("Reading metadata file.");
 	        final TypeReference<HashMap<String,String>> typeRef = new TypeReference<HashMap<String,String>>() {};
-	        
+
 	        File metadataFile =  Paths.get(workingDirectory.toString(), ".metadata.json").toFile();
 	        if (!metadataFile.exists()) {
 	        	LOG.info("Skipping processing of "+target.getFileName()+" as the metadata file no longer exists (is it being cleaned up?)");
 	        	return null;
 	        }
-	        
+
 	        final HashMap<String,String> properties = new ObjectMapper(new JsonFactory()).readValue(metadataFile, typeRef);
-	
+
 	        // FIXME: This should be in a Git / Gitlab post-receive hook
 	        // Add git remote if we're doing a push.
 						/*Runtime.getRuntime().exec(
 								new String[] {"git", "remote", target.getFileName().toString()},
 								new String[] {},
 								target.getParent().toFile()).waitFor();*/
-	
+
 	        // Run import hooks with metadata and file
 	        final File[] received = workingDirectory.toFile().listFiles(new FilenameFilter() {
 	            @Override
 	            public boolean accept(final File dir, final String name) {
 	                return !name.equals(".metadata.json");
 	            }});
-	
+
 	        for (final File file : received) {
 	            Hooks.callPreImport(file.toPath(), properties);
 	        }
-	
+
 	        Hooks.callImportTransfer(received, properties);
 	        return workingDirectory;
     	}
     	catch (Exception e) {
     		LOG.log(Level.WARNING, "Processing of input file at "+target+" aborted abnormally due to the following exception: "+e);
-    		return null;	
+    		return null;
     	}
     }
 }
