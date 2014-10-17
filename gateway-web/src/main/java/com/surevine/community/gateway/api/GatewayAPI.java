@@ -44,29 +44,31 @@ import com.surevine.community.gateway.Quarantine;
 import com.surevine.community.gateway.history.History;
 import com.surevine.community.gateway.hooks.GatewayTransferException;
 import com.surevine.community.gateway.hooks.Hooks;
+import com.surevine.community.gateway.management.api.GatewayManagementServiceFacade;
+import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.Project;
 import com.surevine.community.gateway.model.Projects;
 import com.surevine.community.gateway.model.TransferItem;
 
 @Path("/export")
 public class GatewayAPI {
-	
+
 	private static final Logger LOG = Logger.getLogger(GatewayAPI.class.getName());
-	
+
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Collection<Project> getProjects() {
 		return new ArrayList<Project>(Projects.get());
 	}
-	
+
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Project getProject(final @PathParam("id") String id) {
 		return Projects.get(id);
 	}
-	
+
 	@PUT
 	@Path("/enabled/{name}")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -74,17 +76,17 @@ public class GatewayAPI {
 			@FormParam("enabled") final Boolean enabled) {
 		final Project p = Projects.get(name);
 		p.setEnabled(enabled);
-		
+
 		Projects.put(p);
 	}
 
 	/**
 	 * Generic method of submitting content for export.
-	 * 
+	 *
 	 * Uses a multipart form upload. Invokeable:
-	 * 
+	 *
 	 * curl -XPOST -F "filename=myproject.tar.gz" -F "file=@myproject.tar.gz" http://gateway/gateway/api/export/
-	 * 
+	 *
 	 * The content must be a gzipped tarball and must contain a file named
 	 * .metadata.json with key-value metadata properties in it.
 	 */
@@ -92,24 +94,24 @@ public class GatewayAPI {
 	@Path("/")
 	public void upload(final MultipartFormDataInput form) throws IOException, GatewayTransferException, URISyntaxException {
 		LOG.info("Parsing multipart form.");
-		
-		byte[] file = null;		
+
+		byte[] file = null;
 		final Map<String, String> properties = new HashMap<String, String>(form.getFormDataMap().size());
 		final Map<String, List<InputPart>> data = form.getFormDataMap();
 		for (final String key : data.keySet()) {
 			if (key.equals("file")) {
 				final InputPart part = data.get(key).get(0);
-				
-	            final Pattern p = Pattern.compile("filename=\"(.*)\""); 
-	            final Matcher m = p.matcher(part.getHeaders().getFirst("Content-Disposition"));            
+
+	            final Pattern p = Pattern.compile("filename=\"(.*)\"");
+	            final Matcher m = p.matcher(part.getHeaders().getFirst("Content-Disposition"));
 	            if (m.find()) {
 	                properties.put("filename", m.group(1));
 	            }
-				
+
 				file = ByteStreams.toByteArray(part.getBody(InputStream.class, null));
 			} else {
 				final List<InputPart> inputs = data.get(key);
-				
+
 				for (final InputPart part : inputs) { // If there are two values for the same key we're borked.
 					if (part.getMediaType().isCompatible(MediaType.TEXT_PLAIN_TYPE)) {
 						properties.put(key, part.getBodyAsString());
@@ -117,56 +119,44 @@ public class GatewayAPI {
 				}
 			}
 		}
-		
+
 		LOG.info(String.format("Importing %s", properties.get("filename")));
 		History.getInstance().add(String.format("Received file %s for export.", properties.get("filename")));
-		
+
 		// Save file to quarantine.
 		final java.nio.file.Path source = Quarantine.save(file, properties);
-		
-		// Get all possible export destinations (convert from CSV property
-		// String to a List of URIs).
-		final List<String> urls = new ArrayList<String>(Arrays.asList(GatewayProperties.get(
-				GatewayProperties.EXPORT_DESTINATIONS).split(",")));
-		final List<URI> destinations = Lists.transform(urls, new Function<String, URI>() {
-			@Override
-			public URI apply(final String uri) {
-				try {
-					return new URI(uri);
-				} catch (final URISyntaxException e) {
-					throw new RuntimeException(String.format("The supplied URI [%s] is invalid.", uri), e);
-				}
-			}
-		});
-		
+
+		// Retrieve list of destinations from management console
+		final Set<Destination> destinations = GatewayManagementServiceFacade.getInstance().getDestinations();
+
 		HashMap<String, String> metadata = new HashMap<String, String>();
 		try {
 			metadata = readMetadata(source);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		// Setup transfer queue
 		final Set<TransferItem> transferQueue = new HashSet<TransferItem>();
-		for (final URI destination : destinations) {
-			transferQueue.add(new TransferItem(destination, source, cloneMetadata(metadata)));
+		for (final Destination destination : destinations) {
+			transferQueue.add(new TransferItem(destination.getUri(), source, cloneMetadata(metadata)));
 		}
-		
+
 		// Call preExport hooks.
 		Hooks.callPreExport(transferQueue);
 
 		// Configurable delay?
-		
+
 		// Call export transfer hooks
 		Hooks.callExportTransfer(transferQueue);
-		
+
 		// Clean up quarantine.
 		//Quarantine.remove(source);
 		History.getInstance().add(String.format("Finished exporting %s.", properties.get("filename")));
-		
-		//FIXME: Send notifications, add UI hooks. 
+
+		//FIXME: Send notifications, add UI hooks.
 	}
-	
+
 	/**
 	 * Return a clone of the given metadata hash map.  We can modify the clone without modifying
 	 * the original hashmap
@@ -180,12 +170,12 @@ public class GatewayAPI {
 		}
 		return rV;
 	}
-	
+
 	protected HashMap<String, String> readMetadata(java.nio.file.Path source) throws IOException, InterruptedException {
 		HashMap<String, String> rV = new HashMap<String, String>();
-		
+
         LOG.info("Extracting received file for metadata import");
-        
+
         File extractMetadata = new File(source.getParent().toFile(), ".extract_metadata");
         LOG.info("Extracting metadata to: "+extractMetadata);
         extractMetadata.mkdirs();
@@ -195,7 +185,7 @@ public class GatewayAPI {
                 source.toFile().getAbsoluteFile().getParentFile()).waitFor();
 
         java.nio.file.Path metadataFile = new File(extractMetadata, ".metadata.json").toPath();
-        
+
         byte[] encoded = Files.readAllBytes(metadataFile);
         String jsonString = new String(encoded);
         LOG.info("Metadata String: "+jsonString);
@@ -204,9 +194,9 @@ public class GatewayAPI {
         for (Object o : json.keySet()) {
         	rV.put(o.toString(), json.getString(o.toString()));
         }
-        
+
         FileUtils.deleteDirectory(extractMetadata);
-        
+
 		return rV;
 	}
 }
