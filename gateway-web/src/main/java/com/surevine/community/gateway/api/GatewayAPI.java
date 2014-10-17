@@ -127,7 +127,7 @@ public class GatewayAPI {
 		final java.nio.file.Path source = Quarantine.save(file, properties);
 
 		// Retrieve list of destinations from management console
-		final List<Destination> destinations = GatewayManagementServiceFacade.getDestinations();
+		final Set<Destination> destinations = GatewayManagementServiceFacade.getInstance().getDestinations();
 
 		HashMap<String, String> metadata = new HashMap<String, String>();
 		try {
@@ -139,7 +139,7 @@ public class GatewayAPI {
 		// Setup transfer queue
 		final Set<TransferItem> transferQueue = new HashSet<TransferItem>();
 		for (final Destination destination : destinations) {
-			transferQueue.add(new TransferItem(destination.getUrl(), source, cloneMetadata(metadata)));
+			transferQueue.add(new TransferItem(destination.getUri(), source, cloneMetadata(metadata)));
 		}
 
 		// Call preExport hooks.

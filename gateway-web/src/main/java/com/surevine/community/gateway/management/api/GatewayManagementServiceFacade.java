@@ -3,7 +3,9 @@ package com.surevine.community.gateway.management.api;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.ServiceUnavailableException;
@@ -28,14 +30,31 @@ public class GatewayManagementServiceFacade {
 
 	private static final Logger LOG = Logger.getLogger(GatewayManagementServiceFacade.class.getName());
 
-	public static final String serviceBaseUrl = GatewayProperties.get(GatewayProperties.MANAGEMENT_CONSOLE_API_BASE_URL);
+	private final String serviceBaseUrl = GatewayProperties.get(GatewayProperties.MANAGEMENT_CONSOLE_API_BASE_URL);
+
+	private static GatewayManagementServiceFacade _instance = null;
+
+	private GatewayManagementServiceFacade() {
+
+	}
+
+	/**
+	 * Get an instance of GatewayManagementServiceFacade
+	 * @return the GatewayManagementServiceFacade
+	 */
+	public static GatewayManagementServiceFacade getInstance() {
+		if(_instance == null) {
+			_instance = new GatewayManagementServiceFacade();
+		}
+		return _instance;
+	}
 
 	/**
 	 * Retrieve list of destinations from management console API
 	 *
 	 * @return
 	 */
-	public static List<Destination> getDestinations() {
+	public Set<Destination> getDestinations() {
 
 		LOG.info("Requesting destinations from management console API: " + serviceBaseUrl + "/destinations");
 
@@ -48,7 +67,7 @@ public class GatewayManagementServiceFacade {
 		}
 
 		String jsonResponseBody = response.readEntity(String.class);
-		List<Destination> destinations = parseDestinationsFromResponse(jsonResponseBody);
+		Set<Destination> destinations = parseDestinationsFromResponse(jsonResponseBody);
 
 		return destinations;
 	}
@@ -60,8 +79,9 @@ public class GatewayManagementServiceFacade {
 	 * @return List of destinations
 	 * @throws URISyntaxException
 	 */
-	private static List<Destination> parseDestinationsFromResponse(String responseBody) {
-		ArrayList<Destination> destinations = new ArrayList<Destination>();
+	private Set<Destination> parseDestinationsFromResponse(String responseBody) {
+
+		Set<Destination> destinations = new HashSet<Destination>();
 
 		JSONArray jsonDestinations = new JSONArray(responseBody);
 
