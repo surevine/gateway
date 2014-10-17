@@ -56,10 +56,10 @@ public class GatewayManagementServiceFacade {
 	 */
 	public Set<Destination> getDestinations() {
 
-		LOG.info("Requesting destinations from management console API: " + serviceBaseUrl + "/destinations");
+		LOG.info("Requesting destinations from management console API: " + serviceBaseUrl + "/api/destinations");
 
 		Client client = ClientBuilder.newClient();
-		Response response = client.target(serviceBaseUrl + "/destinations")
+		Response response = client.target(serviceBaseUrl + "/api/destinations")
 								.request("application/json").get();
 
 		if(response.getStatusInfo() != Response.Status.OK) {
