@@ -4,8 +4,13 @@ set -e
 
 LOG_FILE="install.log"
 INSTALL_DIR="/opt/gateway"
+CONSOLE_INSTALL_DIR="/opt/gateway-management"
 NEXUS_USER="nexus"
 WILDFLY_USER="gateway"
+POSTGRES_HOST="localhost"
+POSTGRES_DB="gateway-management"
+POSTGRES_USER="console"
+POSTGRES_PASS="console"
 
 # Adjust the below rpm paths depending on your version of CENTOS
 
@@ -38,9 +43,12 @@ function print_progress() {
 echo
 echo "                  Nexus and community gateway installation."
 echo
-echo "Please select an installation directory:"
+echo "Please select a gateway installation directory:"
 read -p "[${INSTALL_DIR}]: " TMP_INSTALL_DIR
 if [[ ! -z "$TMP_INSTALL_DIR" ]]; then INSTALL_DIR="$TMP_INSTALL_DIR"; fi
+echo "Please select a gateway management console installation directory:"
+read -p "[${CONSOLE_INSTALL_DIR}]: " TMP_CONSOLE_INSTALL_DIR
+if [[ ! -z "$TMP_CONSOLE_INSTALL_DIR" ]]; then CONSOLE_INSTALL_DIR="$TMP_CONSOLE_INSTALL_DIR"; fi
 echo
 echo "Please wait..."
 echo
@@ -53,11 +61,11 @@ touch $LOG_FILE
 
 # Header logs
 date >> $LOG_FILE
-echo "Installing to $INSTALL_DIR" >> $LOG_FILE
+echo "Installing gateway to $INSTALL_DIR" >> $LOG_FILE
 
 # Create directory
 if [ -d "$INSTALL_DIR" ]; then
-  echo "Installation directory already exists at $INSTALL_DIR. Aborting."
+  echo "Gateway installation directory already exists at $INSTALL_DIR. Aborting."
   exit 1
 else
   mkdir -p "$INSTALL_DIR"
@@ -168,13 +176,37 @@ mkdir -p "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" >> $
 ln -sf "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" "$INSTALL_DIR/config" >> $LOG_FILE
 cp -r config/* "$INSTALL_DIR/config" >> $LOG_FILE
 
-# Application startup
-print_progress 36
-service nexus start >> $LOG_FILE
-print_progress 38
-service wildfly start >> $LOG_FILE
+# Install management console
+date >> $LOG_FILE
+echo "Installing gateway management console to $CONSOLE_INSTALL_DIR" >> $LOG_FILE
 
+# Create directory
+if [ -d "$CONSOLE_INSTALL_DIR" ]; then
+  echo "Gateway management console installation directory already exists at $CONSOLE_INSTALL_DIR. Aborting."
+  exit 1
+else
+  mkdir -p "$CONSOLE_INSTALL_DIR"
+fi
+
+# Extract management console
+print_progress 38
+unzip "packages/gateway-management.zip" -d "$CONSOLE_INSTALL_DIR" >> $LOG_FILE
+
+# Modify database connection url
+sed -i "s/postgres:\/\/user:password@host\/database/postgres:\/\/$POSTGRES_USER:$POSTGRES_PASS@$POSTGRES_HOST\/$POSTGRES_DB/g" "$CONSOLE_INSTALL_DIR/conf/application.conf" >> $LOG_FILE
+
+
+# Application startup
 print_progress 40
+service nexus start >> $LOG_FILE
+print_progress 42
+service wildfly start >> $LOG_FILE
+print_progress 44
+service postgresql start >> $LOG_FILE
+print_progress 46
+$CONSOLE_INSTALL_DIR/bin/gateway-management >> $LOG_FILE
+
+print_progress 48
 printf "\n"
 
 echo
