@@ -202,11 +202,9 @@ service nexus start >> $LOG_FILE
 print_progress 42
 service wildfly start >> $LOG_FILE
 print_progress 44
-service postgresql start >> $LOG_FILE
-print_progress 46
 $CONSOLE_INSTALL_DIR/bin/gateway-management >> $LOG_FILE
 
-print_progress 48
+print_progress 46
 printf "\n"
 
 echo
