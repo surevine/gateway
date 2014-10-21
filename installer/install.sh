@@ -4,7 +4,6 @@ set -e
 
 LOG_FILE="install.log"
 INSTALL_DIR="/opt/gateway"
-CONSOLE_INSTALL_DIR="/opt/gateway-management"
 NEXUS_USER="nexus"
 WILDFLY_USER="gateway"
 POSTGRES_HOST="localhost"
