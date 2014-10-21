@@ -190,7 +190,7 @@ print_progress 38
 unzip "packages/gateway-management.zip" -d "$CONSOLE_INSTALL_DIR" >> $LOG_FILE
 
 # Modify database connection url
-sed -i "s/postgres:\/\/user:password@host\/database/postgres:\/\/$POSTGRES_USER:$POSTGRES_PASS@$POSTGRES_HOST\/$POSTGRES_DB/g" "$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.conf" >> $LOG_FILE
+sed -i "s/postgres:\/\/user:password@host\/database/postgres:\/\/$POSTGRES_USER:$POSTGRES_PASS@$POSTGRES_HOST\/$POSTGRES_DB/g" "$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.db.conf" >> $LOG_FILE
 
 # Set java version (required for console)
 export JAVA_HOME=$INSTALL_DIR/java
