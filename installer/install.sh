@@ -7,7 +7,7 @@ INSTALL_DIR="/opt/gateway"
 NEXUS_USER="nexus"
 WILDFLY_USER="gateway"
 POSTGRES_HOST="localhost"
-POSTGRES_DB="gateway-management"
+POSTGRES_DB="gatewaymanagement"
 POSTGRES_USER="console"
 POSTGRES_PASS="console"
 
