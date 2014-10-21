@@ -46,10 +46,8 @@ echo
 echo "Please select a gateway installation directory:"
 read -p "[${INSTALL_DIR}]: " TMP_INSTALL_DIR
 if [[ ! -z "$TMP_INSTALL_DIR" ]]; then INSTALL_DIR="$TMP_INSTALL_DIR"; fi
-echo "Please select a gateway management console installation directory:"
-read -p "[${CONSOLE_INSTALL_DIR}]: " TMP_CONSOLE_INSTALL_DIR
-if [[ ! -z "$TMP_CONSOLE_INSTALL_DIR" ]]; then CONSOLE_INSTALL_DIR="$TMP_CONSOLE_INSTALL_DIR"; fi
-echo
+CONSOLE_INSTALL_DIR=${INSTALL_DIR}/console
+
 echo "Please wait..."
 echo
 
