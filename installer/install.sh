@@ -202,7 +202,7 @@ service nexus start >> $LOG_FILE
 print_progress 42
 service wildfly start >> $LOG_FILE
 print_progress 44
-$CONSOLE_INSTALL_DIR/bin/gateway-management >> $LOG_FILE
+$CONSOLE_INSTALL_DIR/bin/gateway-management -DapplyEvolutions.default=true >> $LOG_FILE
 
 print_progress 46
 printf "\n"
