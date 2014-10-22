@@ -109,7 +109,7 @@ chown -R ${WILDFLY_USER}:${WILDFLY_USER} /home/${WILDFLY_USER}/.m2 >> $LOG_FILE
 $INSTALL_DIR/java/jre/bin/keytool -genkey -noprompt -alias `hostname` -dname "cn=`hostname`" -storepass changeit -keyalg RSA -keystore $INSTALL_DIR/nexus/conf/keystore.jks -keysize 2048 -keypass changeit >> $LOG_FILE
 
 cp -f "nexus_jetty.xml" "$INSTALL_DIR/nexus/conf/jetty.xml" >> $LOG_FILE
-echo "application-port-ssl=8443" >> "$INSTALL_DIR/nexus/conf/nexus.properties" 
+echo "application-port-ssl=8443" >> "$INSTALL_DIR/nexus/conf/nexus.properties"
 
 # NAT Nexus to port 80/443 using iptables
 print_progress 25
@@ -127,7 +127,7 @@ else
 	#rpm -Uvh --quiet $LIBXML || true  >> $LOG_FILE  # Centos 6 only
         rpm -Uvh --quiet $LIBXML_RPM  || true >> $LOG_FILE
 	rpm -Uvh --quiet $CREATEREPO_RPM  || true >> $LOG_FILE
-	
+
 fi
 
 # Customise Nexus
@@ -167,7 +167,7 @@ cp "packages/nexus-deploy.sh" $INSTALL_DIR/ >> $LOG_FILE
 print_progress 35
 sed -i "s/jboss.bind.address:127.0.0.1}\"/jboss.bind.address:0.0.0.0}\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
 sed -i "s/jboss.bind.address.management:127.0.0.1}\"/jboss.bind.address.management:0.0.0.0}\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
-sed -i "s/socket-binding=.http./socket-binding=\"http\" max-post-size=\"2147483648\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE 
+sed -i "s/socket-binding=.http./socket-binding=\"http\" max-post-size=\"2147483648\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
 sed -i "s/-Xmx512m/-Xmx2048m/g" "$INSTALL_DIR/wildfly/bin/standalone.conf" >> $LOG_FILE
 mkdir -p "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" >> $LOG_FILE
 ln -sf "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" "$INSTALL_DIR/config" >> $LOG_FILE
@@ -201,7 +201,7 @@ service nexus start >> $LOG_FILE
 print_progress 42
 service wildfly start >> $LOG_FILE
 print_progress 44
-$CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -DapplyEvolutions.default=true >> $LOG_FILE
+$CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -DapplyEvolutions.default=true -Dconfig.file=../conf/application.db.conf >> $LOG_FILE
 
 print_progress 46
 printf "\n"
