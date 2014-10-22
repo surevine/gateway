@@ -1,6 +1,5 @@
 package com.surevine.community.gateway.model;
 
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -9,36 +8,36 @@ import lombok.Getter;
 /**
  * Maintains transfer allow status of a destination and file pairing with
  * associated metadata.
- * 
+ *
  * @author rich.midwinter@gmail.com
  */
 public class TransferItem {
 
 	@Getter
-	private URI destination;
+	private Destination destination;
 
 	@Getter
 	private Path source;
 
 	@Getter
 	private Map<String, String> metadata;
-	
+
 	@Getter
 	private boolean exportable;
-	
-	public TransferItem(final URI destination, final Path source,
+
+	public TransferItem(final Destination destination, final Path source,
 			final Map<String, String> metadata) {
 		this.destination = destination;
 		this.source = source;
 		this.metadata = metadata;
-		
+
 		this.exportable = true;
 	}
-	
+
 	public void setNotExportable() {
 		exportable = false;
 	}
-	
+
 	// Eclipse generated hashCode and equals:
 
 	@Override
