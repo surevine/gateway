@@ -2,6 +2,7 @@ package com.surevine.community.gateway.hooks;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Files;
@@ -45,18 +46,20 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 
 	    	LOG.info(String.format("Processing destination %s [%s]", destination.getName(), destination.getUri().toString()));
 
-		    Set<String> ruleFiles = new HashSet<String>();
+		    Set<Path> ruleFiles = new HashSet<Path>();
 		    try {
 		    	ruleFiles = loadRuleFiles(destination, config);
 		    }
 		    catch(FileNotFoundException e) {
-		    	LOG.warning(String.format("Could not load all rule files for destination %s [%s]. Skipping item export to destination.",
+		    	LOG.warning(String.format("Could not load all rule files for destination %s [%s]. Skipping item export to destination. %s",
 		    				destination.getName(),
-		    				destination.getId()));
+		    				destination.getId(),
+		    				e.getMessage()));
+		    	item.setNotExportable();
 		    	continue;
 		    }
 
-	    	for (final String ruleFile : ruleFiles) {
+	    	for (final Path ruleFile : ruleFiles) {
 	    		LOG.info(String.format("STARTING javascript hook [%s].", ruleFile));
 
 			    final Rule rule = new Rule();
@@ -68,7 +71,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 			    jsEngine.put("destination", destination.getUri().toString());
 
 			    try {
-					jsEngine.eval(new InputStreamReader(getClass().getResourceAsStream(ruleFile)));
+					jsEngine.eval(new InputStreamReader(Files.newInputStream(ruleFile)));
 				} catch (final Exception e) {
 					rule.mandate(false, "Marking rule as failed due to " +e.getMessage());
 
@@ -105,20 +108,19 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 	 * @return Set of string paths of rule files to be executed
 	 * @throws FileNotFoundException
 	 */
-	private Set<String> loadRuleFiles(Destination destination, Properties config) throws FileNotFoundException {
-		Set<String> ruleFiles = new HashSet<String>();
+	private Set<Path> loadRuleFiles(Destination destination, Properties config) throws FileNotFoundException {
+		Set<Path> ruleFiles = new HashSet<Path>();
 
 	    // Include global rule file in rule set (first)
-	    ruleFiles.add(config.getProperty("management.console.global.rules.dir") + "/global.js");
+	    ruleFiles.add(Paths.get(config.getProperty("management.console.global.rules.dir") + "/global.js"));
 
 	    // Include destination-specific rule file in rule set
-	    ruleFiles.add(config.getProperty("management.console.destination.rules.dir") + "/" + destination.getId() + "/custom.js");
+	    ruleFiles.add(Paths.get(config.getProperty("management.console.destination.rules.dir") + "/" + destination.getId() + "/custom.js"));
 
 	    // Ensure all rule files exists
-	    for(String ruleFile : ruleFiles) {
-	    	Path ruleFilePath = Paths.get(ruleFile);
-		    if(!Files.exists(ruleFilePath)) {
-		    	throw new FileNotFoundException("Could not load rule file: " + ruleFilePath.toString());
+	    for(Path ruleFile : ruleFiles) {
+		    if(!Files.exists(ruleFile)) {
+		    	throw new FileNotFoundException("Could not load rule file: " + ruleFile.toString());
 		    }
 	    }
 
