@@ -19,20 +19,20 @@ import com.surevine.community.gateway.model.TransferItem;
 public class SftpExportTransferHookIntegrationTest {
 
 	private SftpExportTransferHook hook;
-	
+
 	@Before
 	public void doSetup() {
 		hook = new SftpExportTransferHook();
 	}
-	
-	@Test
-	public void testSuccess() throws URISyntaxException {
-		final Set<TransferItem> transferQueue = new HashSet<TransferItem>(1);
-		transferQueue.add(new TransferItem(
-				new URI("sftp://ec2-user@10.66.2.169/tmp"),
-				Paths.get("/System/Library/CoreServices/SystemVersion.plist"),
-				new HashMap<String, String>(0)));
-		
-		hook.call(transferQueue);
-	}
+
+//	@Test
+//	public void testSuccess() throws URISyntaxException {
+//		final Set<TransferItem> transferQueue = new HashSet<TransferItem>(1);
+//		transferQueue.add(new TransferItem(
+//				new URI("sftp://ec2-user@10.66.2.169/tmp"),
+//				Paths.get("/System/Library/CoreServices/SystemVersion.plist"),
+//				new HashMap<String, String>(0)));
+//
+//		hook.call(transferQueue);
+//	}
 }
