@@ -195,13 +195,16 @@ sed -i "s/postgres:\/\/user:password@host\/database/postgres:\/\/$POSTGRES_USER:
 # Set java version (required for console)
 export JAVA_HOME=$INSTALL_DIR/java
 
+# Setup console logfile
+CONSOLE_LOG_FILE=$CONSOLE_INSTALL_DIR/gateway-management-1.0/logs/application.log
+
 # Application startup
 print_progress 40
 service nexus start >> $LOG_FILE
 print_progress 42
 service wildfly start >> $LOG_FILE
 print_progress 44
-$CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -DapplyEvolutions.default=true -Dconfig.file=$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.db.conf >> $LOG_FILE
+nohup $CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -DapplyEvolutions.default=true -Dconfig.file=$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.db.conf & >> $CONSOLE_LOG_FILE
 
 print_progress 46
 printf "\n"
