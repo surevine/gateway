@@ -201,7 +201,7 @@ service nexus start >> $LOG_FILE
 print_progress 42
 service wildfly start >> $LOG_FILE
 print_progress 44
-$CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -DapplyEvolutions.default=true -Dconfig.file=../conf/application.db.conf >> $LOG_FILE
+$CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -DapplyEvolutions.default=true -Dconfig.file=$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.db.conf >> $LOG_FILE
 
 print_progress 46
 printf "\n"
