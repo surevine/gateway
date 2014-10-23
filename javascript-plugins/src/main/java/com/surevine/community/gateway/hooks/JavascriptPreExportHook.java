@@ -46,9 +46,9 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 
 	    	LOG.info(String.format("Processing destination %s [%s]", destination.getName(), destination.getUri().toString()));
 
-		    Set<Path> ruleFiles = new HashSet<Path>();
+		    Set<Path> exportRuleFiles = new HashSet<Path>();
 		    try {
-		    	ruleFiles = loadRuleFiles(destination, config);
+		    	exportRuleFiles = loadExportRuleFiles(destination, config);
 		    }
 		    catch(FileNotFoundException e) {
 		    	LOG.warning(String.format("Could not load all rule files for destination %s [%s]. Skipping item export to destination. %s",
@@ -59,7 +59,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 		    	continue;
 		    }
 
-	    	for (final Path ruleFile : ruleFiles) {
+	    	for (final Path ruleFile : exportRuleFiles) {
 	    		LOG.info(String.format("STARTING javascript hook [%s].", ruleFile));
 
 			    final Rule rule = new Rule();
@@ -101,14 +101,14 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 	}
 
 	/**
-	 * Loads all rule files to be executed for destination (including global rules)
+	 * Loads all rule files / filters to be executed for destination (including global rules)
 	 *
 	 * @param destination Destination to load rules for
 	 * @param config Configuration properties
 	 * @return Set of string paths of rule files to be executed
 	 * @throws FileNotFoundException
 	 */
-	private Set<Path> loadRuleFiles(Destination destination, Properties config) throws FileNotFoundException {
+	private Set<Path> loadExportRuleFiles(Destination destination, Properties config) throws FileNotFoundException {
 		Set<Path> ruleFiles = new HashSet<Path>();
 
 	    // Include global rule file in rule set (first)
