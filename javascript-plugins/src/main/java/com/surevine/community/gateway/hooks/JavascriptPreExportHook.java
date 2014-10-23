@@ -112,10 +112,10 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 		Set<Path> ruleFiles = new HashSet<Path>();
 
 	    // Include global rule file in rule set (first)
-	    ruleFiles.add(Paths.get(config.getProperty("management.console.global.rules.dir") + "/global.js"));
+	    ruleFiles.add(Paths.get(config.getProperty("management.console.global.rules.dir") + "/global-export.js"));
 
 	    // Include destination-specific rule file in rule set
-	    ruleFiles.add(Paths.get(config.getProperty("management.console.destination.rules.dir") + "/" + destination.getId() + "/custom.js"));
+	    ruleFiles.add(Paths.get(config.getProperty("management.console.destination.rules.dir") + "/" + destination.getId() + "/export.js"));
 
 	    // Ensure all rule files exists
 	    for(Path ruleFile : ruleFiles) {
