@@ -22,6 +22,7 @@ import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.Rule;
 import com.surevine.community.gateway.model.TransferItem;
 import com.surevine.community.gateway.util.Redis;
+import com.surevine.community.gateway.util.RuleFileService;
 
 public class JavascriptPreExportHook implements GatewayPreExportHook {
 
@@ -46,9 +47,10 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 
 	    	LOG.info(String.format("Processing destination %s [%s]", destination.getName(), destination.getUri().toString()));
 
+	    	RuleFileService ruleFileService = new RuleFileService(config);
 		    Set<Path> exportRuleFiles = new HashSet<Path>();
 		    try {
-		    	exportRuleFiles = loadExportRuleFiles(destination, config);
+		    	exportRuleFiles = ruleFileService.getExportRuleFiles(destination);
 		    }
 		    catch(FileNotFoundException e) {
 		    	LOG.warning(String.format("Could not load all rule files for destination %s [%s]. Skipping item export to destination. %s",
@@ -98,32 +100,5 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 		    	LOG.info(String.format("COMPLETE javascript hook [%s].", ruleFile));
 		    }
 	    }
-	}
-
-	/**
-	 * Loads all rule files / filters to be executed for destination (including global rules)
-	 *
-	 * @param destination Destination to load rules for
-	 * @param config Configuration properties
-	 * @return Set of string paths of rule files to be executed
-	 * @throws FileNotFoundException
-	 */
-	private Set<Path> loadExportRuleFiles(Destination destination, Properties config) throws FileNotFoundException {
-		Set<Path> ruleFiles = new HashSet<Path>();
-
-	    // Include global rule file in rule set (first)
-	    ruleFiles.add(Paths.get(config.getProperty("management.console.global.rules.dir") + "/global-export.js"));
-
-	    // Include destination-specific rule file in rule set
-	    ruleFiles.add(Paths.get(config.getProperty("management.console.destination.rules.dir") + "/" + destination.getId() + "/export.js"));
-
-	    // Ensure all rule files exists
-	    for(Path ruleFile : ruleFiles) {
-		    if(!Files.exists(ruleFile)) {
-		    	throw new FileNotFoundException("Could not load rule file: " + ruleFile.toString());
-		    }
-	    }
-
-	    return ruleFiles;
 	}
 }

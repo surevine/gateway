@@ -18,6 +18,7 @@ import javax.script.ScriptException;
 
 import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.Rule;
+import com.surevine.community.gateway.util.RuleFileService;
 
 public class JavascriptPreImportHook implements GatewayPreImportHook {
 
@@ -34,9 +35,10 @@ public class JavascriptPreImportHook implements GatewayPreImportHook {
 			e1.printStackTrace(); // FIXME: Handle
 		}
 
+    	RuleFileService ruleFileService = new RuleFileService(config);
 	    Set<Path> importFilters = new HashSet<Path>();
 	    try {
-	    	importFilters = loadImportFilters(config);
+	    	importFilters = ruleFileService.getImportRuleFiles();
 	    }
 	    catch(FileNotFoundException e) {
 	    	LOG.warning("Could not load all import filter files.");
@@ -60,28 +62,5 @@ public class JavascriptPreImportHook implements GatewayPreImportHook {
 
 	    	LOG.info(String.format("COMPLETE javascript hook [%s].", importFilter));
 	    }
-	}
-
-	/**
-	 * Load import filter files
-	 *
-	 * @param config
-	 * @return
-	 * @throws FileNotFoundException
-	 */
-	private Set<Path> loadImportFilters(Properties config) throws FileNotFoundException {
-		Set<Path> ruleFiles = new HashSet<Path>();
-
-	    // Include global rule file in rule set (first)
-	    ruleFiles.add(Paths.get(config.getProperty("management.console.global.rules.dir") + "/global-import.js"));
-
-	    // Ensure all rule files exists
-	    for(Path ruleFile : ruleFiles) {
-		    if(!Files.exists(ruleFile)) {
-		    	throw new FileNotFoundException("Could not load rule file: " + ruleFile.toString());
-		    }
-	    }
-
-	    return ruleFiles;
 	}
 }
