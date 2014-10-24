@@ -24,18 +24,24 @@ public class JavascriptPreImportHook implements GatewayPreImportHook {
 
 	private static final Logger LOG = Logger.getLogger(JavascriptPreImportHook.class.getName());
 
+	private Properties config = new Properties();
+	private RuleFileService ruleFileService;
+
+	public JavascriptPreImportHook() {
+		this.ruleFileService = new RuleFileService(getConfig());
+	}
+
 	@Override
 	public void call(final Path source, final Map<String, String> properties) {
 	    final ScriptEngineManager manager = new ScriptEngineManager();
 	    final ScriptEngine jsEngine = manager.getEngineByName("JavaScript");
-	    final Properties config = new Properties();
+
 	    try {
-			config.load(getClass().getResourceAsStream("/javascript-hook.properties"));
+	    	getConfig().load(getClass().getResourceAsStream("/javascript-hook.properties"));
 		} catch (final IOException e1) {
 			e1.printStackTrace(); // FIXME: Handle
 		}
 
-    	RuleFileService ruleFileService = new RuleFileService(config);
 	    Set<Path> importFilters = new HashSet<Path>();
 	    try {
 	    	importFilters = ruleFileService.getImportRuleFiles();
@@ -63,4 +69,13 @@ public class JavascriptPreImportHook implements GatewayPreImportHook {
 	    	LOG.info(String.format("COMPLETE javascript hook [%s].", importFilter));
 	    }
 	}
+
+	public void setRuleFileService(RuleFileService ruleFileService) {
+		this.ruleFileService = ruleFileService;
+	}
+
+	public Properties getConfig() {
+		return config;
+	}
+
 }

@@ -13,24 +13,30 @@ import java.util.Set;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.TransferItem;
+import com.surevine.community.gateway.util.MockRuleFileService;
 
-@Ignore
 public class MetadataTest {
 
-//	@Test
-//	public void testFilter() throws URISyntaxException {
-//		final Map<String, String> properties = new HashMap<String, String>();
-//
-//		properties.put("filename", "test");
-//		properties.put("organisation", "local");
-//		properties.put("name", "test.jar");
-//
-//		final Set<TransferItem> transferQueue = new HashSet<TransferItem>(1);
-//		transferQueue.add(new TransferItem(new URI("http://google.com"), Paths.get("/tmp"), properties));
-//
-//		new JavascriptPreExportHook().call(transferQueue);
-//
-//		assertEquals(1, properties.keySet().size());
-//	}
+	@Test
+	public void testFilter() throws URISyntaxException {
+		final Map<String, String> properties = new HashMap<String, String>();
+
+		properties.put("filename", "test");
+		properties.put("organisation", "local");
+		properties.put("name", "test.jar");
+
+		final Set<TransferItem> transferQueue = new HashSet<TransferItem>(1);
+		Destination destination = new Destination(1L, "Google", new URI("http://google.com"));
+		transferQueue.add(new TransferItem(destination, Paths.get("/tmp"), properties));
+
+		JavascriptPreExportHook jsPreExportHook = new JavascriptPreExportHook();
+		MockRuleFileService mockRuleFileService = new MockRuleFileService(jsPreExportHook.getConfig());
+		jsPreExportHook.setRuleFileService(mockRuleFileService);
+
+		jsPreExportHook.call(transferQueue);
+
+		assertEquals(2, properties.keySet().size());
+	}
 }

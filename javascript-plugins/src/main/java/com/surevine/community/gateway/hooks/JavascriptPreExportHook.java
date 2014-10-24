@@ -28,13 +28,20 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 
 	private static final Logger LOG = Logger.getLogger(JavascriptPreExportHook.class.getName());
 
+	private Properties config = new Properties();
+	private RuleFileService ruleFileService;
+
+	public JavascriptPreExportHook() {
+		this.ruleFileService = new RuleFileService(getConfig());
+	}
+
 	@Override
 	public void call(final Set<TransferItem> transferQueue) {
 	    final ScriptEngineManager manager = new ScriptEngineManager();
 	    final ScriptEngine jsEngine = manager.getEngineByName("JavaScript");
-	    final Properties config = new Properties();
+
 	    try {
-			config.load(getClass().getResourceAsStream("/javascript-hook.properties"));
+			getConfig().load(getClass().getResourceAsStream("/javascript-hook.properties"));
 		} catch (final IOException e1) {
 			e1.printStackTrace(); // FIXME: Handle
 		}
@@ -47,7 +54,6 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 
 	    	LOG.info(String.format("Processing destination %s [%s]", destination.getName(), destination.getUri().toString()));
 
-	    	RuleFileService ruleFileService = new RuleFileService(config);
 		    Set<Path> exportRuleFiles = new HashSet<Path>();
 		    try {
 		    	exportRuleFiles = ruleFileService.getExportRuleFiles(destination);
@@ -101,4 +107,13 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 		    }
 	    }
 	}
+
+	public void setRuleFileService(RuleFileService ruleFileService) {
+		this.ruleFileService = ruleFileService;
+	}
+
+	public Properties getConfig() {
+		return config;
+	}
+
 }
