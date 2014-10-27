@@ -130,7 +130,7 @@ public class GatewayAPI {
 		// Retrieve list of destinations from management console
 		final Set<Destination> destinations = GatewayManagementServiceFacade.getInstance().getDestinations();
 
-		FederatedSCMManager scmManager = new FederatedSCMManager();
+
 
 		HashMap<String, String> metadata = new HashMap<String, String>();
 		try {
@@ -140,6 +140,7 @@ public class GatewayAPI {
 		}
 
 		// Detect whether item sent from federated SCM component
+		FederatedSCMManager scmManager = new FederatedSCMManager();
 		boolean isSourceControlItem = scmManager.isSourceControlItem(metadata);
 
 		// Setup transfer queue
