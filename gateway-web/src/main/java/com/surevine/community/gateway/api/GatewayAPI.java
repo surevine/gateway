@@ -130,8 +130,6 @@ public class GatewayAPI {
 		// Retrieve list of destinations from management console
 		final Set<Destination> destinations = GatewayManagementServiceFacade.getInstance().getDestinations();
 
-
-
 		HashMap<String, String> metadata = new HashMap<String, String>();
 		try {
 			metadata = readMetadata(source);
