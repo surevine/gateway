@@ -10,7 +10,7 @@ import java.util.Set;
 
 import com.surevine.community.gateway.model.Destination;
 
-public class MockRuleFileService extends RuleFileService {
+public class MockRuleFileService extends ConsoleRuleFileServiceImpl {
 
 	public MockRuleFileService(Properties config) {
 		super(config);

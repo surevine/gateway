@@ -1,4 +1,4 @@
-package com.surevine.community.gateway.util;
+package com.surevine.community.gateway.rules;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
@@ -11,12 +11,12 @@ import java.util.Set;
 import com.surevine.community.gateway.model.Destination;
 
 /**
- * Rule file service. Retrieves gateway rule files
+ * Implementation of RuleFileService for gateway management console maintained rule files.
  *
  * @author jonnyheavey
  *
  */
-public class RuleFileService {
+public class ConsoleRuleFileServiceImpl implements RuleFileService {
 
 	public Properties config;
 
@@ -24,7 +24,7 @@ public class RuleFileService {
 	 * Create new RuleFileService
 	 * @param config Javascript plugin configuration
 	 */
-	public RuleFileService(Properties config) {
+	public ConsoleRuleFileServiceImpl(Properties config) {
 		this.config = config;
 	}
 

@@ -95,6 +95,14 @@ public class GatewayManagementServiceFacade {
 				URI url = new URI(jsonDestination.getString("url"));
 
 				Destination destination = new Destination(id, name, url);
+
+				JSONArray jsonProjects = jsonDestination.getJSONArray("projects");
+				for (int p = 0; p < jsonProjects.length(); p++) {
+					JSONObject jsonProject = jsonProjects.getJSONObject(p);
+					String projectSlug = String.format("%s/%s", jsonProject.getString("projectKey"), jsonProject.getString("repositorySlug"));
+					destination.addProject(projectSlug);
+				}
+
 				destinations.add(destination);
 
 			} catch (JSONException e) {

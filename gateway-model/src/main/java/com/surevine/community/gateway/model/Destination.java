@@ -1,6 +1,7 @@
 package com.surevine.community.gateway.model;
 
 import java.net.URI;
+import java.util.Set;
 
 import lombok.Data;
 import lombok.Getter;
@@ -16,6 +17,9 @@ public class Destination {
 
 	@Getter
 	private URI uri;
+
+	@Getter
+	private Set<String> projects;
 
 	private boolean automatedReview;
 	private long transferDelay;
@@ -38,6 +42,10 @@ public class Destination {
 		 }
 		 Destination oDest = (Destination) obj;
 		 return id == oDest.id;
+	}
+
+	public void addProject(String projectName) {
+		this.projects.add(projectName);
 	}
 
 }

@@ -49,6 +49,7 @@ import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.Project;
 import com.surevine.community.gateway.model.Projects;
 import com.surevine.community.gateway.model.TransferItem;
+import com.surevine.community.gateway.scm.FederatedSCMManager;
 
 @Path("/export")
 public class GatewayAPI {
@@ -129,6 +130,8 @@ public class GatewayAPI {
 		// Retrieve list of destinations from management console
 		final Set<Destination> destinations = GatewayManagementServiceFacade.getInstance().getDestinations();
 
+		FederatedSCMManager scmManager = new FederatedSCMManager();
+
 		HashMap<String, String> metadata = new HashMap<String, String>();
 		try {
 			metadata = readMetadata(source);
@@ -136,9 +139,21 @@ public class GatewayAPI {
 			e1.printStackTrace();
 		}
 
+		// Detect whether item sent from federated SCM component
+		boolean isSourceControlItem = scmManager.isSourceControlItem(metadata);
+
 		// Setup transfer queue
 		final Set<TransferItem> transferQueue = new HashSet<TransferItem>();
 		for (final Destination destination : destinations) {
+
+			// Perform SCM-specific sharing check
+			if(isSourceControlItem) {
+				if(!scmManager.isSharedProject(destination, metadata)) {
+					// Don't export project to destination (as its not shared)
+					continue;
+				}
+			}
+
 			transferQueue.add(new TransferItem(destination, source, cloneMetadata(metadata)));
 		}
 
