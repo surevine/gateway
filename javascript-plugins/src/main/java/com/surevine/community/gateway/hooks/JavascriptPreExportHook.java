@@ -22,7 +22,8 @@ import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.Rule;
 import com.surevine.community.gateway.model.TransferItem;
 import com.surevine.community.gateway.util.Redis;
-import com.surevine.community.gateway.util.RuleFileService;
+import com.surevine.community.gateway.rules.ConsoleRuleFileServiceImpl;
+import com.surevine.community.gateway.rules.RuleFileService;
 
 public class JavascriptPreExportHook implements GatewayPreExportHook {
 
@@ -32,7 +33,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 	private RuleFileService ruleFileService;
 
 	public JavascriptPreExportHook() {
-		this.ruleFileService = new RuleFileService(getConfig());
+		this.ruleFileService = new ConsoleRuleFileServiceImpl(getConfig());
 	}
 
 	@Override

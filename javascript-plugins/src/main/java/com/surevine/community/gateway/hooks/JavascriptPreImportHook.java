@@ -18,7 +18,8 @@ import javax.script.ScriptException;
 
 import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.Rule;
-import com.surevine.community.gateway.util.RuleFileService;
+import com.surevine.community.gateway.rules.ConsoleRuleFileServiceImpl;
+import com.surevine.community.gateway.rules.RuleFileService;
 
 public class JavascriptPreImportHook implements GatewayPreImportHook {
 
@@ -28,7 +29,7 @@ public class JavascriptPreImportHook implements GatewayPreImportHook {
 	private RuleFileService ruleFileService;
 
 	public JavascriptPreImportHook() {
-		this.ruleFileService = new RuleFileService(getConfig());
+		this.ruleFileService = new ConsoleRuleFileServiceImpl(getConfig());
 	}
 
 	@Override
