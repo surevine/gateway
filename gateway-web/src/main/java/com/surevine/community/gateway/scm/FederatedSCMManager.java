@@ -41,8 +41,10 @@ public class FederatedSCMManager {
 		String projectSlug = String.format("%s/%s", metadata.get("project"), metadata.get("repo"));
 		Set<String> destinationSharedProjects = destination.getProjects();
 
-		if(destinationSharedProjects.contains(projectSlug)) {
-			return true;
+		if(destinationSharedProjects != null) {
+			if(destinationSharedProjects.contains(projectSlug)) {
+				return true;
+			}
 		}
 		return false;
 	}

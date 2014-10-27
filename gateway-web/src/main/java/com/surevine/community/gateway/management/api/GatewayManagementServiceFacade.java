@@ -93,16 +93,16 @@ public class GatewayManagementServiceFacade {
 				Long id = jsonDestination.getLong("id");
 				String name = jsonDestination.getString("name");
 				URI url = new URI(jsonDestination.getString("url"));
-
-				Destination destination = new Destination(id, name, url);
+				Set<String> projects = new HashSet<String>();
 
 				JSONArray jsonProjects = jsonDestination.getJSONArray("projects");
 				for (int p = 0; p < jsonProjects.length(); p++) {
 					JSONObject jsonProject = jsonProjects.getJSONObject(p);
 					String projectSlug = String.format("%s/%s", jsonProject.getString("projectKey"), jsonProject.getString("repositorySlug"));
-					destination.addProject(projectSlug);
+					projects.add(projectSlug);
 				}
 
+				Destination destination = new Destination(id, name, url, projects);
 				destinations.add(destination);
 
 			} catch (JSONException e) {

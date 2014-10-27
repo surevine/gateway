@@ -1,6 +1,7 @@
 package com.surevine.community.gateway.model;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Set;
 
 import lombok.Data;
@@ -24,11 +25,21 @@ public class Destination {
 	private boolean automatedReview;
 	private long transferDelay;
 
+	public Destination(final Long id, final String name, final URI uri, final Set<String> projects) {
+		this.id = id;
+		this.name = name;
+		this.uri = uri;
+		this.projects = projects;
+	}
+
 	public Destination(final Long id, final String name, final URI uri) {
 		this.id = id;
 		this.name = name;
 		this.uri = uri;
+		this.projects = new HashSet<String>();
 	}
+
+
 
 	@Override
 	public int hashCode() {
