@@ -39,7 +39,9 @@ public class Destination {
 		this.projects = new HashSet<String>();
 	}
 
-
+	public void addProject(String projectName) {
+		this.projects.add(projectName);
+	}
 
 	@Override
 	public int hashCode() {
@@ -53,10 +55,6 @@ public class Destination {
 		 }
 		 Destination oDest = (Destination) obj;
 		 return id == oDest.id;
-	}
-
-	public void addProject(String projectName) {
-		this.projects.add(projectName);
 	}
 
 }
