@@ -14,7 +14,7 @@ import com.surevine.community.gateway.model.Destination;
  */
 public class FederatedSCMManager {
 
-	private static final String SCM_SOURCE = "SCM";
+	private static final String SCM_SOURCE_TYPE = "SCM";
 
 	/**
 	 * Detect whether item sent from federated SCM system
@@ -22,8 +22,10 @@ public class FederatedSCMManager {
 	 * @return
 	 */
 	public boolean isSourceControlItem(Map<String, String> metadata) {
-		if(metadata.get("source").equals(SCM_SOURCE)) {
-			return true;
+		if(metadata.containsKey("source_type")) {
+			if(metadata.get("source_type").equals(SCM_SOURCE_TYPE)) {
+				return true;
+			}
 		}
 		return false;
 	}
