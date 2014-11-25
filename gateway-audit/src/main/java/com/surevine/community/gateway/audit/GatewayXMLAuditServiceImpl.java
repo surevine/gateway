@@ -82,7 +82,7 @@ public class GatewayXMLAuditServiceImpl implements AuditService {
 		String logfileDirectory = config.getProperty("gateway.audit.logfile.dir");
 		Path auditFile = Paths.get(logfileDirectory, "audit.xml");
 		if(!Files.exists(auditFile)) {
-			createAuditFile();
+			createAuditFile(auditFile);
 		}
 		this.auditLogFile = auditFile.toString();
 
@@ -106,10 +106,7 @@ public class GatewayXMLAuditServiceImpl implements AuditService {
 	/**
 	 * Creates audit XML file to log events to (if file doesn't exist)
 	 */
-	private void createAuditFile() {
-
-		String logfileDirectory = config.getProperty("gateway.audit.logfile.dir");
-		Path auditFile = Paths.get(logfileDirectory, "audit.xml");
+	private void createAuditFile(Path auditFile) {
 
 		if(!Files.exists(auditFile)) {
 			LOG.info("No existing XML audit file found. Creating new file.");
