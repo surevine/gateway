@@ -44,14 +44,12 @@ public class GatewayXMLAuditServiceImpl implements AuditService {
 	public static GatewayXMLAuditServiceImpl _instance = null;
 
 	private static final Logger LOG = Logger.getLogger(GatewayXMLAuditServiceImpl.class.getName());
-
 	private Properties config = new Properties();
 	private DocumentBuilder documentBuilder;
 	private SimpleDateFormat dateFormat;
 	private String auditLogFile;
 
 	private GatewayXMLAuditServiceImpl()  {
-
 		try {
 			getConfig().load(getClass().getResourceAsStream("/audit.properties"));
 		} catch (IOException e1) {
@@ -59,14 +57,12 @@ public class GatewayXMLAuditServiceImpl implements AuditService {
 		}
 
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         try {
 			documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
 			throw new AuditServiceException("Unable to init XML audit service.", e);
 		}
-
 	}
 
 	public static GatewayXMLAuditServiceImpl getInstance() {

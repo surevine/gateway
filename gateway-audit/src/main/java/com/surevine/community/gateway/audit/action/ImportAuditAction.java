@@ -1,5 +1,11 @@
 package com.surevine.community.gateway.audit.action;
 
+/**
+ * Represents an item being imported via Gateway.
+ *
+ * @author jonnyheavey
+ *
+ */
 public class ImportAuditAction implements AuditAction {
 
 	private String filename;

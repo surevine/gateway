@@ -6,6 +6,12 @@ import java.util.Map;
 import com.surevine.community.gateway.audit.action.ImportAuditAction;
 import com.surevine.community.gateway.hooks.GatewayImportTransferHook;
 
+/**
+ * Audits import event for each item imported through gateway.
+ *
+ * @author jonnyheavey
+ *
+ */
 public class ItemImportAuditHook implements GatewayImportTransferHook {
 
 	@Override
