@@ -20,7 +20,7 @@ public class ExportAuditAction implements AuditAction {
 				destination.getName()) + System.getProperty("line.separator"));
 		xml.append("<Export>");
 		xml.append(String.format("<Data name=\"destinationName\" value=\"%s\" />", destination.getName()));
-		xml.append(String.format("<Data name=\"destinationURI\" value=\"%s\" />", destination.getURI()));
+		xml.append(String.format("<Data name=\"destinationURI\" value=\"%s\" />", destination.getUri()));
 		xml.append(String.format("<Data name=\"fileName\" value=\"%s\" />", filename));
 		xml.append("</Export>");
 

@@ -1,5 +1,7 @@
 package com.surevine.community.gateway.audit;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 
 import com.surevine.community.gateway.audit.action.ExportAuditAction;
@@ -21,7 +23,7 @@ public class ItemExportAuditHook implements GatewayExportTransferHook {
 
 			if(item.isExportable()) {
 				Destination destination = item.getDestination();
-				String filename = item.getSource().getFilename();
+				String filename = item.getSource().getFileName().toString();
 				ExportAuditAction exportAction = new ExportAuditAction(filename, destination);
 
 				GatewayXMLAuditServiceImpl.getInstance().audit(exportAction);
