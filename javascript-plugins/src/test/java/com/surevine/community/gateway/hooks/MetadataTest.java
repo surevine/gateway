@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.TransferItem;
+import com.surevine.community.gateway.util.MockAuditService;
 import com.surevine.community.gateway.util.MockRuleFileService;
 
 public class MetadataTest {
@@ -34,6 +35,9 @@ public class MetadataTest {
 		JavascriptPreExportHook jsPreExportHook = new JavascriptPreExportHook();
 		MockRuleFileService mockRuleFileService = new MockRuleFileService(jsPreExportHook.getConfig());
 		jsPreExportHook.setRuleFileService(mockRuleFileService);
+
+		MockAuditService mockAuditService = new MockAuditService();
+		jsPreExportHook.setAuditService(mockAuditService);
 
 		jsPreExportHook.call(transferQueue);
 

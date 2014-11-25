@@ -3,6 +3,9 @@ package com.surevine.community.gateway.audit;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,7 +67,6 @@ public class GatewayXMLAuditServiceImpl implements AuditService {
 			throw new AuditServiceException("Unable to init XML audit service.", e);
 		}
 
-        createAuditFile();
 	}
 
 	public static GatewayXMLAuditServiceImpl getInstance() {
@@ -76,6 +78,13 @@ public class GatewayXMLAuditServiceImpl implements AuditService {
 
 	@Override
 	public void audit(AuditAction action) {
+
+		String logfileDirectory = config.getProperty("gateway.audit.logfile.dir");
+		Path auditFile = Paths.get(logfileDirectory, "audit.xml");
+		if(!Files.exists(auditFile)) {
+			createAuditFile();
+		}
+		this.auditLogFile = auditFile.toString();
 
         Document document;
         Node event;
@@ -101,11 +110,12 @@ public class GatewayXMLAuditServiceImpl implements AuditService {
 
 		String logfileDirectory = config.getProperty("gateway.audit.logfile.dir");
 		Path auditFile = Paths.get(logfileDirectory, "audit.xml");
+
 		if(!Files.exists(auditFile)) {
 			LOG.info("No existing XML audit file found. Creating new file.");
-			Path AuditFileTemplate = Paths.get("/audit-file-template.xml");
+			InputStream auditTemplateStream = getClass().getResourceAsStream("/audit-file-template.xml");
 			try {
-				Files.copy(AuditFileTemplate, auditFile);
+				Files.copy(auditTemplateStream, auditFile);
 			} catch (IOException e) {
 				throw new AuditServiceException("Could not create new XML audit log file.", e);
 			}
@@ -113,7 +123,6 @@ public class GatewayXMLAuditServiceImpl implements AuditService {
 			LOG.info("Found existing XML audit file.");
 		}
 
-		this.auditLogFile = auditFile.toString();
 	}
 
 	/**
@@ -145,15 +154,15 @@ public class GatewayXMLAuditServiceImpl implements AuditService {
 	 */
 	private String loadEventTemplate() {
 
-		Path eventTemplatePath = Paths.get("/audit-event-template.xml");
 		StringBuffer parsedEventTemplate = new StringBuffer();
 
 		try {
-			List<String> lines = Files.readAllLines(eventTemplatePath, Charset.defaultCharset());
+			Path eventTemplate = Paths.get(getClass().getResource("/audit-event-template.xml").toURI());
+			List<String> lines = Files.readAllLines(eventTemplate, Charset.defaultCharset());
 			for (String line : lines) {
 				parsedEventTemplate.append(line + System.getProperty("line.separator"));
 			}
-		} catch (IOException e) {
+		} catch (IOException | URISyntaxException e) {
 			throw new AuditServiceException("Unable to load audit event template.", e);
 		}
 

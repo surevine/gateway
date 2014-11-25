@@ -18,6 +18,10 @@ import java.util.Iterator;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import com.surevine.community.gateway.audit.AuditService;
+import com.surevine.community.gateway.audit.GatewayXMLAuditServiceImpl;
+import com.surevine.community.gateway.audit.action.AuditAction;
+import com.surevine.community.gateway.audit.action.RuleFailAction;
 import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.Rule;
 import com.surevine.community.gateway.model.TransferItem;
@@ -31,9 +35,11 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 
 	private Properties config = new Properties();
 	private RuleFileService ruleFileService;
+	private AuditService auditService;
 
 	public JavascriptPreExportHook() {
 		this.ruleFileService = new ConsoleRuleFileServiceImpl(getConfig());
+		this.auditService = GatewayXMLAuditServiceImpl.getInstance();
 	}
 
 	@Override
@@ -101,6 +107,9 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 			    			destination, source));
 			    	item.setNotExportable();
 
+			    	RuleFailAction ruleFailAction = new RuleFailAction(source, destination);
+			    	auditService.audit(ruleFailAction);
+
 			    	break; // Do not continue evaluating hook scripts for this destination, we're not sending the artifact.
 			    }
 
@@ -111,6 +120,10 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 
 	public void setRuleFileService(RuleFileService ruleFileService) {
 		this.ruleFileService = ruleFileService;
+	}
+
+	public void setAuditService(AuditService auditService) {
+		this.auditService = auditService;
 	}
 
 	public Properties getConfig() {
