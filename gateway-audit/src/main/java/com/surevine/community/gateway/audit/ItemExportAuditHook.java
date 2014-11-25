@@ -1,7 +1,5 @@
 package com.surevine.community.gateway.audit;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Set;
 
 import com.surevine.community.gateway.audit.action.ExportAuditAction;
