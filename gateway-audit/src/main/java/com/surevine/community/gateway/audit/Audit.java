@@ -9,6 +9,7 @@ import com.surevine.community.gateway.audit.action.AuditActionFactory;
 import com.surevine.community.gateway.audit.action.ExportAuditAction;
 import com.surevine.community.gateway.audit.action.ImportAuditAction;
 import com.surevine.community.gateway.audit.action.RuleFailAuditAction;
+import com.surevine.community.gateway.audit.action.logfile.LogAuditActionFactory;
 import com.surevine.community.gateway.audit.action.xml.XMLAuditActionFactory;
 import com.surevine.community.gateway.model.Destination;
 
@@ -35,7 +36,7 @@ public abstract class Audit {
 				auditServiceImpl = XMLAuditServiceImpl.getInstance();
 				break;
 			case LOG_MODE:
-				// TODO
+				auditServiceImpl = new LogAuditServiceImpl();
 				break;
 			default:
 				break;
@@ -55,7 +56,7 @@ public abstract class Audit {
 				auditActionFactoryImpl = new XMLAuditActionFactory();
 				break;
 			case LOG_MODE:
-				// TODO
+				auditActionFactoryImpl = new LogAuditActionFactory();
 				break;
 			default:
 				break;
