@@ -73,7 +73,7 @@ public class XMLAuditServiceImpl implements AuditService {
 	@Override
 	public void audit(AuditAction action) {
 
-		String logfileDirectory = config.getProperty("gateway.audit.logfile.dir");
+		String logfileDirectory = config.getProperty("gateway.audit.xml.logfile.dir");
 		Path auditFile = Paths.get(logfileDirectory, "audit.xml");
 		if(!Files.exists(auditFile)) {
 			createAuditFile(auditFile);
@@ -189,7 +189,7 @@ public class XMLAuditServiceImpl implements AuditService {
 	private String populateEventTemplate(String template, AuditAction action) {
 
 		template = template.replace("%EVENT_TIME%", dateFormat.format(new Date()));
-		template = template.replace("%EVENT_SYSTEM_ENVIRONMENT%", config.getProperty("gateway.system.environment"));
+		template = template.replace("%EVENT_SYSTEM_ENVIRONMENT%", config.getProperty("gateway.audit.xml.system.environment"));
 		template = template.replace("%EVENT_ACTION%", action.serialize());
 
 		return template;
