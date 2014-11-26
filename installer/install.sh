@@ -35,8 +35,8 @@ clear
 
 function print_progress() {
   printf "%0.s#" $(seq 0 $1)
-  printf "%0.s " $(seq 0 $((40-$1)))
-  printf "  ($(($1*100/40))%%)\r"
+  printf "%0.s " $(seq 0 $((50-$1)))
+  printf "  ($(($1*100/50))%%)\r"
 }
 
 echo
@@ -208,6 +208,8 @@ nohup $CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -Dapply
 
 print_progress 46
 printf "\n"
+
+print_progress 50
 
 echo
 echo "Installation complete. Services will be started shortly."
