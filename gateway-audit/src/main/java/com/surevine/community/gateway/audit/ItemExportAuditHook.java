@@ -22,9 +22,9 @@ public class ItemExportAuditHook implements GatewayExportTransferHook {
 			if(item.isExportable()) {
 				Destination destination = item.getDestination();
 				String filename = item.getSource().getFileName().toString();
-				ExportAuditAction exportAction = new ExportAuditAction(filename, destination);
 
-				GatewayXMLAuditServiceImpl.getInstance().audit(exportAction);
+				ExportAuditAction exportAction = Audit.getExportAuditAction(filename, destination);
+				Audit.audit(exportAction);
 			}
 
 		}

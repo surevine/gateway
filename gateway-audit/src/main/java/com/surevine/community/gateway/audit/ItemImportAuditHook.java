@@ -26,9 +26,8 @@ public class ItemImportAuditHook implements GatewayImportTransferHook {
 				source = "Unknown";
 			}
 
-			// TODO potentially include more details on file origin
-			ImportAuditAction importAction = new ImportAuditAction(filename, source);
-			GatewayXMLAuditServiceImpl.getInstance().audit(importAction);
+			ImportAuditAction importAction = Audit.getImportAuditAction(filename, source);
+			Audit.audit(importAction);
 		}
 
 	}

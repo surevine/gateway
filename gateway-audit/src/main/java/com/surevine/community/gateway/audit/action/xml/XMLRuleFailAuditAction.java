@@ -1,23 +1,14 @@
-package com.surevine.community.gateway.audit.action;
+package com.surevine.community.gateway.audit.action.xml;
 
 import java.nio.file.Path;
 
+import com.surevine.community.gateway.audit.action.RuleFailAuditAction;
 import com.surevine.community.gateway.model.Destination;
 
-/**
- * Represents an export rule failure occurence.
- *
- * @author jonnyheavey
- *
- */
-public class RuleFailAction implements AuditAction  {
+public class XMLRuleFailAuditAction extends RuleFailAuditAction {
 
-	Path source;
-	Destination destination;
-
-	public RuleFailAction(Path source, Destination destination) {
-		this.source = source;
-		this.destination = destination;
+	public XMLRuleFailAuditAction(Path source, Destination destination) {
+		super(source, destination);
 	}
 
 	@Override

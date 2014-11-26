@@ -37,17 +37,17 @@ import com.surevine.community.gateway.audit.action.AuditAction;
  * @author jonnyheavey
  *
  */
-public class GatewayXMLAuditServiceImpl implements AuditService {
+public class XMLAuditServiceImpl implements AuditService {
 
-	public static GatewayXMLAuditServiceImpl _instance = null;
+	public static XMLAuditServiceImpl _instance = null;
 
-	private static final Logger LOG = Logger.getLogger(GatewayXMLAuditServiceImpl.class.getName());
+	private static final Logger LOG = Logger.getLogger(XMLAuditServiceImpl.class.getName());
 	private Properties config = new Properties();
 	private DocumentBuilder documentBuilder;
 	private SimpleDateFormat dateFormat;
 	private String auditLogFile;
 
-	private GatewayXMLAuditServiceImpl()  {
+	private XMLAuditServiceImpl()  {
 		try {
 			getConfig().load(getClass().getResourceAsStream("/audit.properties"));
 		} catch (IOException e1) {
@@ -63,9 +63,9 @@ public class GatewayXMLAuditServiceImpl implements AuditService {
 		}
 	}
 
-	public static GatewayXMLAuditServiceImpl getInstance() {
+	public static XMLAuditServiceImpl getInstance() {
 		if(_instance == null) {
-			_instance = new GatewayXMLAuditServiceImpl();
+			_instance = new XMLAuditServiceImpl();
 		}
 		return _instance;
 	}
