@@ -159,6 +159,7 @@
 	<modules>
 		<module>gateway-model</module>
 		<module>plugin-api</module>
+		<module>gateway-audit</module>
 		<module>gitlab-plugin</module>
 		<module>gateway-jedis</module>
 		<module>javascript-plugins</module>
@@ -169,7 +170,6 @@
 		<module>transfer-plugins/cmis-upload-plugin</module>
     	<module>jboss-module</module>
 		<module>gateway-web</module>
-		<module>gateway-audit</module>
   </modules>
 	<scm>
 		<connection>scm:git:ssh://git@github.com/surevine/gateway.git</connection>
