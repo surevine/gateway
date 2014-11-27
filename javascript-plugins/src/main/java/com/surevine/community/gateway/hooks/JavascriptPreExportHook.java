@@ -2,12 +2,9 @@ package com.surevine.community.gateway.hooks;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
@@ -19,9 +16,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import com.surevine.community.gateway.audit.Audit;
-import com.surevine.community.gateway.audit.AuditService;
-import com.surevine.community.gateway.audit.XMLAuditServiceImpl;
-import com.surevine.community.gateway.audit.action.AuditAction;
 import com.surevine.community.gateway.audit.action.RuleFailAuditAction;
 import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.Rule;
