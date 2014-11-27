@@ -169,6 +169,7 @@
 		<module>transfer-plugins/cmis-upload-plugin</module>
     	<module>jboss-module</module>
 		<module>gateway-web</module>
+		<module>gateway-audit</module>
   </modules>
 	<scm>
 		<connection>scm:git:ssh://git@github.com/surevine/gateway.git</connection>

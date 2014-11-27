@@ -18,6 +18,11 @@ import java.util.Iterator;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import com.surevine.community.gateway.audit.Audit;
+import com.surevine.community.gateway.audit.AuditService;
+import com.surevine.community.gateway.audit.XMLAuditServiceImpl;
+import com.surevine.community.gateway.audit.action.AuditAction;
+import com.surevine.community.gateway.audit.action.RuleFailAuditAction;
 import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.Rule;
 import com.surevine.community.gateway.model.TransferItem;
@@ -100,6 +105,9 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 			    			"Destination %s did not pass export rules for %s.",
 			    			destination, source));
 			    	item.setNotExportable();
+
+			    	RuleFailAuditAction ruleFailAction = Audit.getRuleFailAuditAction(source, destination);
+			    	Audit.audit(ruleFailAction);
 
 			    	break; // Do not continue evaluating hook scripts for this destination, we're not sending the artifact.
 			    }

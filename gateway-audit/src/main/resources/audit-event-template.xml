@@ -1,0 +1,21 @@
+<Event>
+	<EventTime>
+		<TimeCreated>%EVENT_TIME%</TimeCreated>
+	</EventTime>
+	<EventSource>
+		<System>
+			<Name>Community portal</Name>
+			<Environment>%EVENT_SYSTEM_ENVIRONMENT%</Environment>
+		</System>
+		<Generator>Gateway</Generator>
+		<Device>
+			<Name>Hosted web application</Name>
+		</Device>
+		<User>
+			<UserDetails>Gateway system user</UserDetails>
+		</User>
+	</EventSource>
+	<EventDetail>
+		%EVENT_ACTION%
+	</EventDetail>
+</Event>
