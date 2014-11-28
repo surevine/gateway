@@ -24,6 +24,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -144,20 +145,15 @@ public class XMLAuditServiceImpl implements AuditService {
 	 * @return Contents of event template
 	 */
 	private String loadEventTemplate() {
-
-		StringBuffer parsedEventTemplate = new StringBuffer();
-
+		InputStream eventTemplateStream = getClass().getResourceAsStream("/audit-event-template.xml");
+		String eventTemplate;
 		try {
-			Path eventTemplate = Paths.get(getClass().getResource("/audit-event-template.xml").toURI());
-			List<String> lines = Files.readAllLines(eventTemplate, Charset.defaultCharset());
-			for (String line : lines) {
-				parsedEventTemplate.append(line + System.getProperty("line.separator"));
-			}
-		} catch (IOException | URISyntaxException e) {
+			eventTemplate = IOUtils.toString(eventTemplateStream, Charset.defaultCharset());
+		} catch (IOException e) {
 			throw new AuditServiceException("Unable to load audit event template.", e);
 		}
 
-		return parsedEventTemplate.toString();
+		return eventTemplate;
 	}
 
 	/**
