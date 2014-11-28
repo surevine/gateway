@@ -1,8 +1,9 @@
-package com.surevine.community.gateway.audit;
+package com.surevine.community.gateway.hooks;
 
 import java.io.File;
 import java.util.Map;
 
+import com.surevine.community.gateway.audit.Audit;
 import com.surevine.community.gateway.audit.action.ImportAuditAction;
 import com.surevine.community.gateway.hooks.GatewayImportTransferHook;
 
@@ -12,7 +13,7 @@ import com.surevine.community.gateway.hooks.GatewayImportTransferHook;
  * @author jonnyheavey
  *
  */
-public class ItemImportAuditHook implements GatewayImportTransferHook {
+public class AuditItemImportTransferHook implements GatewayImportTransferHook {
 
 	@Override
 	public void call(File[] received, Map<String, String> properties) {

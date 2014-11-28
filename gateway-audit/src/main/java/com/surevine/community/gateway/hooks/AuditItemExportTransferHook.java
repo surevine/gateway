@@ -1,7 +1,8 @@
-package com.surevine.community.gateway.audit;
+package com.surevine.community.gateway.hooks;
 
 import java.util.Set;
 
+import com.surevine.community.gateway.audit.Audit;
 import com.surevine.community.gateway.audit.action.ExportAuditAction;
 import com.surevine.community.gateway.hooks.GatewayExportTransferHook;
 import com.surevine.community.gateway.model.Destination;
@@ -13,7 +14,7 @@ import com.surevine.community.gateway.model.TransferItem;
  * @author jonnyheavey
  *
  */
-public class ItemExportAuditHook implements GatewayExportTransferHook {
+public class AuditItemExportTransferHook implements GatewayExportTransferHook {
 
 	public void call(final Set<TransferItem> transferQueue) {
 
