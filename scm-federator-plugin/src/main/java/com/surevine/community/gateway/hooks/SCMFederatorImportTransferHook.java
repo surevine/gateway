@@ -39,7 +39,7 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 			File importedFile = received[i];
 
 			Path importedFilePath = Paths.get(importedFile.getAbsolutePath());
-			Path scmImportPath = Paths.get(getConfig().getProperty("scm.federator.import.dir") + importedFile.getName());
+			Path scmImportPath = Paths.get(getConfig().getProperty("scm.federator.import.dir"), importedFile.getName());
 
 			try {
 				Files.copy(importedFilePath, scmImportPath);
