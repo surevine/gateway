@@ -2,12 +2,22 @@ package com.surevine.community.gateway.hooks;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 
 /**
  * Transfers compatible imported bundles to SCM federator component.
@@ -36,16 +46,14 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 
 		for (int i = 0; i < received.length; i++) {
 
-			File importedFile = received[i];
-
-			Path importedFilePath = Paths.get(importedFile.getAbsolutePath());
-			Path scmImportPath = Paths.get(getConfig().getProperty("scm.federator.import.dir"), importedFile.getName());
+			MultipartEntity entity = buildImportedBundleRequestBody(received[i], properties);
 
 			try {
-				Files.copy(importedFilePath, scmImportPath);
+				Request.Post(getConfig().getProperty("scm.federator.api.base.url") + "/incoming")
+				.body(entity)
+				.execute().returnContent().asString();
 			} catch (IOException e) {
-				LOG.severe("Failed to transfer imported bundle to SCM federator.");
-				e.printStackTrace();
+				LOG.log(Level.SEVERE, "Failed to transfer bundle to SCM federator", e);
 			}
 
 		}
@@ -70,6 +78,33 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 			LOG.info("Exception during support method: "+e);
 			return false;
 		}
+	}
+
+	/**
+	 * Constructs body of post request to be sent to SCM federator
+	 *
+	 * @param bundle SCM bundle to be sent to federator
+	 * @param properties metadata accompanying file
+	 * @return
+	 */
+	private MultipartEntity buildImportedBundleRequestBody(File bundle,
+			Map<String, String> properties) {
+
+		MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+		entity.addPart("bundle", new FileBody(bundle));
+
+		Iterator<Entry<String, String>> it = properties.entrySet().iterator();
+		while(it.hasNext()) {
+			Map.Entry<String, String> property = it.next();
+			try {
+				entity.addPart(property.getKey(), new StringBody(property.getValue()));
+			} catch (UnsupportedEncodingException e) {
+				LOG.warning("Failed to read metadata property value during transfer to SCM federator.");
+				e.printStackTrace();
+			}
+			it.remove();
+		}
+		return entity;
 	}
 
 	private Properties getConfig() {
