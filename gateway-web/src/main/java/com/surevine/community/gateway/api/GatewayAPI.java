@@ -1,19 +1,14 @@
 package com.surevine.community.gateway.api;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,10 +31,7 @@ import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.json.JSONObject;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
-import com.surevine.community.gateway.GatewayProperties;
 import com.surevine.community.gateway.Quarantine;
 import com.surevine.community.gateway.history.History;
 import com.surevine.community.gateway.hooks.GatewayTransferException;
@@ -49,7 +41,6 @@ import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.Project;
 import com.surevine.community.gateway.model.Projects;
 import com.surevine.community.gateway.model.TransferItem;
-import com.surevine.community.gateway.scm.FederatedSCMManager;
 
 @Path("/export")
 public class GatewayAPI {
@@ -137,22 +128,9 @@ public class GatewayAPI {
 			e1.printStackTrace();
 		}
 
-		// Detect whether item sent from federated SCM component
-		FederatedSCMManager scmManager = new FederatedSCMManager();
-		boolean isSourceControlItem = scmManager.isSourceControlItem(metadata);
-
 		// Setup transfer queue
 		final Set<TransferItem> transferQueue = new HashSet<TransferItem>();
 		for (final Destination destination : destinations) {
-
-			// Perform SCM-specific sharing check
-			if(isSourceControlItem) {
-				if(!scmManager.isSharedProject(destination, metadata)) {
-					// Don't export project to destination (as its not shared)
-					continue;
-				}
-			}
-
 			transferQueue.add(new TransferItem(destination, source, cloneMetadata(metadata)));
 		}
 
