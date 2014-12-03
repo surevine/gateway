@@ -36,7 +36,7 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 		try {
 			getConfig().load(getClass().getResourceAsStream("/federator.properties"));
 		} catch (IOException e) {
-			LOG.warning("Failed to load scm federator transfer hook configuration.");
+			LOG.warning("Failed to load SCM federator transfer hook configuration.");
 			e.printStackTrace();
 		}
 	}
@@ -48,6 +48,8 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 
 			MultipartEntity entity = buildImportedBundleRequestBody(received[i], properties);
 
+			LOG.info("Transferring imported bundle to SCM federator.");
+
 			try {
 				Request.Post(getConfig().getProperty("scm.federator.api.base.url") + "/incoming")
 				.body(entity)
@@ -55,6 +57,8 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 			} catch (IOException e) {
 				LOG.log(Level.SEVERE, "Failed to transfer bundle to SCM federator", e);
 			}
+
+			LOG.info("Bundle transfer to SCM federator complete.");
 
 		}
 	}
@@ -89,6 +93,8 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 	 */
 	private MultipartEntity buildImportedBundleRequestBody(File bundle,
 			Map<String, String> properties) {
+
+		LOG.info("Building multi-part request body for bundle transfer to SCM federator.");
 
 		MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 		entity.addPart("bundle", new FileBody(bundle));
