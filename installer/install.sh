@@ -9,7 +9,7 @@ WILDFLY_USER="gateway"
 POSTGRES_HOST="localhost"
 POSTGRES_DB="gatewaymanagement"
 POSTGRES_USER="console"
-POSTGRES_PASS="console_password"
+POSTGRES_PASS="console"
 
 # Adjust the below rpm paths depending on your version of CENTOS
 
@@ -23,13 +23,9 @@ PYTHON_DELTA_RPM="packages/python-deltarpm-3.5-0.5.20090913git.el6.x86_64.rpm"
 LIBXML="packages/libxml2-2.7.6-14.el6_5.2.x86_64.rpm"
 
 LIBXSLT_RPM="packages/libxslt-1.1.17-4.el5_8.3.x86_64.rpm"
-POSTGRES_LIBS_RPM="packages/postgresql-libs-8.1.23-10.el5_10.x86_64.rpm"
-POSTGRES_RPM="packages/postgresql-8.1.23-10.el5_10.x86_64.rpm"
-POSTGRES_SERVER_RPM="packages/postgresql-server-8.1.23-10.el5_10.x86_64.rpm"
+POSTGRES_RPM="packages/postgresql93-*.rhel5.x86_64.rpm"
 #LIBXSLT_RPM="packages/libxslt-1.1.26-2.el6_3.1.x86_64"
-#POSTGRES_LIBS_RPM="packages/postgresql-libs-8.4.20-1.el6_5.x86_64.rpm"
-#POSTGRES_RPM="packages/postgresql-8.4.20-1.el6_5.x86_64.rpm"
-#POSTGRES_SERVER_RPM="packages/postgresql-server-8.4.20-1.el6_5.x86_64.rpm"
+#POSTGRES_RPM="packages/postgresql93-*.rhel6.x86_64.rpm"
 
 PROGRESS=0
 MAX_PROGRESS=`grep -oE "^\\s*progress\\s*[0-9]*$" $BASH_SOURCE | wc -l`
@@ -62,10 +58,17 @@ function print_progress() {
 echo
 echo "                  Nexus and community gateway installation."
 echo
+
+# Check we have the required utilities
+which unzip >/dev/null 2>&1 || ( echo "Please install the 'unzip' utility"; echo "Exiting as no 'unzip'" >>$LOG_FILE; exit 1 )
+
 echo "Please select a gateway installation directory:"
 read -p "[${INSTALL_DIR}]: " TMP_INSTALL_DIR
 if [[ ! -z "$TMP_INSTALL_DIR" ]]; then INSTALL_DIR="$TMP_INSTALL_DIR"; fi
 CONSOLE_INSTALL_DIR=${INSTALL_DIR}/console
+
+# The install directory escaped for regex replacements
+INSTALL_DIR_ESCAPED="`echo "$INSTALL_DIR" | sed 's/[\/&]/\\\\&/g'`"
 
 echo "Please wait..."
 echo
@@ -165,6 +168,7 @@ progress
 ln -sf "$INSTALL_DIR/nexus/bin/nexus" "/etc/init.d/nexus" >> $LOG_FILE
 sed -i "s/#RUN_AS_USER=/RUN_AS_USER=$NEXUS_USER/g" "/etc/init.d/nexus" >> $LOG_FILE
 sed -i "12i\\\nJAVA_HOME=$INSTALL_DIR/java/jre\nPATH=\$JAVA_HOME/bin:\$PATH" "/etc/init.d/nexus" >> $LOG_FILE
+sed -i "s/NEXUS_HOME=\"\\.\\.\"/NEXUS_HOME=\"$INSTALL_DIR_ESCAPED\\/nexus\"/" "/etc/init.d/nexus" >> $LOG_FILE
 chkconfig --add nexus >> $LOG_FILE
 chkconfig --levels 345 nexus on >> $LOG_FILE
 chown -R $NEXUS_USER:$NEXUS_USER "$INSTALL_DIR/nexus-2.7.2-03" >> $LOG_FILE
@@ -197,45 +201,41 @@ cp -r config/* "$INSTALL_DIR/config" >> $LOG_FILE
 date >> $LOG_FILE
 echo "Installing postgres" >> $LOG_FILE
 progress
-if rpm -q postgresql-server >> $LOG_FILE; then
+if rpm -q postgresql93-server >> $LOG_FILE; then
   echo "PostgreSQL Server already installed - skipping" >> $LOG_FILE
   progress 5
 else
-  if [ $IS_AMZN -ne 0 ]
-  then
-    yum -y install postgresql-server >>$LOG_FILE
-    progress 5
-  else
-  	rpm -Uvh --quiet $LIBXSLT_RPM >>$LOG_FILE 2>&1         || true
-    progress
-    rpm -Uvh --quiet $POSTGRES_LIBS_RPM >>$LOG_FILE 2>&1   || true
-    progress 2
-    rpm -Uvh --quiet $POSTGRES_RPM >>$LOG_FILE 2>&1        || true
-    progress 2
-    rpm -Uvh --quiet $POSTGRES_SERVER_RPM >>$LOG_FILE 2>&1 || true
-  fi
+  rpm -Uvh --quiet $LIBXSLT_RPM >>$LOG_FILE 2>&1         || true
+  progress
+  rpm -Uvh --quiet $POSTGRES_RPM >>$LOG_FILE 2>&1        || true
+  progress 2
+
+  echo "Starting and configuring postgres" >>$LOG_FILE
+
+  progress
+  service postgresql-9.3 initdb >>$LOG_FILE 2>&1 || true
+
+  progress
+  echo "local $POSTGRES_DB $POSTGRES_USER md5" > /tmp/pg_hba.conf
+  echo "host $POSTGRES_DB $POSTGRES_USER 127.0.0.1/32 md5" >> /tmp/pg_hba.conf
+  cat /var/lib/pgsql/9.3/data/pg_hba.conf >> /tmp/pg_hba.conf
+  cat /tmp/pg_hba.conf > /var/lib/pgsql/9.3/data/pg_hba.conf
 fi
-
-echo "Starting and configuring postgres" >>$LOG_FILE
+	
+progress
+service postgresql-9.3 restart >>$LOG_FILE 2>&1
 
 progress
-service postgresql restart >>$LOG_FILE 2>&1 || true
-
-progress
-echo "local $POSTGRES_DB $POSTGRES_USER md5" > /tmp/pg_hba.conf
-echo "host $POSTGRES_DB $POSTGRES_USER 127.0.0.1/32 md5" >> /tmp/pg_hba.conf
-cat /var/lib/pgsql/data/pg_hba.conf >> /tmp/pg_hba.conf
-cat /tmp/pg_hba.conf > /var/lib/pgsql/data/pg_hba.conf
-
-progress
-service postgresql restart >>$LOG_FILE 2>&1
-
-progress
-echo "Creating user and database" >>$LOG_FILE
-su - postgres -c psql >> $LOG_FILE <<SQLCommands
-CREATE USER $POSTGRES_USER PASSWORD '$POSTGRES_PASS';
-CREATE DATABASE $POSTGRES_DB OWNER $POSTGRES_USER;
+# Check if the database and user already exist (i.e let's try connecting)
+if PGPASSWORD=$POSTGRES_PASS psql -U $POSTGRES_USER -d $POSTGRES_DB </dev/null >>$LOG_FILE 2>&1; then
+  echo "Database already exists - skipping" >>$LOG_FILE
+else
+  echo "Creating user and database" >>$LOG_FILE
+  su - postgres -c psql >> $LOG_FILE <<SQLCommands
+  CREATE USER $POSTGRES_USER PASSWORD '$POSTGRES_PASS';
+  CREATE DATABASE $POSTGRES_DB OWNER $POSTGRES_USER;
 SQLCommands
+fi
 
 # Install management console
 date >> $LOG_FILE
@@ -270,7 +270,7 @@ service wildfly start >> $LOG_FILE
 progress
 mkdir -p `dirname $CONSOLE_LOG_FILE`
 progress
-nohup $CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -DapplyEvolutions.default=true -Dconfig.file=$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.db.conf >> $CONSOLE_LOG_FILE &
+nohup $CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -DapplyEvolutions.default=true -Dconfig.file=$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.db.conf >> $CONSOLE_LOG_FILE 2>&1 &
 
 progress
 printf "\n"
