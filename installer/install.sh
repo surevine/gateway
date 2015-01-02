@@ -75,6 +75,9 @@ else
     echo "Please upgrade Gitlab to 7.4 or above"
 fi
 
+echo "Please enter the HTTP address of your Gitlab install"
+read -p "[http://locahost/]: " GITLAB_LOCATION
+if [[ -z "$GITLAB_LOCATION" ]]; then GITLAB_LOCATION="http://localhost/"; fi
 
 echo "Please provide the private_token of a Gitlab admin user:"
 read -p ":" GITLAB_TOKEN
@@ -246,7 +249,7 @@ nohup $CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -Dapply
 su gateway ssh-keygen -f file_rsa -t rsa -N ''
 
 # POST cURL `gateway` user's ~/.ssh/id_rsa.pub to http://gitlab/api/user/keys with `key` = ssh & `title` = 'Gateway key'
-su gateway curl -X POST --data "key@~/.ssh/id_rsa.pub&title=Gateway+user+key" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "http://127.0.0.1/api/v3/user/keys"
+su gateway curl -X POST --data "key@~/.ssh/id_rsa.pub&title=Gateway+user+key" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$GITLAB_LOCATION/api/v3/user/keys"
 
 print_progress 46
 printf "\n"
