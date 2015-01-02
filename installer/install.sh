@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 LOG_FILE="install.log"
 INSTALL_DIR="/opt/gateway"
 NEXUS_USER="nexus"
@@ -48,19 +46,17 @@ if [[ ! -z "$TMP_INSTALL_DIR" ]]; then INSTALL_DIR="$TMP_INSTALL_DIR"; fi
 CONSOLE_INSTALL_DIR=${INSTALL_DIR}/console
 
 # Check if gitlab is installed - heuristic is ( user_exists('git') && contains_dir(/opt/, 'gitlab')
-GIT_USER_EXISTS=false
-id -u git > /dev/null 2>&1 && GIT_USER_EXISTS=true
+GIT_USER_EXISTS="no"
+id -u git > /dev/null 2>&1 && GIT_USER_EXISTS="yes"
 
-if $GIT_USER_EXISTS; then
-    echo "Found git user"
-else
+if [ "$GIT_USER_EXISTS" == "no" ]; then
     echo "No git user found, please install git and Gitlab"
     exit 1;
 fi
 
 GITLAB_VERSION=$(ls /opt/ | grep -v grep | grep -i gitlab-7)
 
-if [ -z "$GITLAB_VERSION" ]; then
+if [[ -z "$GITLAB_VERSION" ]]; then
     echo "No GitLab 7 install detected in /opt/"
     exit 1;
 fi
