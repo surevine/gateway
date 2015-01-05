@@ -61,14 +61,13 @@ if [[ -z "$GITLAB_VERSION" ]]; then
     exit 1;
 fi
 
-echo "Discovered Gitlab version $GITLAB_VERSION . Is this version >= 7.4?"
-read -p "[Y/n]: " GITLAB_VALID_VERSION
-if [[ -z "$GITLAB_VALID_VERSION" ]]; then GITLAB_VALID_VERSION="Y"; fi
+echo "Have you installed Gitlab version 7.4 or greater?"
+read -p "[Y/n]: " GITLAB_INSTALLED
+if [[ -z "$GITLAB_INSTALLED" ]]; then GITLAB_INSTALLED="Y"; fi
 
-if [ "$GITLAB_VALID_VERSION" = "Y" ] then
-    echo "Valid Gitlab version"
-else
+if [ "$GITLAB_VALID_VERSION" = "n" ] then
     echo "Please upgrade Gitlab to 7.4 or above"
+    exit 1;
 fi
 
 echo "Please enter the HTTP address of your Gitlab install"
@@ -79,6 +78,7 @@ echo "Please provide the private_token of a Gitlab admin user:"
 read -p ":" GITLAB_TOKEN
 
 if [ -z "$GITLAB_TOKEN" ]; then
+    echo "No token provided, exiting"
     exit 1;
 fi
 
