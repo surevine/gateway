@@ -49,9 +49,9 @@ echo "Have you installed Gitlab version 7.4 or greater?"
 read -p "[Y/n]: " GITLAB_INSTALLED
 if [[ -z "$GITLAB_INSTALLED" ]]; then GITLAB_INSTALLED="Y"; fi
 
-if [ "$GITLAB_VALID_VERSION" = "n" ] then
+if [ "$GITLAB_INSTALLED" == "n" ]; then
     echo "Please upgrade Gitlab to 7.4 or above"
-    exit 1;
+    exit
 fi
 
 echo "Please enter the HTTP address of your Gitlab install"
@@ -63,7 +63,7 @@ read -p ":" GITLAB_TOKEN
 
 if [ -z "$GITLAB_TOKEN" ]; then
     echo "No token provided, exiting"
-    exit 1;
+    exit
 fi
 
 echo "Please wait..."
