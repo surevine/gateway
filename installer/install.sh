@@ -226,10 +226,10 @@ fi
 #nohup $CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -DapplyEvolutions.default=true -Dconfig.file=$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.db.conf & >> $CONSOLE_LOG_FILE
 
 # Generate `gateway` user's ssh keys
-su gateway ssh-keygen -f file_rsa -t rsa -N ''
+su - gateway -c "ssh-keygen -f id_gen_rsa -t rsa -N ''"
 
 # POST cURL `gateway` user's ~/.ssh/id_rsa.pub to http://gitlab/api/user/keys with `key` = ssh & `title` = 'Gateway key'
-su gateway curl -X POST --data "key@~/.ssh/id_rsa.pub&title=Gateway+user+key" --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$GITLAB_LOCATION/api/v3/user/keys"
+su - gateway -c 'curl -X POST -i --data "key@~/.ssh/id_gen_rsa.pub&title=Gateway+user+key" --header "PRIVATE-TOKEN: "'"$GITLAB_TOKEN"'""  "'"$GITLAB_LOCATION"'"/api/v3/user/keys'
 
 print_progress 46
 printf "\n"
