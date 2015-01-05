@@ -66,164 +66,164 @@ if [ -z "$GITLAB_TOKEN" ]; then
     exit
 fi
 
-echo "Please wait..."
-echo
-
-# Move log files aside
-cat /dev/null > $LOG_FILE
-
-print_progress 1
-touch $LOG_FILE
-
-# Header logs
-date >> $LOG_FILE
-echo "Installing gateway to $INSTALL_DIR" >> $LOG_FILE
-
-# Create directory
-if [ -d "$INSTALL_DIR" ]; then
-  echo "Gateway installation directory already exists at $INSTALL_DIR. Aborting."
-  exit 1
-else
-  mkdir -p "$INSTALL_DIR"
-fi
-
-# Exract JDK
-print_progress 8
-tar xzvf "packages/jdk-7u51-linux-x64.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
-ln -sf "$INSTALL_DIR/jdk1.7.0_51" "$INSTALL_DIR/java" >> $LOG_FILE
-
-# Extract Nexus
-print_progress 12
-tar xzvf "packages/nexus-2.7.2-03-bundle.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
-ln -sf "$INSTALL_DIR/nexus-2.7.2-03" "$INSTALL_DIR/nexus" >> $LOG_FILE
-
-# Extract JBoss
-print_progress 16
-tar xzvf "packages/wildfly-8.0.0.Final.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
-ln -sf "$INSTALL_DIR/wildfly-8.0.0.Final" "$INSTALL_DIR/wildfly" >> $LOG_FILE
-
-# System users
-print_progress 18
-id -u $NEXUS_USER 1>> $LOG_FILE 2>> $LOG_FILE || useradd $NEXUS_USER >> $LOG_FILE
-id -u $WILDFLY_USER 1>> $LOG_FILE 2>> $LOG_FILE || useradd $WILDFLY_USER >> $LOG_FILE
-
-# Extract Maven
-print_progress 20
-tar xzvf "packages/apache-maven-3.1.1-bin.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
-ln -sf "$INSTALL_DIR/apache-maven-3.1.1" "$INSTALL_DIR/maven" >> $LOG_FILE
-echo 'export M2_HOME=/opt/gateway/maven' >> /etc/bashrc
-echo 'export M2=$M2_HOME/bin' >> /etc/bashrc
-echo 'export PATH=$M2:$PATH' >> /etc/bashrc
-export M2_HOME=/opt/gateway/maven
-export M2=$M2_HOME/bin
-export PATH=$M2:$PATH
-
-# Configure Maven
-print_progress 21
-mkdir ~gateway/.m2
-tar xzvf packages/maven_home.tar.gz -C /home/${WILDFLY_USER}/.m2 >> $LOG_FILE
-chown -R ${WILDFLY_USER}:${WILDFLY_USER} /home/${WILDFLY_USER}/.m2 >> $LOG_FILE
-
-# Create keystore and configure Nexus' Jetty for SSL
-$INSTALL_DIR/java/jre/bin/keytool -genkey -noprompt -alias `hostname` -dname "cn=`hostname`" -storepass changeit -keyalg RSA -keystore $INSTALL_DIR/nexus/conf/keystore.jks -keysize 2048 -keypass changeit >> $LOG_FILE
-
-cp -f "nexus_jetty.xml" "$INSTALL_DIR/nexus/conf/jetty.xml" >> $LOG_FILE
-echo "application-port-ssl=8443" >> "$INSTALL_DIR/nexus/conf/nexus.properties"
-
-# NAT Nexus to port 80/443 using iptables
-print_progress 25
-iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8081 >> $LOG_FILE
-iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 8443 >> $LOG_FILE
-service iptables save >> $LOG_FILE
-
-# Install createrepo dependency
-print_progress 27
-IS_AMZN=`uname -a | grep amzn | wc -l`
-if [ $IS_AMZN -ne 0 ]
-then
-	yum -y install createrepo >> $LOG_FILE
-else
-	#rpm -Uvh --quiet $LIBXML || true  >> $LOG_FILE  # Centos 6 only
-        rpm -Uvh --quiet $LIBXML_RPM  || true >> $LOG_FILE
-	rpm -Uvh --quiet $CREATEREPO_RPM  || true >> $LOG_FILE
-
-fi
-
-# Customise Nexus
-print_progress 30
-cp "packages/fluent-hc-4.2.5.jar" "$INSTALL_DIR/nexus/nexus/WEB-INF/lib/" >> $LOG_FILE
-cp "packages/httpmime-4.2.5.jar" "$INSTALL_DIR/nexus/nexus/WEB-INF/lib/" >> $LOG_FILE
-cp "packages/nexus-gateway-plugin.jar" "$INSTALL_DIR/nexus/nexus/WEB-INF/lib/" >> $LOG_FILE
-
-# Add gateway war
-print_progress 31
-cp "packages/gateway.war" "$INSTALL_DIR/wildfly/standalone/deployments/" >> $LOG_FILE
-
-# Nexus service script
-print_progress 33
-ln -sf "$INSTALL_DIR/nexus/bin/nexus" "/etc/init.d/nexus" >> $LOG_FILE
-sed -i "s/#RUN_AS_USER=/RUN_AS_USER=$NEXUS_USER/g" "/etc/init.d/nexus" >> $LOG_FILE
-sed -i "12i\\\nJAVA_HOME=$INSTALL_DIR/java/jre\nPATH=\$JAVA_HOME/bin:\$PATH" "/etc/init.d/nexus" >> $LOG_FILE
-chkconfig --add nexus >> $LOG_FILE
-chkconfig --levels 345 nexus on >> $LOG_FILE
-chown -R $NEXUS_USER:$NEXUS_USER "$INSTALL_DIR/nexus-2.7.2-03" >> $LOG_FILE
-chown -R $NEXUS_USER:$NEXUS_USER "$INSTALL_DIR/sonatype-work" >> $LOG_FILE
-
-# JBoss service script
-print_progress 34
-ln -sf "$INSTALL_DIR/wildfly/bin/init.d/wildfly-init-redhat.sh" "/etc/init.d/wildfly" >> $LOG_FILE
-chkconfig --add wildfly >> $LOG_FILE
-chkconfig --levels 345 wildfly on >> $LOG_FILE
-sed -i "11i\\\nexport JBOSS_USER=$WILDFLY_USER\nJBOSS_HOME=$INSTALL_DIR/wildfly\nJAVA_HOME=$INSTALL_DIR/java/jre" "/etc/init.d/wildfly" >> $LOG_FILE
-chown -R "$WILDFLY_USER:$WILDFLY_USER" "$INSTALL_DIR/wildfly-8.0.0.Final" >> $LOG_FILE
-
-# Install nexus-deploy
-cp "packages/nexus-deploy.sh" $INSTALL_DIR/ >> $LOG_FILE
-
-# System configuration
-
-# Application configuration
-print_progress 35
-sed -i "s/jboss.bind.address:127.0.0.1}\"/jboss.bind.address:0.0.0.0}\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
-sed -i "s/jboss.bind.address.management:127.0.0.1}\"/jboss.bind.address.management:0.0.0.0}\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
-sed -i "s/socket-binding=.http./socket-binding=\"http\" max-post-size=\"2147483648\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
-sed -i "s/-Xmx512m/-Xmx2048m/g" "$INSTALL_DIR/wildfly/bin/standalone.conf" >> $LOG_FILE
-mkdir -p "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" >> $LOG_FILE
-ln -sf "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" "$INSTALL_DIR/config" >> $LOG_FILE
-cp -r config/* "$INSTALL_DIR/config" >> $LOG_FILE
-
-# Install management console
-date >> $LOG_FILE
-echo "Installing gateway management console to $CONSOLE_INSTALL_DIR" >> $LOG_FILE
-
-# Create directory
-if [ -d "$CONSOLE_INSTALL_DIR" ]; then
-  echo "Gateway management console installation directory already exists at $CONSOLE_INSTALL_DIR. Aborting."
-  exit 1
-else
-  mkdir -p "$CONSOLE_INSTALL_DIR"
-fi
-
-# Extract management console
-print_progress 38
-unzip "packages/gateway-management.zip" -d "$CONSOLE_INSTALL_DIR" >> $LOG_FILE
-
-# Modify database connection url
-sed -i "s/postgres:\/\/user:password@host\/database/postgres:\/\/$POSTGRES_USER:$POSTGRES_PASS@$POSTGRES_HOST\/$POSTGRES_DB/g" "$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.db.conf" >> $LOG_FILE
-
-# Set java version (required for console)
-export JAVA_HOME=$INSTALL_DIR/java
-
-# Setup console logfile
-CONSOLE_LOG_FILE=$CONSOLE_INSTALL_DIR/gateway-management-1.0/logs/application.log
-
-# Application startup
-print_progress 40
-service nexus start >> $LOG_FILE
-print_progress 42
-service wildfly start >> $LOG_FILE
-print_progress 44
-nohup $CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -DapplyEvolutions.default=true -Dconfig.file=$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.db.conf & >> $CONSOLE_LOG_FILE
+#echo "Please wait..."
+#echo
+#
+## Move log files aside
+#cat /dev/null > $LOG_FILE
+#
+#print_progress 1
+#touch $LOG_FILE
+#
+## Header logs
+#date >> $LOG_FILE
+#echo "Installing gateway to $INSTALL_DIR" >> $LOG_FILE
+#
+## Create directory
+#if [ -d "$INSTALL_DIR" ]; then
+#  echo "Gateway installation directory already exists at $INSTALL_DIR. Aborting."
+#  exit 1
+#else
+#  mkdir -p "$INSTALL_DIR"
+#fi
+#
+## Exract JDK
+#print_progress 8
+#tar xzvf "packages/jdk-7u51-linux-x64.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
+#ln -sf "$INSTALL_DIR/jdk1.7.0_51" "$INSTALL_DIR/java" >> $LOG_FILE
+#
+## Extract Nexus
+#print_progress 12
+#tar xzvf "packages/nexus-2.7.2-03-bundle.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
+#ln -sf "$INSTALL_DIR/nexus-2.7.2-03" "$INSTALL_DIR/nexus" >> $LOG_FILE
+#
+## Extract JBoss
+#print_progress 16
+#tar xzvf "packages/wildfly-8.0.0.Final.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
+#ln -sf "$INSTALL_DIR/wildfly-8.0.0.Final" "$INSTALL_DIR/wildfly" >> $LOG_FILE
+#
+## System users
+#print_progress 18
+#id -u $NEXUS_USER 1>> $LOG_FILE 2>> $LOG_FILE || useradd $NEXUS_USER >> $LOG_FILE
+#id -u $WILDFLY_USER 1>> $LOG_FILE 2>> $LOG_FILE || useradd $WILDFLY_USER >> $LOG_FILE
+#
+## Extract Maven
+#print_progress 20
+#tar xzvf "packages/apache-maven-3.1.1-bin.tar.gz" -C "$INSTALL_DIR" >> $LOG_FILE
+#ln -sf "$INSTALL_DIR/apache-maven-3.1.1" "$INSTALL_DIR/maven" >> $LOG_FILE
+#echo 'export M2_HOME=/opt/gateway/maven' >> /etc/bashrc
+#echo 'export M2=$M2_HOME/bin' >> /etc/bashrc
+#echo 'export PATH=$M2:$PATH' >> /etc/bashrc
+#export M2_HOME=/opt/gateway/maven
+#export M2=$M2_HOME/bin
+#export PATH=$M2:$PATH
+#
+## Configure Maven
+#print_progress 21
+#mkdir ~gateway/.m2
+#tar xzvf packages/maven_home.tar.gz -C /home/${WILDFLY_USER}/.m2 >> $LOG_FILE
+#chown -R ${WILDFLY_USER}:${WILDFLY_USER} /home/${WILDFLY_USER}/.m2 >> $LOG_FILE
+#
+## Create keystore and configure Nexus' Jetty for SSL
+#$INSTALL_DIR/java/jre/bin/keytool -genkey -noprompt -alias `hostname` -dname "cn=`hostname`" -storepass changeit -keyalg RSA -keystore $INSTALL_DIR/nexus/conf/keystore.jks -keysize 2048 -keypass changeit >> $LOG_FILE
+#
+#cp -f "nexus_jetty.xml" "$INSTALL_DIR/nexus/conf/jetty.xml" >> $LOG_FILE
+#echo "application-port-ssl=8443" >> "$INSTALL_DIR/nexus/conf/nexus.properties"
+#
+## NAT Nexus to port 80/443 using iptables
+#print_progress 25
+#iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8081 >> $LOG_FILE
+#iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 8443 >> $LOG_FILE
+#service iptables save >> $LOG_FILE
+#
+## Install createrepo dependency
+#print_progress 27
+#IS_AMZN=`uname -a | grep amzn | wc -l`
+#if [ $IS_AMZN -ne 0 ]
+#then
+#	yum -y install createrepo >> $LOG_FILE
+#else
+#	#rpm -Uvh --quiet $LIBXML || true  >> $LOG_FILE  # Centos 6 only
+#        rpm -Uvh --quiet $LIBXML_RPM  || true >> $LOG_FILE
+#	rpm -Uvh --quiet $CREATEREPO_RPM  || true >> $LOG_FILE
+#
+#fi
+#
+## Customise Nexus
+#print_progress 30
+#cp "packages/fluent-hc-4.2.5.jar" "$INSTALL_DIR/nexus/nexus/WEB-INF/lib/" >> $LOG_FILE
+#cp "packages/httpmime-4.2.5.jar" "$INSTALL_DIR/nexus/nexus/WEB-INF/lib/" >> $LOG_FILE
+#cp "packages/nexus-gateway-plugin.jar" "$INSTALL_DIR/nexus/nexus/WEB-INF/lib/" >> $LOG_FILE
+#
+## Add gateway war
+#print_progress 31
+#cp "packages/gateway.war" "$INSTALL_DIR/wildfly/standalone/deployments/" >> $LOG_FILE
+#
+## Nexus service script
+#print_progress 33
+#ln -sf "$INSTALL_DIR/nexus/bin/nexus" "/etc/init.d/nexus" >> $LOG_FILE
+#sed -i "s/#RUN_AS_USER=/RUN_AS_USER=$NEXUS_USER/g" "/etc/init.d/nexus" >> $LOG_FILE
+#sed -i "12i\\\nJAVA_HOME=$INSTALL_DIR/java/jre\nPATH=\$JAVA_HOME/bin:\$PATH" "/etc/init.d/nexus" >> $LOG_FILE
+#chkconfig --add nexus >> $LOG_FILE
+#chkconfig --levels 345 nexus on >> $LOG_FILE
+#chown -R $NEXUS_USER:$NEXUS_USER "$INSTALL_DIR/nexus-2.7.2-03" >> $LOG_FILE
+#chown -R $NEXUS_USER:$NEXUS_USER "$INSTALL_DIR/sonatype-work" >> $LOG_FILE
+#
+## JBoss service script
+#print_progress 34
+#ln -sf "$INSTALL_DIR/wildfly/bin/init.d/wildfly-init-redhat.sh" "/etc/init.d/wildfly" >> $LOG_FILE
+#chkconfig --add wildfly >> $LOG_FILE
+#chkconfig --levels 345 wildfly on >> $LOG_FILE
+#sed -i "11i\\\nexport JBOSS_USER=$WILDFLY_USER\nJBOSS_HOME=$INSTALL_DIR/wildfly\nJAVA_HOME=$INSTALL_DIR/java/jre" "/etc/init.d/wildfly" >> $LOG_FILE
+#chown -R "$WILDFLY_USER:$WILDFLY_USER" "$INSTALL_DIR/wildfly-8.0.0.Final" >> $LOG_FILE
+#
+## Install nexus-deploy
+#cp "packages/nexus-deploy.sh" $INSTALL_DIR/ >> $LOG_FILE
+#
+## System configuration
+#
+## Application configuration
+#print_progress 35
+#sed -i "s/jboss.bind.address:127.0.0.1}\"/jboss.bind.address:0.0.0.0}\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
+#sed -i "s/jboss.bind.address.management:127.0.0.1}\"/jboss.bind.address.management:0.0.0.0}\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
+#sed -i "s/socket-binding=.http./socket-binding=\"http\" max-post-size=\"2147483648\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
+#sed -i "s/-Xmx512m/-Xmx2048m/g" "$INSTALL_DIR/wildfly/bin/standalone.conf" >> $LOG_FILE
+#mkdir -p "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" >> $LOG_FILE
+#ln -sf "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" "$INSTALL_DIR/config" >> $LOG_FILE
+#cp -r config/* "$INSTALL_DIR/config" >> $LOG_FILE
+#
+## Install management console
+#date >> $LOG_FILE
+#echo "Installing gateway management console to $CONSOLE_INSTALL_DIR" >> $LOG_FILE
+#
+## Create directory
+#if [ -d "$CONSOLE_INSTALL_DIR" ]; then
+#  echo "Gateway management console installation directory already exists at $CONSOLE_INSTALL_DIR. Aborting."
+#  exit 1
+#else
+#  mkdir -p "$CONSOLE_INSTALL_DIR"
+#fi
+#
+## Extract management console
+#print_progress 38
+#unzip "packages/gateway-management.zip" -d "$CONSOLE_INSTALL_DIR" >> $LOG_FILE
+#
+## Modify database connection url
+#sed -i "s/postgres:\/\/user:password@host\/database/postgres:\/\/$POSTGRES_USER:$POSTGRES_PASS@$POSTGRES_HOST\/$POSTGRES_DB/g" "$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.db.conf" >> $LOG_FILE
+#
+## Set java version (required for console)
+#export JAVA_HOME=$INSTALL_DIR/java
+#
+## Setup console logfile
+#CONSOLE_LOG_FILE=$CONSOLE_INSTALL_DIR/gateway-management-1.0/logs/application.log
+#
+## Application startup
+#print_progress 40
+#service nexus start >> $LOG_FILE
+#print_progress 42
+#service wildfly start >> $LOG_FILE
+#print_progress 44
+#nohup $CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -DapplyEvolutions.default=true -Dconfig.file=$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.db.conf & >> $CONSOLE_LOG_FILE
 
 # Generate `gateway` user's ssh keys
 su gateway ssh-keygen -f file_rsa -t rsa -N ''
