@@ -13,19 +13,19 @@ POSTGRES_PASS="console"
 
 # Adjust the below rpm paths depending on your version of CENTOS
 
-CREATEREPO_RPM="packages/createrepo-0.4.11-3.el5.noarch.rpm" # For Centos 5.10
-# CREATEREPO_RPM="packages/createrepo-0.9.9-18.el6.noarch.rpm" # For Centos 6
+# CREATEREPO_RPM="packages/createrepo-0.4.11-3.el5.noarch.rpm" # For Centos 5.10
+CREATEREPO_RPM="packages/createrepo-0.9.9-18.el6.noarch.rpm" # For Centos 6
 
-LIBXML_RPM="packages/libxml2-python-2.6.26-2.1.21.el5_9.3.x86_64.rpm" # For Centos 5.10
-#LIBXML_RPM="packages/libxml2-python-2.7.6-14.el6_5.2.x86_64.rpm"
+# LIBXML_RPM="packages/libxml2-python-2.6.26-2.1.21.el5_9.3.x86_64.rpm" # For Centos 5.10
+LIBXML_RPM="packages/libxml2-python-2.7.6-14.el6_5.2.x86_64.rpm"
 
 PYTHON_DELTA_RPM="packages/python-deltarpm-3.5-0.5.20090913git.el6.x86_64.rpm"
 LIBXML="packages/libxml2-2.7.6-14.el6_5.2.x86_64.rpm"
 
-LIBXSLT_RPM="packages/libxslt-1.1.17-4.el5_8.3.x86_64.rpm"
-POSTGRES_RPM="packages/postgresql93-*.rhel5.x86_64.rpm"
-#LIBXSLT_RPM="packages/libxslt-1.1.26-2.el6_3.1.x86_64"
-#POSTGRES_RPM="packages/postgresql93-*.rhel6.x86_64.rpm"
+#LIBXSLT_RPM="packages/libxslt-1.1.17-4.el5_8.3.x86_64.rpm"
+#POSTGRES_RPM="packages/postgresql93-*.rhel5.x86_64.rpm"
+LIBXSLT_RPM="packages/libxslt-1.1.26-2.el6_3.1.x86_64"
+POSTGRES_RPM="packages/postgresql93-*.rhel6.x86_64.rpm"
 
 PROGRESS=0
 MAX_PROGRESS=`grep -oE "^\\s*progress\\s*[0-9]*$" $BASH_SOURCE | wc -l`
