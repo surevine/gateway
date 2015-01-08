@@ -46,6 +46,7 @@ chmod +x installer/install.sh
 # Source tarballs
 curl -skL "https://github.com/surevine/gateway/archive/master.zip" -o "installer/sources/gateway.src.zip"
 curl -skL "https://github.com/surevine/nexus-gateway-plugin/archive/master.zip" -o "installer/sources/nexus-gateway-plugin.src.zip"
+curl -skL "https://github.com/surevine/federated-scm/archive/master.zip" -o "installer/sources/federated-scm.src.zip"
 
 # Nexus jetty config
 curl -skL "https://raw.githubusercontent.com/surevine/gateway/master/installer/nexus_jetty.xml" -o installer/config/nexus_jetty.xml
@@ -55,6 +56,7 @@ curl -skL -u "$NEXUS_USERNAME:$NEXUS_PASSWORD" "https://nexus.surevine.net/servi
 curl -skL -u "$NEXUS_USERNAME:$NEXUS_PASSWORD" "https://nexus.surevine.net/service/local/artifact/maven/redirect?r=TPS&g=com.surevine.community&a=gateway-management&p=zip&v=LATEST" -o "installer/packages/gateway-management.zip"
 # nexus-gateway-plugin needed here:
 #curl -sk "https://nexus.surevine.net/service/local/artifact/maven/redirect?r=TPS&g=com.surevine.community&a=gateway-web&p=war&v=LATEST" -o "installer/packages/gateway.war"
+curl -skL -u "$NEXUS_USERNAME:$NEXUS_PASSWORD" "https://nexus.surevine.net/service/local/artifact/maven/redirect?r=TPS&g=com.surevine.gateway.scm&a=federated-scm&p=war&v=LATEST" -o "installer/packages/federated-scm.war"
 
 
 # Create archive

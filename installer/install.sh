@@ -70,6 +70,28 @@ CONSOLE_INSTALL_DIR=${INSTALL_DIR}/console
 # The install directory escaped for regex replacements
 INSTALL_DIR_ESCAPED="`echo "$INSTALL_DIR" | sed 's/[\/&]/\\\\&/g'`"
 
+echo "Have you installed Gitlab version 7.4 or greater?"
+read -p "[Y/n]: " GITLAB_INSTALLED
+if [[ -z "$GITLAB_INSTALLED" ]]; then GITLAB_INSTALLED="Y"; fi
+
+if [ "$GITLAB_INSTALLED" == "n" ]; then
+    echo "Please upgrade Gitlab to 7.4 or above"
+    exit
+fi
+
+echo "Please enter the HTTP address of your Gitlab install"
+read -p "[http://locahost/]: " GITLAB_LOCATION
+if [[ -z "$GITLAB_LOCATION" ]]; then GITLAB_LOCATION="http://localhost/"; fi
+
+echo "Please provide the private_token of a Gitlab admin user:"
+read -p ":" GITLAB_TOKEN
+
+if [ -z "$GITLAB_TOKEN" ]; then
+    echo "No token provided, exiting"
+    exit
+fi
+
+
 echo "Please wait..."
 echo
 
@@ -271,6 +293,14 @@ progress
 mkdir -p `dirname $CONSOLE_LOG_FILE`
 progress
 nohup $CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -DapplyEvolutions.default=true -Dconfig.file=$CONSOLE_INSTALL_DIR/gateway-management-1.0/conf/application.db.conf >> $CONSOLE_LOG_FILE 2>&1 &
+
+progress
+
+# Generate `gateway` user's ssh keys
+su - gateway -c "ssh-keygen -f id_gen_rsa -t rsa -N ''"
+
+# POST cURL `gateway` user's ~/.ssh/id_rsa.pub to http://gitlab/api/user/keys with `key` = ssh & `title` = 'Gateway key'
+su - gateway -c 'curl -X POST -i --data "key@~/.ssh/id_gen_rsa.pub&title=Gateway+user+key" --header "PRIVATE-TOKEN: "'"$GITLAB_TOKEN"'""  "'"$GITLAB_LOCATION"'"/api/v3/user/keys'
 
 progress
 printf "\n"
