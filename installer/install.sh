@@ -300,7 +300,7 @@ progress
 su - gateway -c "ssh-keygen -f id_gen_rsa -t rsa -N ''"
 
 # POST cURL `gateway` user's ~/.ssh/id_rsa.pub to http://gitlab/api/user/keys with `key` = ssh & `title` = 'Gateway key'
-su - gateway -c 'SSH=`cat /home/gateway/id_gen_rsa.pub` curl -X POST -F "key=$SSH" -F "title=Gateway user key" --header "PRIVATE-TOKEN: "'"$GITLAB_TOKEN"'""  "'"$GITLAB_LOCATION"'"/api/v3/user/keys'
+su - gateway -c 'export SSH=`cat /home/gateway/id_gen_rsa.pub` && curl -X POST -F "key=$SSH" -F "title=Gateway user key" --header "PRIVATE-TOKEN: "'"$GITLAB_TOKEN"'""  "'"$GITLAB_LOCATION"'"/api/v3/user/keys'
 
 progress
 printf "\n"
