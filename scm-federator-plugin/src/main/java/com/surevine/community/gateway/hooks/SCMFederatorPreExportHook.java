@@ -1,10 +1,17 @@
 package com.surevine.community.gateway.hooks;
 
+import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.TransferItem;
+import com.surevine.community.gateway.sanitisation.SanitisationResult;
+import com.surevine.community.gateway.sanitisation.SanitisationServiceFacade;
 
 /**
  * PreExportHook to apply SCM-federation specific logic
@@ -12,6 +19,8 @@ import com.surevine.community.gateway.model.TransferItem;
  * @author jonnyheavey
  */
 public class SCMFederatorPreExportHook implements GatewayPreExportHook {
+
+	private static final Logger LOG = Logger.getLogger(SCMFederatorPreExportHook.class.getName());
 
 	private static final String SCM_SOURCE_TYPE = "SCM";
 
@@ -24,6 +33,8 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 					// Don't export project to destination (as its not shared)
 					item.setNotExportable();
 				}
+
+				sanitise(item);
 			}
 		}
 	}
@@ -59,6 +70,30 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Confirms item is safe to export.
+	 * @param item TransferItem to be sanitised
+	 */
+	private void sanitise(final TransferItem item) {
+
+		Map<String, String> metadata = item.getMetadata();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+		SanitisationResult result = SanitisationServiceFacade.getInstance().isSane(item.getSource(),
+																					metadata.get("projectKey"),
+																					metadata.get("repoSlug"),
+																					"Export-"+dateFormat.format(new Date()));
+		if(!result.isSane()) {
+			// Don't export item as sanitisation rejected
+			item.setNotExportable();
+			LOG.warning(String.format("Export of item '%s' to destination '%s' prevented by sanitisation service. Reasons:",
+					item.getSource(),
+					item.getDestination().getName()));
+			for(String error: result.getErrors()) {
+				LOG.warning(error);
+			}
+		}
 	}
 
 }
