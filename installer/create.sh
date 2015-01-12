@@ -25,7 +25,14 @@ cat > installer/config/module.xml << EOF
 </module>
 EOF
 
-cp installer/config/module.xml installer/config-scm/
+cat > installer/config-scm/module.xml << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.1" name="com.surevine.gateway.scm">
+    <resources>
+        <resource-root path="."/>
+    </resources>
+</module>
+EOF
 
 # Suck down source control files
 curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/gateway-web/src/main/resources/gateway.properties" -o "installer/config/gateway.properties"
