@@ -191,6 +191,7 @@ cp "packages/nexus-gateway-plugin.jar" "$INSTALL_DIR/nexus/nexus/WEB-INF/lib/" >
 # Add gateway war
 progress
 cp "packages/gateway.war" "$INSTALL_DIR/wildfly/standalone/deployments/" >> $LOG_FILE
+cp "packages/federated-scm.war" "$INSTALL_DIR/wildfly/standalone/deployments/" >> $LOG_FILE
 
 # Nexus service script
 progress
