@@ -83,7 +83,7 @@ echo "Please enter the HTTP address of your Gitlab install"
 read -p "[http://locahost/]: " GITLAB_LOCATION
 if [[ -z "$GITLAB_LOCATION" ]]; then GITLAB_LOCATION="http://localhost/"; fi
 
-echo "Please provide the private_token of a Gitlab admin user:"
+echo "Please provide the private_token of a Gitlab admin user"
 read -p ":" GITLAB_TOKEN
 
 if [ -z "$GITLAB_TOKEN" ]; then
@@ -91,6 +91,13 @@ if [ -z "$GITLAB_TOKEN" ]; then
     exit
 fi
 
+echo "Please provide an organisation name to identify this organisation to partners"
+read -p ":" ORG_NAME
+
+if [ -z "$ORG_NAME" ]; then
+    echo "No name provided, exiting"
+    exit
+fi
 
 echo "Please wait..."
 echo
@@ -157,10 +164,10 @@ cp -f "config/nexus_jetty.xml" "$INSTALL_DIR/nexus/conf/jetty.xml" >> $LOG_FILE
 echo "application-port-ssl=8443" >> "$INSTALL_DIR/nexus/conf/nexus.properties"
 
 # NAT Nexus to port 80/443 using iptables
-progress
-iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8081 >> $LOG_FILE
-iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 8443 >> $LOG_FILE
-service iptables save >> $LOG_FILE
+#progress
+#iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8081 >> $LOG_FILE
+#iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 8443 >> $LOG_FILE
+#service iptables save >> $LOG_FILE
 
 # Install createrepo dependency
 progress
@@ -217,7 +224,19 @@ sed -i "s/socket-binding=.http./socket-binding=\"http\" max-post-size=\"21474836
 sed -i "s/-Xmx512m/-Xmx2048m/g" "$INSTALL_DIR/wildfly/bin/standalone.conf" >> $LOG_FILE
 mkdir -p "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" >> $LOG_FILE
 ln -sf "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" "$INSTALL_DIR/config" >> $LOG_FILE
+ln -sf "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" "$INSTALL_DIR/config" >> $LOG_FILE
 cp -r config/* "$INSTALL_DIR/config" >> $LOG_FILE
+
+# federated SCM configuration
+sed -i sed -i "s/{fedscm.org.name}/$ORG_NAME/g" "$INSTALL_DIR/config/federated-scm.properties" >> $LOG_FILE
+sed -i sed -i "s/{scm.auth.token}/$GITLAB_TOKEN/g" "$INSTALL_DIR/config/federated-scm.properties" >> $LOG_FILE
+sed -i sed -i "s/{scm.hostname}/$GITLAB_LOCATION/g" "$INSTALL_DIR/config/federated-scm.properties" >> $LOG_FILE
+
+mkdir -p /tmp/tpsc/scm/
+mkdir -p /tmp/tpsc/scm/repositories
+mkdir -p /tmp/tpsc/scm/bundle_remotes
+
+chown -R gateway /tmp/tpsc/
 
 # Install and configure PostgreSQL
 date >> $LOG_FILE
@@ -297,10 +316,10 @@ nohup $CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -Dapply
 progress
 
 # Generate `gateway` user's ssh keys
-su - gateway -c "ssh-keygen -f id_gen_rsa -t rsa -N ''"
+su - gateway -c "ssh-keygen -f id_gen_rsa -t rsa -N ''" >> $LOG_FILE
 
 # POST cURL `gateway` user's ~/.ssh/id_rsa.pub to http://gitlab/api/user/keys with `key` = ssh & `title` = 'Gateway key'
-su - gateway -c 'SSH=`cat /home/gateway/id_gen_rsa.pub` curl -X POST -F "key=$SSH" -F "title=Gateway user key" --header "PRIVATE-TOKEN: "'"$GITLAB_TOKEN"'""  "'"$GITLAB_LOCATION"'"/api/v3/user/keys'
+su - gateway -c 'export SSH=`cat /home/gateway/id_gen_rsa.pub` && curl -X POST -F "key=$SSH" -F "title=Gateway user key" --header "PRIVATE-TOKEN: "'"$GITLAB_TOKEN"'""  "'"$GITLAB_LOCATION"'"/api/v3/user/keys' >> $LOG_FILE
 
 progress
 printf "\n"
@@ -314,5 +333,12 @@ echo "              located at "$INSTALL_DIR"/nexus/config/keystore.jks"
 echo
 echo "              This keystore will need changing to match your environment"
 echo "              if you wish to use HTTPS in production"
+echo
+echo "              SSH keys for the `gateway` system user have been created without a passphrase
+echo "              and stored in `/home/gateway/"
+echo
+echo "              Nexus is reachable over HTTP on port 8081, and over HTTPS on port 8433"
+echo
+echo "              Any existing service on ports 80 and 443 have been preserved"
 echo
 date
