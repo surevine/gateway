@@ -61,7 +61,7 @@ public class SanitisationServiceFacade {
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	public SanitisationResult isSane(Path archiveToSanitise, String projectKey, String repoSlug, String identifier) throws UnsupportedEncodingException {
+	public SanitisationResult isSane(Path archiveToSanitise, String projectKey, String repoSlug, String identifier) {
 
 		LOG.info("Sending archive to sanitisation service: " + archiveToSanitise.toString());
 
@@ -69,9 +69,14 @@ public class SanitisationServiceFacade {
 
 		MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 		entity.addPart("archive", new FileBody(archive));
-		entity.addPart("projectKey", new StringBody(projectKey));
-		entity.addPart("repoSlug", new StringBody(repoSlug));
-		entity.addPart("identifier", new StringBody(identifier));
+		try {
+			entity.addPart("projectKey", new StringBody(projectKey));
+			entity.addPart("repoSlug", new StringBody(repoSlug));
+			entity.addPart("identifier", new StringBody(identifier));
+		} catch (UnsupportedEncodingException e1) {
+			LOG.severe("Failed to build entities for sanitisation request.");
+			e1.printStackTrace();
+		}
 
 		String url = getConfig().getProperty("sanitisation.service.base.url") + "/sanitise";
 
@@ -91,14 +96,14 @@ public class SanitisationServiceFacade {
 			String responseString = IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
 			try {
 				parseJSONResponse(result, responseString);
-			} catch (JSONException e) {
+			} catch (JSONException e2) {
 				result.setSane(false);
 				result.addError("Failed to parse sanitisation service response.");
 			}
 
-		} catch (IOException e) {
+		} catch (IOException e3) {
 			LOG.severe("Failed to send archive to sanitisation service.");
-			e.printStackTrace();
+			e3.printStackTrace();
 		}
 
 		return result;
