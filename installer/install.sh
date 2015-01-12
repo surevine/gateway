@@ -164,10 +164,10 @@ cp -f "config/nexus_jetty.xml" "$INSTALL_DIR/nexus/conf/jetty.xml" >> $LOG_FILE
 echo "application-port-ssl=8443" >> "$INSTALL_DIR/nexus/conf/nexus.properties"
 
 # NAT Nexus to port 80/443 using iptables
-progress
-iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8081 >> $LOG_FILE
-iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 8443 >> $LOG_FILE
-service iptables save >> $LOG_FILE
+#progress
+#iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8081 >> $LOG_FILE
+#iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 8443 >> $LOG_FILE
+#service iptables save >> $LOG_FILE
 
 # Install createrepo dependency
 progress
@@ -333,5 +333,12 @@ echo "              located at "$INSTALL_DIR"/nexus/config/keystore.jks"
 echo
 echo "              This keystore will need changing to match your environment"
 echo "              if you wish to use HTTPS in production"
+echo
+echo "              SSH keys for the `gateway` system user have been created without a passphrase
+echo "              and stored in `/home/gateway/"
+echo
+echo "              Nexus is reachable over HTTP on port 8081, and over HTTPS on port 8433"
+echo
+echo "              Any existing service on ports 80 and 443 have been preserved"
 echo
 date
