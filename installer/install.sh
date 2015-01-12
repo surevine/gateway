@@ -223,15 +223,19 @@ sed -i "s/jboss.bind.address:127.0.0.1}\"/jboss.bind.address:0.0.0.0}\"/g" "$INS
 sed -i "s/jboss.bind.address.management:127.0.0.1}\"/jboss.bind.address.management:0.0.0.0}\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
 sed -i "s/socket-binding=.http./socket-binding=\"http\" max-post-size=\"2147483648\"/g" "$INSTALL_DIR/wildfly/standalone/configuration/standalone.xml" >> $LOG_FILE
 sed -i "s/-Xmx512m/-Xmx2048m/g" "$INSTALL_DIR/wildfly/bin/standalone.conf" >> $LOG_FILE
+
 mkdir -p "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" >> $LOG_FILE
+mkdir -p "$INSTALL_DIR/wildfly/modules/com/surevine/gateway/scm/main" >> $LOG_FILE
+
 ln -sf "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" "$INSTALL_DIR/config" >> $LOG_FILE
-ln -sf "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" "$INSTALL_DIR/config" >> $LOG_FILE
+ln -sf "$INSTALL_DIR/wildfly/modules/com/surevine/gateway/scm/main" "$INSTALL_DIR/config-scm" >> $LOG_FILE
 cp -r config/* "$INSTALL_DIR/config" >> $LOG_FILE
+cp -r config-scm/* "$INSTALL_DIR/config-scm" >> $LOG_FILE
 
 # federated SCM configuration
-sed -i "s/{fedscm.org.name}/$ORG_NAME/g" "$INSTALL_DIR/config/federated-scm.properties" >> $LOG_FILE
-sed -i "s/{scm.auth.token}/$GITLAB_TOKEN/g" "$INSTALL_DIR/config/federated-scm.properties" >> $LOG_FILE
-sed -i "s|{scm.hostname}|$GITLAB_LOCATION|g" "$INSTALL_DIR/config/federated-scm.properties" >> $LOG_FILE
+sed -i "s/{fedscm.org.name}/$ORG_NAME/g" "$INSTALL_DIR/config-scm/federated-scm.properties" >> $LOG_FILE
+sed -i "s/{scm.auth.token}/$GITLAB_TOKEN/g" "$INSTALL_DIR/config-scm/federated-scm.properties" >> $LOG_FILE
+sed -i "s|{scm.hostname}|$GITLAB_LOCATION|g" "$INSTALL_DIR/config-scm/federated-scm.properties" >> $LOG_FILE
 
 mkdir -p /tmp/tpsc/scm/
 mkdir -p /tmp/tpsc/scm/repositories

@@ -10,6 +10,7 @@ STATIC_ROOT="/var/lib/jenkins/tps/installer"
 mkdir -p installer/packages
 mkdir -p installer/sources
 mkdir -p installer/config
+mkdir -p installer/config-scm
 
 # Copy static files into place
 cp ${STATIC_ROOT}/README installer/
@@ -24,9 +25,11 @@ cat > installer/config/module.xml << EOF
 </module>
 EOF
 
+cp installer/config/module.xml installer/config-scm/
+
 # Suck down source control files
 curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/gateway-web/src/main/resources/gateway.properties" -o "installer/config/gateway.properties"
-curl -sk "https://raw.githubusercontent.com/surevine/federated-scm/master/src/main/resources/federated-scm.properties" -o "installer/config/federated-scm.properties"
+curl -sk "https://raw.githubusercontent.com/surevine/federated-scm/master/src/main/resources/federated-scm.properties" -o "installer/config-scm/federated-scm.properties"
 curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/javascript-plugins/src/main/resources/export-rules.js" -o "installer/config/export-rules.js"
 curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/javascript-plugins/src/main/resources/import-filter.js" -o "installer/config/import-filter.js"
 curl -sk "https://raw.githubusercontent.com/surevine/gateway/master/javascript-plugins/src/main/resources/javascript-hook.properties" -o "installer/config/javascript-hook.properties"
