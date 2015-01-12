@@ -228,9 +228,9 @@ ln -sf "$INSTALL_DIR/wildfly/modules/com/surevine/community/gateway/main" "$INST
 cp -r config/* "$INSTALL_DIR/config" >> $LOG_FILE
 
 # federated SCM configuration
-sed -i sed -i "s/{fedscm.org.name}/$ORG_NAME/g" "$INSTALL_DIR/config/federated-scm.properties" >> $LOG_FILE
-sed -i sed -i "s/{scm.auth.token}/$GITLAB_TOKEN/g" "$INSTALL_DIR/config/federated-scm.properties" >> $LOG_FILE
-sed -i sed -i "s/{scm.hostname}/$GITLAB_LOCATION/g" "$INSTALL_DIR/config/federated-scm.properties" >> $LOG_FILE
+sed -i "s/{fedscm.org.name}/$ORG_NAME/g" "$INSTALL_DIR/config/federated-scm.properties" >> $LOG_FILE
+sed -i "s/{scm.auth.token}/$GITLAB_TOKEN/g" "$INSTALL_DIR/config/federated-scm.properties" >> $LOG_FILE
+sed -i "s|{scm.hostname}|$GITLAB_LOCATION|g" "$INSTALL_DIR/config/federated-scm.properties" >> $LOG_FILE
 
 mkdir -p /tmp/tpsc/scm/
 mkdir -p /tmp/tpsc/scm/repositories
