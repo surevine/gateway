@@ -321,10 +321,13 @@ nohup $CONSOLE_INSTALL_DIR/gateway-management-1.0/bin/gateway-management -Dapply
 progress
 
 # Generate `gateway` user's ssh keys
-su - gateway -c "ssh-keygen -f id_gen_rsa -t rsa -N ''" >> $LOG_FILE
+su - gateway -c "ssh-keygen -f id_rsa -t rsa -N ''" >> $LOG_FILE
+su - gateway -c "mkdir -p /home/gateway/.ssh" >> $LOG_FILE
+su - gateway -c "mv /home/gateway/id_rsa* /home/gateway/.ssh" >> $LOG_FILE
+su - gateway -c 'ssh-keyscan -t rsa `echo "'"$GITLAB_LOCATION"'" | sed "s|/||g" | sed "s|http:||g"` >> ~/.ssh/known_hosts' >> $LOG_FILE
 
 # POST cURL `gateway` user's ~/.ssh/id_rsa.pub to http://gitlab/api/user/keys with `key` = ssh & `title` = 'Gateway key'
-su - gateway -c 'export SSH=`cat /home/gateway/id_gen_rsa.pub` && curl -X POST -F "key=$SSH" -F "title=Gateway user key" --header "PRIVATE-TOKEN: "'"$GITLAB_TOKEN"'""  "'"$GITLAB_LOCATION"'"/api/v3/user/keys' >> $LOG_FILE
+su - gateway -c 'export SSH=`cat /home/gateway/.ssh/id_rsa.pub` && curl -X POST -F "key=$SSH" -F "title=Gateway user key" --header "PRIVATE-TOKEN: "'"$GITLAB_TOKEN"'""  "'"$GITLAB_LOCATION"'"/api/v3/user/keys' >> $LOG_FILE
 
 progress
 printf "\n"
@@ -340,7 +343,7 @@ echo "              This keystore will need changing to match your environment"
 echo "              if you wish to use HTTPS in production"
 echo
 echo "              SSH keys for the gateway system user have been created without a passphrase
-echo "              and stored in /home/gateway/"
+echo "              and stored in /home/gateway"
 echo
 echo "              Nexus is reachable over HTTP on port 8081, and over HTTPS on port 8433"
 echo
