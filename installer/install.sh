@@ -342,7 +342,7 @@ echo
 echo "              This keystore will need changing to match your environment"
 echo "              if you wish to use HTTPS in production"
 echo
-echo "              SSH keys for the gateway system user have been created without a passphrase
+echo "              SSH keys for the gateway system user have been created without a passphrase"
 echo "              and stored in /home/gateway"
 echo
 echo "              Nexus is reachable over HTTP on port 8081, and over HTTPS on port 8433"
