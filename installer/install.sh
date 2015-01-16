@@ -70,6 +70,13 @@ CONSOLE_INSTALL_DIR=${INSTALL_DIR}/console
 # The install directory escaped for regex replacements
 INSTALL_DIR_ESCAPED="`echo "$INSTALL_DIR" | sed 's/[\/&]/\\\\&/g'`"
 
+echo "Will this installation of Gateway use Gitlab for source code management?"
+read -p "[Y/n]: " USING_GITLAB
+if [[ -z "$USING_GITLAB" ]]; then USING_GITLAB="y"; fi
+if [ "$USING_GITLAB" == "Y" ]; then USING_GITLAB="y"; fi
+
+if [ "$USING_GITLAB" == "y" ]; then
+
 echo "Have you installed Gitlab version 7.4 or greater?"
 read -p "[Y/n]: " GITLAB_INSTALLED
 if [[ -z "$GITLAB_INSTALLED" ]]; then GITLAB_INSTALLED="Y"; fi
@@ -89,6 +96,8 @@ read -p ":" GITLAB_TOKEN
 if [ -z "$GITLAB_TOKEN" ]; then
     echo "No token provided, exiting"
     exit
+fi
+
 fi
 
 echo "Please provide an organisation name to identify this organisation to partners"
@@ -234,8 +243,11 @@ cp -r config-scm/* "$INSTALL_DIR/config-scm" >> $LOG_FILE
 
 # federated SCM configuration
 sed -i "s/{fedscm.org.name}/$ORG_NAME/g" "$INSTALL_DIR/config-scm/federated-scm.properties" >> $LOG_FILE
+
+if [ "$USING_GITLAB" == "y" ]; then
 sed -i "s/{scm.auth.token}/$GITLAB_TOKEN/g" "$INSTALL_DIR/config-scm/federated-scm.properties" >> $LOG_FILE
 sed -i "s|{scm.hostname}|$GITLAB_LOCATION|g" "$INSTALL_DIR/config-scm/federated-scm.properties" >> $LOG_FILE
+fi
 
 mkdir -p /tmp/tpsc/scm/
 mkdir -p /tmp/tpsc/scm/repositories
@@ -324,10 +336,14 @@ progress
 su - gateway -c "ssh-keygen -f id_rsa -t rsa -N ''" >> $LOG_FILE
 su - gateway -c "mkdir -p /home/gateway/.ssh" >> $LOG_FILE
 su - gateway -c "mv /home/gateway/id_rsa* /home/gateway/.ssh" >> $LOG_FILE
+
+
+if [ "$USING_GITLAB" == "y" ]; then
 su - gateway -c 'ssh-keyscan -t rsa `echo "'"$GITLAB_LOCATION"'" | sed "s|/||g" | sed "s|http:||g"` >> ~/.ssh/known_hosts' >> $LOG_FILE
 
 # POST cURL `gateway` user's ~/.ssh/id_rsa.pub to http://gitlab/api/user/keys with `key` = ssh & `title` = 'Gateway key'
 su - gateway -c 'export SSH=`cat /home/gateway/.ssh/id_rsa.pub` && curl -X POST -F "key=$SSH" -F "title=Gateway user key" --header "PRIVATE-TOKEN: "'"$GITLAB_TOKEN"'""  "'"$GITLAB_LOCATION"'"/api/v3/user/keys' >> $LOG_FILE
+fi
 
 progress
 printf "\n"
@@ -348,5 +364,10 @@ echo
 echo "              Nexus is reachable over HTTP on port 8081, and over HTTPS on port 8433"
 echo
 echo "              Any existing service on ports 80 and 443 have been preserved"
+echo
+if [ "$USING_GITLAB" == "n" ]; then
+echo "              As you opted out of using Gitlab, you will need to follow further installation commands"
+echo "              to point this Gateway installation at the correct source code management system"
+fi
 echo
 date
