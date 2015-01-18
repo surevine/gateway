@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +16,9 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+
+import com.surevine.community.gateway.management.api.GatewayManagementServiceFacade;
+import com.surevine.community.gateway.model.WhitelistedProject;
 
 /**
  * Transfers compatible imported bundles to SCM federator component.
@@ -73,6 +77,13 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 			LOG.info("Source type is: "+sourceType);
 			boolean supported = sourceType.equalsIgnoreCase(SCM_SOURCE_TYPE);
 			LOG.info("Does this class support this artifact? "+supported);
+
+			// Additionally ensure SCM project is whitelisted
+			if(!isWhitelisted(properties)) {
+				LOG.info("artifact rejected as SCM project is not whitelisted.");
+				supported = false;
+			}
+
 			return supported;
 		}
 		catch (Exception e) {
@@ -112,6 +123,32 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 
 	private Properties getConfig() {
 		return config;
+	}
+
+	/**
+	 * Determines whether SCM project has been whitelisted for import via gateway
+	 * @param properties Properties from imported archive (representing SCM project)
+	 * @return
+	 */
+	private boolean isWhitelisted(Map<String, String> properties) {
+
+		boolean isWhitelisted = false;
+
+		WhitelistedProject inboundProject = new WhitelistedProject(properties.get("source_organisation"),
+																properties.get("project"),
+																properties.get("repo"));
+
+		Set<WhitelistedProject> whitelistedProjects = GatewayManagementServiceFacade.getInstance().getWhitelistedProjects();
+
+		for(WhitelistedProject whitelistedProject : whitelistedProjects) {
+			if(inboundProject.equals(whitelistedProject)) {
+				isWhitelisted = true;
+				break;
+			}
+		}
+
+		LOG.info("Is SCM project whitelisted? " + isWhitelisted);
+		return isWhitelisted;
 	}
 
 }

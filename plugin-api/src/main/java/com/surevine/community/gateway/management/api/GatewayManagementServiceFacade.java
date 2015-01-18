@@ -2,9 +2,7 @@ package com.surevine.community.gateway.management.api;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -19,6 +17,7 @@ import org.json.JSONObject;
 
 import com.surevine.community.gateway.GatewayProperties;
 import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.WhitelistedProject;
 
 /**
  * Service facade around gateway management console API
@@ -116,6 +115,59 @@ public class GatewayManagementServiceFacade {
 		}
 
 		return destinations;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public Set<WhitelistedProject> getWhitelistedProjects() {
+
+		LOG.info("Requesting whitelisted projects from management console API: " + serviceBaseUrl + "/api/whitelist");
+
+		Client client = ClientBuilder.newClient();
+		Response response = client.target(serviceBaseUrl + "/api/whitelist")
+								.request("application/json").get();
+
+		if(response.getStatusInfo() != Response.Status.OK) {
+			throw new ServiceUnavailableException("Unable to retrieve whitelisted projects from management console API.");
+		}
+
+		String jsonResponseBody = response.readEntity(String.class);
+		Set<WhitelistedProject> projects = parseProjectsFromReponse(jsonResponseBody);
+
+		return projects;
+
+	}
+
+	private Set<WhitelistedProject> parseProjectsFromReponse(String responseBody) {
+
+		Set<WhitelistedProject> projects = new HashSet<WhitelistedProject>();
+		JSONArray jsonProjects = new JSONArray(responseBody);
+
+		for (int i = 0; i < jsonProjects.length(); i++) {
+
+			try {
+
+				JSONObject jsonProject = jsonProjects.getJSONObject(i);
+				String sourceOrganisation = jsonProject.getString("sourceOrganisation");
+				String projectKey = jsonProject.getString("projectKey");
+				String repositorySlug = jsonProject.getString("repositorySlug");
+
+				WhitelistedProject project = new WhitelistedProject(sourceOrganisation,
+																	projectKey,
+																	repositorySlug);
+				projects.add(project);
+
+			} catch (JSONException e) {
+				LOG.warning("Unable to parse whitelisted project from JSON: " + e);
+				continue;
+			}
+
+		}
+
+		return projects;
+
 	}
 
 }
