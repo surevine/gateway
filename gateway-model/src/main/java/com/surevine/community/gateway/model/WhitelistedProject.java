@@ -28,4 +28,24 @@ public class WhitelistedProject {
 		this.repositorySlug = repositorySlug;
 	}
 
+	@Override
+	public int hashCode() {
+		String uid = sourceOrganisation + ":" +
+					projectKey + "/" +
+					repositorySlug;
+		return uid.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		 if(!(obj instanceof WhitelistedProject)) {
+			 return false;
+		 }
+		 WhitelistedProject oProj = (WhitelistedProject) obj;
+
+		 return (sourceOrganisation == oProj.sourceOrganisation) &&
+				 (projectKey == oProj.projectKey) &&
+				 (repositorySlug == oProj.repositorySlug);
+	}
+
 }
