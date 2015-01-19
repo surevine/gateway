@@ -55,17 +55,7 @@ public class GatewayManagementServiceFacade {
 	 */
 	public Set<Destination> getDestinations() {
 
-		LOG.info("Requesting destinations from management console API: " + serviceBaseUrl + "/api/destinations");
-
-		Client client = ClientBuilder.newClient();
-		Response response = client.target(serviceBaseUrl + "/api/destinations")
-								.request("application/json").get();
-
-		if(response.getStatusInfo() != Response.Status.OK) {
-			throw new ServiceUnavailableException("Unable to retrieve destinations from management console API.");
-		}
-
-		String jsonResponseBody = response.readEntity(String.class);
+		String jsonResponseBody = getJSONResponse(serviceBaseUrl + "/api/destinations");
 		Set<Destination> destinations = parseDestinationsFromResponse(jsonResponseBody);
 
 		return destinations;
@@ -124,21 +114,10 @@ public class GatewayManagementServiceFacade {
 	 */
 	public Set<WhitelistedProject> getWhitelistedProjects() {
 
-		LOG.info("Requesting whitelisted projects from management console API: " + serviceBaseUrl + "/api/whitelist");
-
-		Client client = ClientBuilder.newClient();
-		Response response = client.target(serviceBaseUrl + "/api/whitelist")
-								.request("application/json").get();
-
-		if(response.getStatusInfo() != Response.Status.OK) {
-			throw new ServiceUnavailableException("Unable to retrieve whitelisted projects from management console API.");
-		}
-
-		String jsonResponseBody = response.readEntity(String.class);
+		String jsonResponseBody = getJSONResponse(serviceBaseUrl + "/api/whitelist");
 		Set<WhitelistedProject> projects = parseProjectsFromReponse(jsonResponseBody);
 
 		return projects;
-
 	}
 
 	/**
@@ -173,6 +152,27 @@ public class GatewayManagementServiceFacade {
 		}
 
 		return projects;
+
+	}
+
+	/**
+	 * Helper method to request JSON from management console API endpoint
+	 * @param url API URL to make request to
+	 * @return
+	 */
+	private String getJSONResponse(String url) {
+
+		LOG.info("Request to management console API: " + url);
+
+		Client client = ClientBuilder.newClient();
+		Response response = client.target(url)
+								.request("application/json").get();
+
+		if(response.getStatusInfo() != Response.Status.OK) {
+			throw new ServiceUnavailableException("Error making request to management console API. Response code: " + response.getStatus());
+		}
+
+		return response.readEntity(String.class);
 
 	}
 
