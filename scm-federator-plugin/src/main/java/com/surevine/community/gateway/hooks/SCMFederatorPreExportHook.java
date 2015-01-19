@@ -81,8 +81,8 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 		Map<String, String> metadata = item.getMetadata();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
 		SanitisationResult result = SanitisationServiceFacade.getInstance().isSane(item.getSource(),
-																					metadata.get("projectKey"),
-																					metadata.get("repoSlug"),
+																					metadata.get("project"),
+																					metadata.get("repo"),
 																					"Export-"+dateFormat.format(new Date()));
 		if(!result.isSane()) {
 			// Don't export item as sanitisation rejected
