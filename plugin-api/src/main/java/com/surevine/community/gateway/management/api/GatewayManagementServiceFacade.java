@@ -118,8 +118,9 @@ public class GatewayManagementServiceFacade {
 	}
 
 	/**
+	 * Retrieve list of whitelisted projects from management console API
 	 *
-	 * @return
+	 * @return Set of whitelisted projects
 	 */
 	public Set<WhitelistedProject> getWhitelistedProjects() {
 
@@ -140,6 +141,11 @@ public class GatewayManagementServiceFacade {
 
 	}
 
+	/**
+	 * Parses JSON response to getWhitelistedProjects request into list of whitelisted projects
+	 * @param responseBody String response to API request
+	 * @return Set of whitelisted projects
+	 */
 	private Set<WhitelistedProject> parseProjectsFromReponse(String responseBody) {
 
 		Set<WhitelistedProject> projects = new HashSet<WhitelistedProject>();
