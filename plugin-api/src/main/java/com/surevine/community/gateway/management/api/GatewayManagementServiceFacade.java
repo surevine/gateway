@@ -114,7 +114,7 @@ public class GatewayManagementServiceFacade {
 	 */
 	public Set<WhitelistedProject> getWhitelistedProjects() {
 
-		String jsonResponseBody = getJSONResponse(serviceBaseUrl + "/api/whitelist");
+		String jsonResponseBody = getJSONResponse(serviceBaseUrl + "/api/inbound-projects");
 		Set<WhitelistedProject> projects = parseProjectsFromReponse(jsonResponseBody);
 
 		return projects;
