@@ -87,13 +87,16 @@ public class SanitisationServiceFacade {
 										.body(entity)
 										.execute().returnResponse();
 
+			String responseString = IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
+
 			if(response.getStatusLine().getStatusCode() != SUCCESS) {
 				result.setSane(false);
-				result.addError("Sanitisation service failed.");
+				result.addError(String.format("Sanitisation service failed. %s: %s",
+												response.getStatusLine().getStatusCode(),
+												responseString));
 				return result;
 			}
 
-			String responseString = IOUtils.toString(response.getEntity().getContent(), Charset.defaultCharset());
 			try {
 				parseJSONResponse(result, responseString);
 			} catch (JSONException e2) {
