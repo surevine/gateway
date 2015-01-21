@@ -43,9 +43,9 @@ public class WhitelistedProject {
 		 }
 		 WhitelistedProject oProj = (WhitelistedProject) obj;
 
-		 return (sourceOrganisation == oProj.sourceOrganisation) &&
-				 (projectKey == oProj.projectKey) &&
-				 (repositorySlug == oProj.repositorySlug);
+		 return (sourceOrganisation.equalsIgnoreCase(oProj.sourceOrganisation)) &&
+				 (projectKey.equalsIgnoreCase(oProj.projectKey)) &&
+				 (repositorySlug.equalsIgnoreCase(oProj.repositorySlug));
 	}
 
 }
