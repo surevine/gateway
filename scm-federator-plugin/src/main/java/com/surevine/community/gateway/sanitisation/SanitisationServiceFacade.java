@@ -37,7 +37,7 @@ public class SanitisationServiceFacade {
 
 	private SanitisationServiceFacade() {
 		try {
-			getConfig().load(getClass().getResourceAsStream("/federator.properties"));
+			getConfig().load(getClass().getResourceAsStream("/scm-federation.properties"));
 		} catch (IOException e) {
 			LOG.warning("Failed to load sanitisation hook configuration.");
 			e.printStackTrace();

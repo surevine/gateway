@@ -35,9 +35,9 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 
 	public SCMFederatorImportTransferHook() {
 		try {
-			getConfig().load(getClass().getResourceAsStream("/federator.properties"));
+			getConfig().load(getClass().getResourceAsStream("/scm-federation.properties"));
 		} catch (IOException e) {
-			LOG.warning("Failed to load SCM federator transfer hook configuration.");
+			LOG.warning("Failed to load SCM federation transfer hook configuration.");
 			e.printStackTrace();
 		}
 	}
