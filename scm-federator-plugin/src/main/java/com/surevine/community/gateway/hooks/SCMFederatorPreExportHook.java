@@ -1,10 +1,12 @@
 package com.surevine.community.gateway.hooks;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -21,8 +23,18 @@ import com.surevine.community.gateway.sanitisation.SanitisationServiceFacade;
 public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 
 	private static final Logger LOG = Logger.getLogger(SCMFederatorPreExportHook.class.getName());
-
 	private static final String SCM_SOURCE_TYPE = "SCM";
+
+	private Properties config = new Properties();
+
+	public SCMFederatorPreExportHook() {
+		try {
+			getConfig().load(getClass().getResourceAsStream("/scm-federator-plugin.properties"));
+		} catch (IOException e) {
+			LOG.warning("Failed to load SCM federation export hook configuration.");
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public void call(Set<TransferItem> transferQueue) {
@@ -34,9 +46,24 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 					item.setNotExportable();
 				}
 
-				sanitise(item);
+				if(isSanitisationEnabled()) {
+					sanitise(item);
+				}
+
 			}
 		}
+	}
+
+	private Properties getConfig() {
+		return config;
+	}
+
+	/**
+	 * Reads configuration to determine if sanitisation has been enabled for exports
+	 * @return
+	 */
+	private Boolean isSanitisationEnabled() {
+		return Boolean.parseBoolean(getConfig().getProperty("sanitisation.enabled"));
 	}
 
 	/**
