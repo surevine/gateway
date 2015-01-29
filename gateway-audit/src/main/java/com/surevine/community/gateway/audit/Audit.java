@@ -23,9 +23,6 @@ public abstract class Audit {
 	private static AuditActionFactory auditActionFactoryImpl;
 	private static Properties config = new Properties();
 
-	private static final String XML_MODE = "xml";
-	private static final String LOG_MODE = "log";
-
 	/**
 	 * Initialise the AuditService based on config property
 	 * @return
@@ -33,14 +30,14 @@ public abstract class Audit {
 	private static AuditService getAuditService() {
 		if(auditServiceImpl == null) {
 			switch(getAuditModeSetting()) {
-			case XML_MODE:
+			case XML:
 				auditServiceImpl = XMLAuditServiceImpl.getInstance();
 				break;
-			case LOG_MODE:
+			case LOG:
 				auditServiceImpl = new LogAuditServiceImpl();
 				break;
 			default:
-				break;
+				throw new AuditServiceException("Could not initialise application auditing. Auditing mode not correctly configured.");
 			}
 		}
 		return auditServiceImpl;
@@ -53,14 +50,14 @@ public abstract class Audit {
 	private static AuditActionFactory getAuditActionFactory() {
 		if(auditActionFactoryImpl == null) {
 			switch(getAuditModeSetting()) {
-			case XML_MODE:
+			case XML:
 				auditActionFactoryImpl = new XMLAuditActionFactory();
 				break;
-			case LOG_MODE:
+			case LOG:
 				auditActionFactoryImpl = new LogAuditActionFactory();
 				break;
 			default:
-				break;
+				throw new AuditServiceException("Could not initialise application auditing. Auditing mode not correctly configured.");
 			}
 		}
 		return auditActionFactoryImpl;
@@ -72,10 +69,10 @@ public abstract class Audit {
 	 *
 	 * @return configured audit mode
 	 */
-	private static String getAuditModeSetting() {
+	private static AuditMode getAuditModeSetting() {
 		try {
 			config.load(Audit.class.getClassLoader().getResourceAsStream("/audit.properties"));
-			return config.getProperty("gateway.audit.mode");
+			return AuditMode.getMode(config.getProperty("gateway.audit.mode"));
 		} catch (IOException e) {
 			throw new AuditServiceException("Failed to load audit service property.", e);
 		}
