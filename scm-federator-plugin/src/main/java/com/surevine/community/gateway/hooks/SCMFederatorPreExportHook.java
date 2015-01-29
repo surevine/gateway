@@ -10,6 +10,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.surevine.community.gateway.audit.Audit;
+import com.surevine.community.gateway.audit.action.SanitisationFailAuditAction;
 import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.TransferItem;
 import com.surevine.community.gateway.sanitisation.SanitisationResult;
@@ -120,6 +122,10 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 			for(String error: result.getErrors()) {
 				LOG.warning(error);
 			}
+
+			// Audit failure
+			SanitisationFailAuditAction action = Audit.getSanitisationFailAuditAction(item.getSource(), item.getDestination());
+			Audit.audit(action);
 		}
 	}
 

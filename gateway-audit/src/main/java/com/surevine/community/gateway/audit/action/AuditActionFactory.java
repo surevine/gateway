@@ -17,4 +17,6 @@ public interface AuditActionFactory {
 
 	RuleFailAuditAction getRuleFailAuditAction(Path source, Destination destination);
 
+	SanitisationFailAuditAction getSanitisationFailAuditAction(Path source, Destination destination);
+
 }

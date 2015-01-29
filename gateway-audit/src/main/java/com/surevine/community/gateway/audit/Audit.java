@@ -9,6 +9,7 @@ import com.surevine.community.gateway.audit.action.AuditActionFactory;
 import com.surevine.community.gateway.audit.action.ExportAuditAction;
 import com.surevine.community.gateway.audit.action.ImportAuditAction;
 import com.surevine.community.gateway.audit.action.RuleFailAuditAction;
+import com.surevine.community.gateway.audit.action.SanitisationFailAuditAction;
 import com.surevine.community.gateway.audit.action.logfile.LogAuditActionFactory;
 import com.surevine.community.gateway.audit.action.xml.XMLAuditActionFactory;
 import com.surevine.community.gateway.model.Destination;
@@ -108,6 +109,16 @@ public abstract class Audit {
 	 */
 	public static RuleFailAuditAction getRuleFailAuditAction(Path source, Destination destination) {
 		return getAuditActionFactory().getRuleFailAuditAction(source, destination);
+	}
+
+	/**
+	 * Get action representing sanitisation check failure
+	 * @param source file to be exported
+	 * @param destination intended export destination
+	 * @return
+	 */
+	public static SanitisationFailAuditAction getSanitisationFailAuditAction(Path source, Destination destination) {
+		return getAuditActionFactory().getSanitisationFailAuditAction(source, destination);
 	}
 
 	/**
