@@ -22,9 +22,9 @@ public class AuditItemImportTransferHook implements GatewayImportTransferHook {
 
 			File receivedFile = received[i];
 			String filename = receivedFile.getName();
-			String source = properties.get("source");
+			String source = properties.get("source_organisation");
 			if(source == null) {
-				source = "Unknown";
+				source = "Unknown (source metadata not set)";
 			}
 
 			ImportAuditAction importAction = Audit.getImportAuditAction(filename, source);
