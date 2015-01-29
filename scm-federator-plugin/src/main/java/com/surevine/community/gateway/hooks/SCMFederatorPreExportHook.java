@@ -94,8 +94,10 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 		Set<String> destinationSharedProjects = destination.getProjects();
 
 		if(destinationSharedProjects != null) {
-			if(destinationSharedProjects.contains(projectSlug)) {
-				return true;
+			for(String sharedProject : destinationSharedProjects) {
+				if(sharedProject.equalsIgnoreCase(projectSlug)) {
+					return true;
+				}
 			}
 		}
 		return false;
