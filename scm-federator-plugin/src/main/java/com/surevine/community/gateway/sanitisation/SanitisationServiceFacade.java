@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
@@ -39,8 +40,7 @@ public class SanitisationServiceFacade {
 		try {
 			getConfig().load(getClass().getResourceAsStream("/scm-federator-plugin.properties"));
 		} catch (IOException e) {
-			LOG.warning("Failed to load sanitisation hook configuration.");
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "Failed to load sanitisation hook configuration.", e);
 		}
 	}
 
@@ -73,9 +73,8 @@ public class SanitisationServiceFacade {
 			entity.addPart("projectKey", new StringBody(projectKey));
 			entity.addPart("repoSlug", new StringBody(repoSlug));
 			entity.addPart("identifier", new StringBody(identifier));
-		} catch (UnsupportedEncodingException e1) {
-			LOG.severe("Failed to build entities for sanitisation request.");
-			e1.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			LOG.log(Level.SEVERE, "Failed to build entities for sanitisation request.", e);
 		}
 
 		String url = getConfig().getProperty("sanitisation.service.base.url") + "/sanitise";
@@ -99,14 +98,15 @@ public class SanitisationServiceFacade {
 
 			try {
 				parseJSONResponse(result, responseString);
-			} catch (JSONException e2) {
+			} catch (JSONException e) {
+				String error = "Failed to parse sanitisation service response.";
+				LOG.log(Level.WARNING, error, e);
 				result.setSane(false);
-				result.addError("Failed to parse sanitisation service response.");
+				result.addError(error);
 			}
 
-		} catch (IOException e3) {
-			LOG.severe("Failed to send archive to sanitisation service.");
-			e3.printStackTrace();
+		} catch (IOException e) {
+			LOG.log(Level.SEVERE, "Failed to send archive to sanitisation service.", e);
 		}
 
 		return result;

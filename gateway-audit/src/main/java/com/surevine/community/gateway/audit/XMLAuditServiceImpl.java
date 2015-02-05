@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -51,8 +52,8 @@ public class XMLAuditServiceImpl implements AuditService {
 	private XMLAuditServiceImpl()  {
 		try {
 			getConfig().load(getClass().getResourceAsStream("/audit.properties"));
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		} catch (IOException e) {
+			LOG.log(Level.SEVERE, "Failed to load audit module configuration. ", e);
 		}
 
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");

@@ -37,8 +37,7 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 		try {
 			getConfig().load(getClass().getResourceAsStream("/scm-federator-plugin.properties"));
 		} catch (IOException e) {
-			LOG.warning("Failed to load SCM federation transfer hook configuration.");
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "Failed to load SCM federation transfer hook configuration.", e);
 		}
 	}
 
@@ -78,7 +77,6 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 			boolean supported = sourceType.equalsIgnoreCase(SCM_SOURCE_TYPE);
 			LOG.info("Does this class support this artifact? "+supported);
 
-			// Additionally ensure SCM project is whitelisted
 			if(!isWhitelisted(properties)) {
 				LOG.info("artifact rejected as SCM project is not whitelisted.");
 				supported = false;
@@ -87,7 +85,7 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 			return supported;
 		}
 		catch (Exception e) {
-			LOG.info("Exception during support method: "+e);
+			LOG.log(Level.INFO, "Exception during support method.", e);
 			return false;
 		}
 	}
@@ -113,8 +111,7 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 			try {
 				entity.addPart(property.getKey(), new StringBody(property.getValue()));
 			} catch (UnsupportedEncodingException e) {
-				LOG.warning("Failed to read metadata property value during transfer to SCM federator.");
-				e.printStackTrace();
+				LOG.log(Level.WARNING, "Failed to read metadata property value during transfer to SCM federator.", e);
 			}
 			it.remove();
 		}

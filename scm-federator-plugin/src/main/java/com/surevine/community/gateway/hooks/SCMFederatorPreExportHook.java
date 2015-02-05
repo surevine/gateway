@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.surevine.community.gateway.audit.Audit;
@@ -33,8 +34,7 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 		try {
 			getConfig().load(getClass().getResourceAsStream("/scm-federator-plugin.properties"));
 		} catch (IOException e) {
-			LOG.warning("Failed to load SCM federation export hook configuration.");
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "Failed to load SCM federation export hook configuration.", e);
 		}
 	}
 
