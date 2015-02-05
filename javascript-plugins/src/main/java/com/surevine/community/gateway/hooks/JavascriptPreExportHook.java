@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Iterator;
 
@@ -42,8 +43,8 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 
 	    try {
 			getConfig().load(getClass().getResourceAsStream("/javascript-hook.properties"));
-		} catch (final IOException e1) {
-			e1.printStackTrace(); // FIXME: Handle
+		} catch (final IOException e) {
+			LOG.log(Level.SEVERE, "Failed to load javascript hook module configuration.", e);
 		}
 
 	    for (final TransferItem item : transferQueue) {
@@ -82,8 +83,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 					jsEngine.eval(new InputStreamReader(Files.newInputStream(ruleFile)));
 				} catch (final Exception e) {
 					rule.mandate(false, "Marking rule as failed due to " +e.getMessage());
-
-					e.printStackTrace(); // FIXME: Handle
+					LOG.log(Level.INFO, "Javascript rule failed.", e);
 				}
 
 				final Map<String, String> metadataAfter = item.getMetadata();

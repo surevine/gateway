@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.script.ScriptEngine;
@@ -39,8 +40,8 @@ public class JavascriptPreImportHook implements GatewayPreImportHook {
 
 	    try {
 	    	getConfig().load(getClass().getResourceAsStream("/javascript-hook.properties"));
-		} catch (final IOException e1) {
-			e1.printStackTrace(); // FIXME: Handle
+		} catch (final IOException e) {
+			LOG.log(Level.SEVERE, "Failed to load Javascript hook module configuration.", e);
 		}
 
 	    Set<Path> importFilters = new HashSet<Path>();
@@ -64,7 +65,7 @@ public class JavascriptPreImportHook implements GatewayPreImportHook {
 		    try {
 		    	jsEngine.eval(new InputStreamReader(Files.newInputStream(importFilter)));
 			} catch (final Exception e) {
-				e.printStackTrace(); // FIXME: Handle
+				LOG.log(Level.SEVERE, "Failed to evaluate Javascript rule file.", e);
 			}
 
 	    	LOG.info(String.format("COMPLETE javascript hook [%s].", importFilter));

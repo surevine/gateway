@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletContextEvent;
@@ -103,8 +104,7 @@ public class Hooks {
 	        	LOG.info(String.format("COMPLETE [%s]", hook.getClass().getName()));
 	        	}
         	catch (Exception e) {
-        		LOG.warning("Exception "+e+" during processing of "+hook.getClass().getName());
-        		e.printStackTrace();
+        		LOG.log(Level.WARNING, "Exception "+e+" during processing of "+hook.getClass().getName(), e);
         	}
         }
 	}

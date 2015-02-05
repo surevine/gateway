@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -124,8 +125,9 @@ public class GatewayAPI {
 		HashMap<String, String> metadata = new HashMap<String, String>();
 		try {
 			metadata = readMetadata(source);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			// FIXME: Handle better
+			LOG.log(Level.WARNING, "Thread interupted while reading metadata from disk.", e);
 		}
 
 		// Setup transfer queue

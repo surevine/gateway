@@ -5,22 +5,23 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LabellingNexusDeployImportTransferHook extends NexusDeployImportTransferHook {
-	
+
 	private static final Logger LOG = Logger.getLogger(LabellingNexusDeployImportTransferHook.class.getName());
-	
+
 	@Override
 	public void call(final File[] received, final Map<String, String> properties) {
 		deployMainArtifact(received, properties);
-		
+
 		deployLabelArtifact(received, properties);
 	}
-	
+
 	private void deployLabelArtifact(final File[] received, final Map<String, String> properties) {
 		final File target = received[0];
-		
+
 		// FIXME: Optionally push label.
 		final StringBuilder label = new StringBuilder();
 		label.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?><securityLabel>");
@@ -31,14 +32,14 @@ public class LabellingNexusDeployImportTransferHook extends NexusDeployImportTra
 		label.append(properties.get(LabelKey.DECORATOR));
 		label.append("</decorator>");
 		label.append("<groups>");
-		
+
 		final String[] groups = properties.get(LabelKey.GROUPS).split(",");
 		for (final String group : groups) {
 			label.append("<group>");
 			label.append(group);
 			label.append("</groups>");
 		}
-		
+
 		label.append("</groups");
 		label.append("<countries>");
 
@@ -48,16 +49,16 @@ public class LabellingNexusDeployImportTransferHook extends NexusDeployImportTra
 			label.append(country);
 			label.append("</country>");
 		}
-		
+
 		label.append("</countries>");
 		label.append("</securityLabel>");
-		
+
 		// Write out a security label file.
 		try {
 			Files.write(Paths.get(target.getParent(), "securitylabel.xml"), label.toString().getBytes());
-		} catch (final IOException e1) {
+		} catch (final IOException e) {
 			// FIXME: Handle better
-			e1.printStackTrace();
+			LOG.log(Level.SEVERE, "Failed to write security label file to disk.", e);
 		}
 	}
 }

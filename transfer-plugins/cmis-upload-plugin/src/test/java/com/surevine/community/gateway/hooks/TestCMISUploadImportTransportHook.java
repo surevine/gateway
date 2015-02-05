@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.surevine.community.gateway.properties.CMISProperties;
@@ -23,20 +24,20 @@ public class TestCMISUploadImportTransportHook {
 			OUTPUT_DIR=new File(outputDirFromProps);
 		}
 	}
-	
+
 	@BeforeClass
 	public static void init() {
 		if (!(OUTPUT_DIR.exists() || OUTPUT_DIR.mkdirs())) {
 			throw new RuntimeException("Couldn't instaniate output directory: "+OUTPUT_DIR);
 		}
 	}
-	
+
 	protected File createTempDir(String testName) {
 		File rV = new File(OUTPUT_DIR, testName + "_"+(new Date().getTime()/1000l));
 		rV.mkdirs();
 		return rV;
-	}	
-	
+	}
+
 	protected File createFileToTransfer(String data, String testName) throws IOException {
 		File parent = createTempDir(testName);
 		File file = new File(parent, testName);
@@ -47,14 +48,15 @@ public class TestCMISUploadImportTransportHook {
 		os.close();
 		return file;
 	}
-	
+
 	protected Map<String, String> getTestProperties() {
 		Map<String,String> rV = new HashMap<String, String>();
 		rV.put("foo", "bar");
 		return rV;
 	}
-	
+
 	@Test
+	@Ignore
 	public void testBasicTransfer() throws IOException {
 		File[] files = new File[1];
 		files[0]=createFileToTransfer("Sometimes I wish I had a cat. All I’ve ever had was a head, and that the seagulls took", "testBasicTransfer");
