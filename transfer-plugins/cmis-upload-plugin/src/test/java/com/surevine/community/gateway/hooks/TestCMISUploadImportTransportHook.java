@@ -13,22 +13,22 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.surevine.community.gateway.properties.CMISProperties;
-
+@Ignore
 public class TestCMISUploadImportTransportHook {
 
-	private static File OUTPUT_DIR=new File("/tmp/alfresco_gateway_test");
+	private static File OUTPUT_DIR = new File("/tmp/alfresco_gateway_test");
 	static {
-		String outputDirFromProps=System.getProperty(TestCMISUploadImportTransportHook.class.getName().concat(".OUTPUT_DIR"));
-		if (outputDirFromProps!=null) {
-			OUTPUT_DIR=new File(outputDirFromProps);
+		final String outputDirFromProps = System.getProperty(TestCMISUploadImportTransportHook.class.getName().concat(
+				".OUTPUT_DIR"));
+		if (outputDirFromProps != null) {
+			OUTPUT_DIR = new File(outputDirFromProps);
 		}
 	}
 
 	@BeforeClass
 	public static void init() {
 		if (!(OUTPUT_DIR.exists() || OUTPUT_DIR.mkdirs())) {
-			throw new RuntimeException("Couldn't instaniate output directory: "+OUTPUT_DIR);
+			throw new RuntimeException("Couldn't instaniate output directory: " + OUTPUT_DIR);
 		}
 	}
 
@@ -42,7 +42,7 @@ public class TestCMISUploadImportTransportHook {
 		File parent = createTempDir(testName);
 		File file = new File(parent, testName);
 		file.createNewFile();
-		OutputStream os = new FileOutputStream(file);
+		final OutputStream os = new FileOutputStream(file);
 		os.write(data.getBytes(Charset.forName("UTF-8")));
 		os.flush();
 		os.close();
@@ -50,7 +50,7 @@ public class TestCMISUploadImportTransportHook {
 	}
 
 	protected Map<String, String> getTestProperties() {
-		Map<String,String> rV = new HashMap<String, String>();
+		final Map<String, String> rV = new HashMap<String, String>();
 		rV.put("foo", "bar");
 		return rV;
 	}
@@ -58,8 +58,10 @@ public class TestCMISUploadImportTransportHook {
 	@Test
 	@Ignore
 	public void testBasicTransfer() throws IOException {
-		File[] files = new File[1];
-		files[0]=createFileToTransfer("Sometimes I wish I had a cat. All I’ve ever had was a head, and that the seagulls took", "testBasicTransfer");
+		final File[] files = new File[1];
+		files[0] = createFileToTransfer(
+				"Sometimes I wish I had a cat. All I’ve ever had was a head, and that the seagulls took",
+				"testBasicTransfer");
 		new CMISUploadImportTransportHook().deployMainArtifact(files, getTestProperties());
 	}
 }

@@ -3,7 +3,6 @@ package com.surevine.community.gateway.hooks;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -31,30 +30,29 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 	private static final Logger LOG = Logger.getLogger(SCMFederatorImportTransferHook.class.getName());
 	private static final String SCM_SOURCE_TYPE = "SCM";
 
-	private Properties config = new Properties();
+	private final Properties config = new Properties();
 
 	public SCMFederatorImportTransferHook() {
 		try {
 			getConfig().load(getClass().getResourceAsStream("/scm-federator-plugin.properties"));
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOG.log(Level.WARNING, "Failed to load SCM federation transfer hook configuration.", e);
 		}
 	}
 
 	@Override
-	public void call(File[] received, Map<String, String> properties) {
+	public void call(final File[] received, final Map<String, String> properties) {
 
-		for (int i = 0; i < received.length; i++) {
+		for (final File element : received) {
 
-			MultipartEntity entity = buildImportedBundleRequestBody(received[i], properties);
+			final MultipartEntity entity = buildImportedBundleRequestBody(element, properties);
 
 			LOG.info("Transferring imported bundle to SCM federator.");
 
 			try {
-				Request.Post(getConfig().getProperty("scm.federator.api.base.url") + "/incoming")
-				.body(entity)
+				Request.Post(getConfig().getProperty("scm.federator.api.base.url") + "/incoming").body(entity)
 				.execute().returnContent().asString();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOG.log(Level.SEVERE, "Failed to transfer bundle to SCM federator", e);
 			}
 
@@ -64,27 +62,28 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 	}
 
 	@Override
-	public boolean supports(Map<String, String> properties) {
+	public boolean supports(final Map<String, String> properties) {
 
 		LOG.info("Checking bundle support for SCM federation.");
 
 		try {
-			String sourceType=properties.get("source_type");
-			if (sourceType==null) {
-				sourceType=properties.get("SOURCE_TYPE");
+			String sourceType = properties.get("source_type");
+			if (sourceType == null) {
+				sourceType = properties.get("SOURCE_TYPE");
 			}
-			LOG.info("Source type is: "+sourceType);
+			LOG.info("Source type is: " + sourceType);
 			boolean supported = sourceType.equalsIgnoreCase(SCM_SOURCE_TYPE);
-			LOG.info("Does this class support this artifact? "+supported);
+			LOG.info("Does this class support this artifact? " + supported);
 
-			if(!isWhitelisted(properties)) {
-				LOG.info("artifact rejected as SCM project is not whitelisted.");
-				supported = false;
+			if (supported) {
+				if (!isWhitelisted(properties)) {
+					LOG.info("artifact rejected as SCM project is not whitelisted.");
+					supported = false;
+				}
 			}
 
 			return supported;
-		}
-		catch (Exception e) {
+		} catch (final Exception e) {
 			LOG.log(Level.INFO, "Exception during support method.", e);
 			return false;
 		}
@@ -93,27 +92,25 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 	/**
 	 * Constructs body of post request to be sent to SCM federator
 	 *
-	 * @param bundle SCM bundle to be sent to federator
-	 * @param properties metadata accompanying file
+	 * @param bundle
+	 *            SCM bundle to be sent to federator
+	 * @param properties
+	 *            metadata accompanying file
 	 * @return
 	 */
-	private MultipartEntity buildImportedBundleRequestBody(File bundle,
-			Map<String, String> properties) {
+	private MultipartEntity buildImportedBundleRequestBody(final File bundle, final Map<String, String> properties) {
 
 		LOG.info("Building multi-part request body for bundle transfer to SCM federator.");
 
-		MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+		final MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 		entity.addPart("bundle", new FileBody(bundle));
 
-		Iterator<Entry<String, String>> it = properties.entrySet().iterator();
-		while(it.hasNext()) {
-			Map.Entry<String, String> property = it.next();
+		for (final Entry<String, String> property : properties.entrySet()) {
 			try {
 				entity.addPart(property.getKey(), new StringBody(property.getValue()));
-			} catch (UnsupportedEncodingException e) {
+			} catch (final UnsupportedEncodingException e) {
 				LOG.log(Level.WARNING, "Failed to read metadata property value during transfer to SCM federator.", e);
 			}
-			it.remove();
 		}
 		return entity;
 	}
@@ -123,22 +120,25 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 	}
 
 	/**
-	 * Determines whether SCM project has been whitelisted for import via gateway
-	 * @param properties Properties from imported archive (representing SCM project)
+	 * Determines whether SCM project has been whitelisted for import via
+	 * gateway
+	 *
+	 * @param properties
+	 *            Properties from imported archive (representing SCM project)
 	 * @return
 	 */
-	private boolean isWhitelisted(Map<String, String> properties) {
+	private boolean isWhitelisted(final Map<String, String> properties) {
 
 		boolean isWhitelisted = false;
 
-		WhitelistedProject inboundProject = new WhitelistedProject(properties.get("source_organisation"),
-																properties.get("project"),
-																properties.get("repo"));
+		final WhitelistedProject inboundProject = new WhitelistedProject(properties.get("source_organisation"),
+				properties.get("project"), properties.get("repo"));
 
-		Set<WhitelistedProject> whitelistedProjects = GatewayManagementServiceFacade.getInstance().getWhitelistedProjects();
+		final Set<WhitelistedProject> whitelistedProjects = GatewayManagementServiceFacade.getInstance()
+				.getWhitelistedScmProjects();
 
-		for(WhitelistedProject whitelistedProject : whitelistedProjects) {
-			if(inboundProject.equals(whitelistedProject)) {
+		for (final WhitelistedProject whitelistedProject : whitelistedProjects) {
+			if (inboundProject.equals(whitelistedProject)) {
 				isWhitelisted = true;
 				break;
 			}
