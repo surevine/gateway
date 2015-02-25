@@ -74,7 +74,7 @@ public class IssuesFederatorImportTransferHook implements GatewayImportTransferH
 			LOG.info("Does this class support this artifact? " + supported);
 
 			if (!isWhitelisted(properties)) {
-				LOG.info("artifact rejected as issues project is not whitelisted.");
+				LOG.info("artifact rejected as issues project is not whitelisted for inbound federation from destination.");
 				supported = false;
 			}
 
@@ -136,7 +136,7 @@ public class IssuesFederatorImportTransferHook implements GatewayImportTransferH
 			isWhitelisted = true;
 		}
 
-		LOG.info("Is repository/destination whitelisted for inbound federation? " + isWhitelisted);
+		LOG.info("Is issue repository whitelisted for inbound federation from destination? " + isWhitelisted);
 		return isWhitelisted;
 	}
 

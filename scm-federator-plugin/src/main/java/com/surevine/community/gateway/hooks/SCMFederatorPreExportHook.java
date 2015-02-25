@@ -1,7 +1,6 @@
 package com.surevine.community.gateway.hooks;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;

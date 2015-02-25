@@ -17,6 +17,7 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 
 import com.surevine.community.gateway.management.api.GatewayManagementServiceFacade;
+import com.surevine.community.gateway.model.Repository;
 import com.surevine.community.gateway.model.WhitelistedProject;
 
 /**
@@ -47,7 +48,7 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 
 			final MultipartEntity entity = buildImportedBundleRequestBody(element, properties);
 
-			LOG.info("Transferring imported bundle to SCM federator.");
+			LOG.info("Transferring imported bundle to SCM federator. " + getConfig().getProperty("scm.federator.api.base.url") + "/incoming");
 
 			try {
 				Request.Post(getConfig().getProperty("scm.federator.api.base.url") + "/incoming").body(entity)
@@ -77,7 +78,7 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 
 			if (supported) {
 				if (!isWhitelisted(properties)) {
-					LOG.info("artifact rejected as SCM project is not whitelisted.");
+					LOG.info("artifact rejected as SCM project is not whitelisted for inbound federation from destination.");
 					supported = false;
 				}
 			}
@@ -120,8 +121,8 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 	}
 
 	/**
-	 * Determines whether SCM project has been whitelisted for import via
-	 * gateway
+	 * Determines whether repository has been whitelisted for inbound federation from
+	 * source organisation (destination) via gateway
 	 *
 	 * @param properties
 	 *            Properties from imported archive (representing SCM project)
@@ -131,21 +132,18 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 
 		boolean isWhitelisted = false;
 
-		final WhitelistedProject inboundProject = new WhitelistedProject(properties.get("source_organisation"),
-				properties.get("project"), properties.get("repo"));
+		Repository federatedInboundRepo = GatewayManagementServiceFacade.getInstance().
+			getFederatedInboundRepository(properties.get("source_organisation"),
+					properties.get("project") + "/" + properties.get("repo"),
+					"SCM");
 
-		final Set<WhitelistedProject> whitelistedProjects = GatewayManagementServiceFacade.getInstance()
-				.getWhitelistedScmProjects();
-
-		for (final WhitelistedProject whitelistedProject : whitelistedProjects) {
-			if (inboundProject.equals(whitelistedProject)) {
-				isWhitelisted = true;
-				break;
-			}
+		if(federatedInboundRepo != null) {
+			isWhitelisted = true;
 		}
 
-		LOG.info("Is SCM project whitelisted? " + isWhitelisted);
+		LOG.info("Is SCM repository whitelisted for inbound federation from destination? " + isWhitelisted);
 		return isWhitelisted;
+
 	}
 
 }
