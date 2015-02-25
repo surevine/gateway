@@ -6,7 +6,7 @@ else
   CONFIG_KEYS="$@"
 fi
 
-WILDFLY_DIR="/Applications/wildfly/instance_1"
+WILDFLY_DIR="/Users/jonnyheavey/Documents/tpse-workspace/wildfly-8.0.0.Final"
 
 BUILT_DIRECTORY=`find wildfly-packager/target/ -type d -d -name "gateway-wildfly-package-*"`
 

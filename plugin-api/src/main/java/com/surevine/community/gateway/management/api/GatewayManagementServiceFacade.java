@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import com.surevine.community.gateway.GatewayProperties;
 import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Repository;
 import com.surevine.community.gateway.model.WhitelistedProject;
 
 /**
@@ -63,6 +64,58 @@ public class GatewayManagementServiceFacade {
 	}
 
 	/**
+	 * Retrieve list of repositories configured for outbound federation with destination
+	 * from management console API
+	 *
+	 * @param destination destination to retrieve outbound-federated repositories for
+	 * @return
+	 */
+	public Set<Repository> getOutboundRepositoriesForDestination(Destination destination) {
+
+		// TODO pass required repository type to API (to narrow down result set)
+
+		final String jsonResponseBody = getJSONResponse(serviceBaseUrl + "/api/federation/" + destination.getId() + "/outbound");
+		final Set<Repository> federatedRepositories = parseFederatedRepositories(jsonResponseBody);
+
+		return federatedRepositories;
+	}
+
+	/**
+	 * Parses JSON response to get[In/Out]boundRepositoriesForDestination requests into list of Repositories
+	 *
+	 * @param jsonResponseBody String body of response
+	 * @return set of repositories
+	 */
+	private Set<Repository> parseFederatedRepositories(String jsonResponseBody) {
+
+		final Set<Repository> repositories = new HashSet<Repository>();
+
+		final JSONArray jsonFederationConfigurations = new JSONArray(jsonResponseBody);
+
+		for (int i = 0; i < jsonFederationConfigurations.length(); i++) {
+
+			try {
+
+				final JSONObject jsonFedConfig = jsonFederationConfigurations.getJSONObject(i);
+				final JSONObject jsonRepo = jsonFedConfig.getJSONObject("repository");
+				final String repoType = jsonRepo.getString("repoType");
+				final String identifier = jsonRepo.getString("identifier");
+				final Repository repository = new Repository(repoType, identifier);
+
+				repositories.add(repository);
+
+			} catch (final JSONException e) {
+				LOG.warning("Unable to parse destination from JSON: " + e);
+				continue;
+			}
+
+		}
+
+		return repositories;
+
+	}
+
+	/**
 	 * Parses JSON response to getDestinations request into list of Destinations
 	 *
 	 * @param responseBody
@@ -84,25 +137,9 @@ public class GatewayManagementServiceFacade {
 				final Long id = jsonDestination.getLong("id");
 				final String name = jsonDestination.getString("name");
 				final URI url = new URI(jsonDestination.getString("url"));
+				final String sourceKey = jsonDestination.getString("sourceKey");
 
-				final Set<String> projects = new HashSet<String>();
-				final JSONArray jsonProjects = jsonDestination.getJSONArray("projects");
-				for (int p = 0; p < jsonProjects.length(); p++) {
-					final JSONObject jsonProject = jsonProjects.getJSONObject(p);
-					final String projectSlug = String.format("%s/%s", jsonProject.getString("projectKey"),
-							jsonProject.getString("repositorySlug"));
-					projects.add(projectSlug);
-				}
-
-				final Set<String> issueProjects = new HashSet<String>();
-				final JSONArray jsonIssueProjects = jsonDestination.getJSONArray("issueProjects");
-				for (int p = 0; p < jsonIssueProjects.length(); p++) {
-					final JSONObject jsonProject = jsonIssueProjects.getJSONObject(p);
-					final String projectidentifier = jsonProject.getString("projectKey");
-					issueProjects.add(projectidentifier);
-				}
-
-				final Destination destination = new Destination(id, name, url, projects, issueProjects);
+				final Destination destination = new Destination(id, name, url, sourceKey);
 				destinations.add(destination);
 
 			} catch (final JSONException e) {

@@ -12,7 +12,9 @@ import java.util.logging.Logger;
 
 import com.surevine.community.gateway.audit.Audit;
 import com.surevine.community.gateway.audit.action.SanitisationFailAuditAction;
+import com.surevine.community.gateway.management.api.GatewayManagementServiceFacade;
 import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Repository;
 import com.surevine.community.gateway.model.TransferItem;
 import com.surevine.community.gateway.sanitisation.SanitisationResult;
 import com.surevine.community.gateway.sanitisation.SanitisationServiceFacade;
@@ -96,11 +98,11 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 	 */
 	private boolean isSharedProject(final Destination destination, final Map<String, String> metadata) {
 
-		final Set<String> destinationSharedProjects = destination.getIssueProjects();
+		final Set<Repository> destinationOutboundRepositories = GatewayManagementServiceFacade.getInstance().getOutboundRepositoriesForDestination(destination);
 
-		if (destinationSharedProjects != null) {
-			for (final String sharedProject : destinationSharedProjects) {
-				if (sharedProject.equalsIgnoreCase(metadata.get("project"))) {
+		if (!destinationOutboundRepositories.isEmpty()) {
+			for (final Repository federatedOutboundRepo : destinationOutboundRepositories) {
+				if (federatedOutboundRepo.getIdentifier().equalsIgnoreCase(metadata.get("project"))) {
 					return true;
 				}
 			}

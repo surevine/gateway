@@ -91,7 +91,9 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 	private boolean isSharedProject(Destination destination, Map<String, String> metadata) {
 
 		String projectSlug = String.format("%s/%s", metadata.get("project"), metadata.get("repo"));
-		Set<String> destinationSharedProjects = destination.getProjects();
+
+		// TODO fix once ticketing has been implemented
+		Set<String> destinationSharedProjects = null;
 
 		if(destinationSharedProjects != null) {
 			for(String sharedProject : destinationSharedProjects) {
