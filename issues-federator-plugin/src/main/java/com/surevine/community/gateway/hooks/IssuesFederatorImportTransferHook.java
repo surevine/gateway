@@ -17,6 +17,7 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 
 import com.surevine.community.gateway.management.api.GatewayManagementServiceFacade;
+import com.surevine.community.gateway.model.Repository;
 import com.surevine.community.gateway.model.WhitelistedProject;
 
 /**
@@ -116,31 +117,26 @@ public class IssuesFederatorImportTransferHook implements GatewayImportTransferH
 	}
 
 	/**
-	 * Determines whether issues project has been whitelisted for import via
-	 * gateway
+	 * Determines whether repository has been whitelisted for inbound federation from
+	 * source organisation (destination) via gateway
 	 *
 	 * @param properties
-	 *            Properties from imported archive (representing issues project)
+	 *            Properties from imported archive (representing repository and source destination)
 	 * @return
 	 */
 	private boolean isWhitelisted(final Map<String, String> properties) {
 
 		boolean isWhitelisted = false;
 
-		final WhitelistedProject inboundProject = new WhitelistedProject(properties.get("source_organisation"),
-				properties.get("project"), null);
+		Repository federatedInboundRepo = GatewayManagementServiceFacade.getInstance().
+			getFederatedInboundRepository(properties.get("source_organisation"),
+					properties.get("project"), "ISSUE");
 
-		final Set<WhitelistedProject> whitelistedProjects = GatewayManagementServiceFacade.getInstance()
-				.getWhitelistedIssueProjects();
-
-		for (final WhitelistedProject whitelistedProject : whitelistedProjects) {
-			if (inboundProject.equals(whitelistedProject)) {
-				isWhitelisted = true;
-				break;
-			}
+		if(federatedInboundRepo != null) {
+			isWhitelisted = true;
 		}
 
-		LOG.info("Is issues project whitelisted? " + isWhitelisted);
+		LOG.info("Is repository/destination whitelisted for inbound federation? " + isWhitelisted);
 		return isWhitelisted;
 	}
 

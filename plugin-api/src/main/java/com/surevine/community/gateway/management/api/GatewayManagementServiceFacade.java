@@ -2,13 +2,19 @@ package com.surevine.community.gateway.management.api;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
 import org.json.JSONArray;
@@ -70,7 +76,7 @@ public class GatewayManagementServiceFacade {
 	 * @param destination destination to retrieve outbound-federated repositories for
 	 * @return
 	 */
-	public Set<Repository> getOutboundRepositoriesForDestination(Destination destination) {
+	public Set<Repository> getFederatedOutboundRepositoriesForDestination(Destination destination) {
 
 		// TODO pass required repository type to API (to narrow down result set)
 
@@ -225,12 +231,23 @@ public class GatewayManagementServiceFacade {
 	 *            API URL to make request to
 	 * @return
 	 */
-	private String getJSONResponse(final String url) {
-
-		LOG.info("Request to management console API: " + url);
+	private String getJSONResponse(final String url, final Map<String, String> queryParams) {
 
 		final Client client = ClientBuilder.newClient();
-		final Response response = client.target(url).request("application/json").get();
+
+		WebTarget requestURL= client.target(url);
+
+		if(!queryParams.isEmpty()) {
+			Iterator<Entry<String, String>> it = queryParams.entrySet().iterator();
+			while(it.hasNext()) {
+				Entry<String,String> param = it.next();
+				requestURL.queryParam(param.getKey(), param.getValue());
+			}
+		}
+
+		LOG.info("Request to management console API: " + requestURL.toString());
+
+		final Response response = requestURL.request("application/json").get();
 
 		if (response.getStatusInfo() != Response.Status.OK) {
 			throw new ServiceUnavailableException("Error making request to management console API. Response code: "
@@ -238,6 +255,62 @@ public class GatewayManagementServiceFacade {
 		}
 
 		return response.readEntity(String.class);
+
+	}
+
+	private String getJSONResponse(final String url) {
+		return getJSONResponse(url, Collections.<String,String>emptyMap());
+	}
+
+	/**
+	 * Retrieve repository configured for inbound federation from partner organisation
+	 * from management console API
+	 *
+	 * @param sourceKey key of partner organisation sending repository
+	 * @param repoIdentifier unique repository identifier
+	 * @return
+	 */
+	public Repository getFederatedInboundRepository(String sourceKey,
+			String repoIdentifier, String repoType) {
+
+		Map<String, String> queryParams = new HashMap<String, String>();
+		queryParams.put("sourceKey", sourceKey);
+		queryParams.put("repoIdentifier", repoIdentifier);
+		queryParams.put("repoType", repoType);
+
+		final String jsonResponseBody = getJSONResponse(serviceBaseUrl + "/api/federation/inbound", queryParams);
+		final Repository federatedRepository = parseFederatedRepository(jsonResponseBody);
+
+		return federatedRepository;
+	}
+
+	/**
+	 * Parses JSON response to getFederatedInboundRepository request
+	 *
+	 * @param jsonResponseBody String body of response
+	 * @return Federated repository (if it exists and is shared)
+	 */
+	private Repository parseFederatedRepository(String jsonResponseBody) {
+
+		final JSONArray jsonFederationConfigurations = new JSONArray(jsonResponseBody);
+
+		for (int i = 0; i < jsonFederationConfigurations.length(); i++) {
+
+			try {
+				final JSONObject jsonFedConfig = jsonFederationConfigurations.getJSONObject(i);
+				final JSONObject jsonRepo = jsonFedConfig.getJSONObject("repository");
+				final String repoType = jsonRepo.getString("repoType");
+				final String identifier = jsonRepo.getString("identifier");
+
+				return new Repository(repoType, identifier);
+			} catch (final JSONException e) {
+				LOG.warning("Unable to parse destination from JSON: " + e);
+				continue;
+			}
+
+		}
+
+		return null;
 
 	}
 
