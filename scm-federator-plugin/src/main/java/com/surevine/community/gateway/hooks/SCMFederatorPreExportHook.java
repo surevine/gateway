@@ -12,7 +12,9 @@ import java.util.logging.Logger;
 
 import com.surevine.community.gateway.audit.Audit;
 import com.surevine.community.gateway.audit.action.SanitisationFailAuditAction;
+import com.surevine.community.gateway.management.api.GatewayManagementServiceFacade;
 import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Repository;
 import com.surevine.community.gateway.model.TransferItem;
 import com.surevine.community.gateway.sanitisation.SanitisationResult;
 import com.surevine.community.gateway.sanitisation.SanitisationServiceFacade;
@@ -41,8 +43,8 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 	public void call(Set<TransferItem> transferQueue) {
 
 		for (final TransferItem item : transferQueue) {
-			if(isSourceControlItem(item.getMetadata())) {
-				if(!isSharedProject(item.getDestination(), item.getMetadata())) {
+			if(isItemAppropriate(item.getMetadata())) {
+				if(!isSharedRepository(item.getDestination(), item.getMetadata())) {
 					// Don't export project to destination (as its not shared)
 					item.setNotExportable();
 				}
@@ -68,11 +70,11 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 	}
 
 	/**
-	 * Detect whether item sent from federated SCM system
-	 * @param source String representing item source system
+	 * Detect whether item sent from federated SCM component
+	 * @param metadata Metadata
 	 * @return
 	 */
-	private boolean isSourceControlItem(Map<String, String> metadata) {
+	private boolean isItemAppropriate(final Map<String, String> metadata) {
 		if(metadata.containsKey("source_type")) {
 			if(metadata.get("source_type").equals(SCM_SOURCE_TYPE)) {
 				return true;
@@ -82,21 +84,21 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 	}
 
 	/**
-	 * Determines whether project has been configured to be shared with destination
+	 * Determines whether repository has been configured to be shared (outbound) with destination
 	 * @param destination destination being shared to
-	 * @param projectName project to be shared
+	 * @param metadata repository metadata
 	 * @return
 	 */
-	private boolean isSharedProject(Destination destination, Map<String, String> metadata) {
+	private boolean isSharedRepository(Destination destination, Map<String, String> metadata) {
 
-		String projectSlug = String.format("%s/%s", metadata.get("project"), metadata.get("repo"));
+		String repoIdentifier = String.format("%s/%s", metadata.get("project"), metadata.get("repo"));
 
-		// TODO fix once ticketing has been implemented
-		Set<String> destinationSharedProjects = null;
+		final Set<Repository> destinationOutboundRepositories = GatewayManagementServiceFacade.getInstance().getFederatedOutboundRepositoriesForDestination(destination);
 
-		if(destinationSharedProjects != null) {
-			for(String sharedProject : destinationSharedProjects) {
-				if(sharedProject.equalsIgnoreCase(projectSlug)) {
+		if (!destinationOutboundRepositories.isEmpty()) {
+			for (final Repository federatedOutboundRepo : destinationOutboundRepositories) {
+				if (federatedOutboundRepo.getIdentifier().equalsIgnoreCase(repoIdentifier) &&
+						federatedOutboundRepo.getRepoType().equalsIgnoreCase("SCM")) {
 					return true;
 				}
 			}

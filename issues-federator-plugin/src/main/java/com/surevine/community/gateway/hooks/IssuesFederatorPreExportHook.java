@@ -102,7 +102,8 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 
 		if (!destinationOutboundRepositories.isEmpty()) {
 			for (final Repository federatedOutboundRepo : destinationOutboundRepositories) {
-				if (federatedOutboundRepo.getIdentifier().equalsIgnoreCase(metadata.get("project"))) {
+				if (federatedOutboundRepo.getIdentifier().equalsIgnoreCase(metadata.get("project")) &&
+						federatedOutboundRepo.getRepoType().equalsIgnoreCase("ISSUE")) {
 					return true;
 				}
 			}
@@ -113,8 +114,7 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 	/**
 	 * Confirms item is safe to export.
 	 *
-	 * @param item
-	 *            TransferItem to be sanitised
+	 * @param item TransferItem to be sanitised
 	 */
 	private void sanitise(final TransferItem item) {
 
