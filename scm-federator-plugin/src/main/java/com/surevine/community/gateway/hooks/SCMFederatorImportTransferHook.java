@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,7 +17,6 @@ import org.apache.http.entity.mime.content.StringBody;
 
 import com.surevine.community.gateway.management.api.GatewayManagementServiceFacade;
 import com.surevine.community.gateway.model.Repository;
-import com.surevine.community.gateway.model.WhitelistedProject;
 
 /**
  * Transfers compatible imported bundles to SCM federator component.

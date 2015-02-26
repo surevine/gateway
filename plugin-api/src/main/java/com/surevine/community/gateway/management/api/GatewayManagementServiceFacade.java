@@ -1,14 +1,8 @@
 package com.surevine.community.gateway.management.api;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +10,6 @@ import java.util.logging.Logger;
 import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
 import org.json.JSONArray;
@@ -26,7 +19,6 @@ import org.json.JSONObject;
 import com.surevine.community.gateway.GatewayProperties;
 import com.surevine.community.gateway.model.Destination;
 import com.surevine.community.gateway.model.Repository;
-import com.surevine.community.gateway.model.WhitelistedProject;
 
 /**
  * Service facade around gateway management console API
@@ -155,8 +147,7 @@ public class GatewayManagementServiceFacade {
 	/**
 	 * Parses JSON response to getDestinations request into list of Destinations
 	 *
-	 * @param responseBody
-	 *            String body of response
+	 * @param responseBody String body of response
 	 * @return List of destinations
 	 * @throws URISyntaxException
 	 */
