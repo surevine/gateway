@@ -91,19 +91,17 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 	 */
 	private boolean isSharedRepository(Destination destination, Map<String, String> metadata) {
 
+		boolean isShared = false;
 		String repoIdentifier = String.format("%s/%s", metadata.get("project"), metadata.get("repo"));
 
-		final Set<Repository> destinationOutboundRepositories = GatewayManagementServiceFacade.getInstance().getFederatedOutboundRepositoriesForDestination(destination);
+		Repository federatedOutboundRepo = GatewayManagementServiceFacade.getInstance().
+				getOutboundFederatedRepository(destination, "SCM", repoIdentifier);
 
-		if (!destinationOutboundRepositories.isEmpty()) {
-			for (final Repository federatedOutboundRepo : destinationOutboundRepositories) {
-				if (federatedOutboundRepo.getIdentifier().equalsIgnoreCase(repoIdentifier) &&
-						federatedOutboundRepo.getRepoType().equalsIgnoreCase("SCM")) {
-					return true;
-				}
-			}
+		if(federatedOutboundRepo != null) {
+			isShared = true;
 		}
-		return false;
+
+		return isShared;
 	}
 
 	/**

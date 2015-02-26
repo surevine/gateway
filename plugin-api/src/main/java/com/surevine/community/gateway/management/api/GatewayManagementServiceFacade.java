@@ -59,9 +59,9 @@ public class GatewayManagementServiceFacade {
 	}
 
 	/**
-	 * Retrieve list of destinations from management console API
+	 * Retrieve list of configured destinations
 	 *
-	 * @return
+	 * @return Set of configured destinations
 	 */
 	public Set<Destination> getDestinations() {
 
@@ -72,54 +72,83 @@ public class GatewayManagementServiceFacade {
 	}
 
 	/**
-	 * Retrieve list of repositories configured for outbound federation with destination
-	 * from management console API
+	 * Retrieve repository that is configured for inbound-federation
+	 * from partner/destination
 	 *
-	 * @param destination destination to retrieve outbound-federated repositories for
+	 * @param sourceKey key of partner organisation sending repository
+	 * @param repoIdentifier unique repository identifier
 	 * @return
 	 */
-	public Set<Repository> getFederatedOutboundRepositoriesForDestination(Destination destination) {
+	public Repository getInboundFederatedRepository(String sourceKey,
+			String repoIdentifier, String repoType) {
 
-		// TODO pass required repository type to API (to narrow down result set)
+		final Client client = ClientBuilder.newClient();
+		final Response response = client.target(serviceBaseUrl + "/api/federation/inbound-single")
+									.queryParam("sourceKey", sourceKey)
+									.queryParam("repoIdentifier", repoIdentifier)
+									.queryParam("repoType", repoType)
+									.request("application/json").get();
 
-		final String jsonResponseBody = getJSONResponse(serviceBaseUrl + "/api/federation/" + destination.getId() + "/outbound");
-		final Set<Repository> federatedRepositories = parseFederatedRepositories(jsonResponseBody);
+		if(Response.Status.fromStatusCode(response.getStatus()) != Response.Status.OK) {
+			return null;
+		}
 
-		return federatedRepositories;
+		final String jsonResponseBody = response.readEntity(String.class);
+		final Repository federatedRepository = parseRepositoryFromResponse(jsonResponseBody);
+
+		return federatedRepository;
 	}
 
 	/**
-	 * Parses JSON response to get[In/Out]boundRepositoriesForDestination requests into list of Repositories
+	 * Retrieve repository that is configured for outbound-federation
+	 * with partner/destination.
 	 *
-	 * @param jsonResponseBody String body of response
-	 * @return set of repositories
+	 * @param destination destination the repository is shared with
+	 * @param repoType Type of repository
+	 * @param repoIdentifier Identifier of shared repository
+	 * @return shared Repository or null if doesn't exist (or isn't shared)
 	 */
-	private Set<Repository> parseFederatedRepositories(String jsonResponseBody) {
+	public Repository getOutboundFederatedRepository(Destination destination,
+			String repoType, String repoIdentifier) {
 
-		final Set<Repository> repositories = new HashSet<Repository>();
+		final Client client = ClientBuilder.newClient();
+		final Response response = client.target(serviceBaseUrl + "/api/federation/outbound-single")
+									.queryParam("destinationId", destination.getId())
+									.queryParam("repoIdentifier", repoIdentifier)
+									.queryParam("repoType", repoType)
+									.request("application/json").get();
 
-		final JSONArray jsonFederationConfigurations = new JSONArray(jsonResponseBody);
-
-		for (int i = 0; i < jsonFederationConfigurations.length(); i++) {
-
-			try {
-
-				final JSONObject jsonFedConfig = jsonFederationConfigurations.getJSONObject(i);
-				final JSONObject jsonRepo = jsonFedConfig.getJSONObject("repository");
-				final String repoType = jsonRepo.getString("repoType");
-				final String identifier = jsonRepo.getString("identifier");
-				final Repository repository = new Repository(repoType, identifier);
-
-				repositories.add(repository);
-
-			} catch (final JSONException e) {
-				LOG.warning("Unable to parse destination from JSON: " + e);
-				continue;
-			}
-
+		if(Response.Status.fromStatusCode(response.getStatus()) != Response.Status.OK) {
+			return null;
 		}
 
-		return repositories;
+		final String jsonResponseBody = response.readEntity(String.class);
+		final Repository federatedRepository = parseRepositoryFromResponse(jsonResponseBody);
+
+		return federatedRepository;
+
+	}
+
+	/**
+	 * Helper method to request JSON from management console API endpoint
+	 *
+	 * @param url
+	 *            API URL to make request to
+	 * @return
+	 */
+	private String getJSONResponse(final String url) {
+
+		LOG.info("Request to management console API: " + url);
+
+		final Client client = ClientBuilder.newClient();
+		final Response response = client.target(url).request("application/json").get();
+
+		if (response.getStatusInfo() != Response.Status.OK) {
+			throw new ServiceUnavailableException("Error making request to management console API. Response code: "
+					+ response.getStatus());
+		}
+
+		return response.readEntity(String.class);
 
 	}
 
@@ -164,126 +193,12 @@ public class GatewayManagementServiceFacade {
 	}
 
 	/**
-	 * Retrieve list of whitelisted scm projects from management console API
-	 *
-	 * @return Set of whitelisted projects
-	 */
-	public Set<WhitelistedProject> getWhitelistedScmProjects() {
-
-		final String jsonResponseBody = getJSONResponse(serviceBaseUrl + "/api/inbound-projects");
-		final Set<WhitelistedProject> projects = parseProjectsFromReponse(jsonResponseBody);
-
-		return projects;
-	}
-
-	/**
-	 * Retrieve list of whitelisted issue projects from management console API
-	 *
-	 * @return Set of whitelisted projects
-	 */
-	public Set<WhitelistedProject> getWhitelistedIssueProjects() {
-
-		final String jsonResponseBody = getJSONResponse(serviceBaseUrl + "/api/inbound-issue-projects");
-		final Set<WhitelistedProject> projects = parseProjectsFromReponse(jsonResponseBody);
-
-		return projects;
-	}
-
-	/**
-	 * Parses JSON response to getWhitelistedProjects request into list of whitelisted projects
-	 *
-	 * @param responseBody
-	 *            String response to API request
-	 * @return Set of whitelisted projects
-	 */
-	private Set<WhitelistedProject> parseProjectsFromReponse(final String responseBody) {
-
-		final Set<WhitelistedProject> projects = new HashSet<WhitelistedProject>();
-		final JSONArray jsonProjects = new JSONArray(responseBody);
-
-		for (int i = 0; i < jsonProjects.length(); i++) {
-
-			try {
-
-				final JSONObject jsonProject = jsonProjects.getJSONObject(i);
-				final String sourceOrganisation = jsonProject.getString("sourceOrganisation");
-				final String projectKey = jsonProject.getString("projectKey");
-				final String repositorySlug = !jsonProject.has("repositorySlug") ? null : jsonProject
-						.getString("repositorySlug");
-
-				final WhitelistedProject project = new WhitelistedProject(sourceOrganisation, projectKey,
-						repositorySlug);
-				projects.add(project);
-
-			} catch (final JSONException e) {
-				LOG.warning("Unable to parse whitelisted project from JSON: " + e);
-				continue;
-			}
-
-		}
-
-		return projects;
-
-	}
-
-	/**
-	 * Helper method to request JSON from management console API endpoint
-	 *
-	 * @param url
-	 *            API URL to make request to
-	 * @return
-	 */
-	private String getJSONResponse(final String url) {
-
-		LOG.info("Request to management console API: " + url);
-
-		final Client client = ClientBuilder.newClient();
-		final Response response = client.target(url).request("application/json").get();
-
-		if (response.getStatusInfo() != Response.Status.OK) {
-			throw new ServiceUnavailableException("Error making request to management console API. Response code: "
-					+ response.getStatus());
-		}
-
-		return response.readEntity(String.class);
-
-	}
-
-	/**
-	 * Retrieve repository configured for inbound federation from partner organisation
-	 * from management console API
-	 *
-	 * @param sourceKey key of partner organisation sending repository
-	 * @param repoIdentifier unique repository identifier
-	 * @return
-	 */
-	public Repository getFederatedInboundRepository(String sourceKey,
-			String repoIdentifier, String repoType) {
-
-		final Client client = ClientBuilder.newClient();
-		final Response response = client.target(serviceBaseUrl + "/api/federation/inbound-single")
-									.queryParam("sourceKey", sourceKey)
-									.queryParam("repoIdentifier", repoIdentifier)
-									.queryParam("repoType", repoType)
-									.request("application/json").get();
-
-		if(Response.Status.fromStatusCode(response.getStatus()) != Response.Status.OK) {
-			return null;
-		}
-
-		final String jsonResponseBody = response.readEntity(String.class);
-		final Repository federatedRepository = parseFederatedRepository(jsonResponseBody);
-
-		return federatedRepository;
-	}
-
-	/**
-	 * Parses JSON response to getFederatedInboundRepository request
+	 * Parses JSON response to get[In/Out]boundFederatedRepository requests
 	 *
 	 * @param jsonResponseBody String body of response
 	 * @return Federated repository (if it exists and is shared)
 	 */
-	private Repository parseFederatedRepository(String jsonResponseBody) {
+	private Repository parseRepositoryFromResponse(String jsonResponseBody) {
 
 		try {
 			final JSONObject jsonFedConfig = new JSONObject(jsonResponseBody);

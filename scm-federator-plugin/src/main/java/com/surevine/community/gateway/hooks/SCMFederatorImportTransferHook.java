@@ -133,7 +133,7 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 		boolean isWhitelisted = false;
 
 		Repository federatedInboundRepo = GatewayManagementServiceFacade.getInstance().
-			getFederatedInboundRepository(properties.get("source_organisation"),
+			getInboundFederatedRepository(properties.get("source_organisation"),
 					properties.get("project") + "/" + properties.get("repo"),
 					"SCM");
 

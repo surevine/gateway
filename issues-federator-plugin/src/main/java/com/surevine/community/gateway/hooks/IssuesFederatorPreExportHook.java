@@ -98,17 +98,17 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 	 */
 	private boolean isSharedProject(final Destination destination, final Map<String, String> metadata) {
 
-		final Set<Repository> destinationOutboundRepositories = GatewayManagementServiceFacade.getInstance().getFederatedOutboundRepositoriesForDestination(destination);
+		boolean isShared = false;
+		String repoIdentifier = metadata.get("project");
 
-		if (!destinationOutboundRepositories.isEmpty()) {
-			for (final Repository federatedOutboundRepo : destinationOutboundRepositories) {
-				if (federatedOutboundRepo.getIdentifier().equalsIgnoreCase(metadata.get("project")) &&
-						federatedOutboundRepo.getRepoType().equalsIgnoreCase("ISSUE")) {
-					return true;
-				}
-			}
+		Repository federatedOutboundRepo = GatewayManagementServiceFacade.getInstance().
+				getOutboundFederatedRepository(destination, "ISSUE", repoIdentifier);
+
+		if(federatedOutboundRepo != null) {
+			isShared = true;
 		}
-		return false;
+
+		return isShared;
 	}
 
 	/**

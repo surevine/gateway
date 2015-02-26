@@ -129,7 +129,7 @@ public class IssuesFederatorImportTransferHook implements GatewayImportTransferH
 		boolean isWhitelisted = false;
 
 		Repository federatedInboundRepo = GatewayManagementServiceFacade.getInstance().
-			getFederatedInboundRepository(properties.get("source_organisation"),
+			getInboundFederatedRepository(properties.get("source_organisation"),
 					properties.get("project"), "ISSUE");
 
 		if(federatedInboundRepo != null) {
