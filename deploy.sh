@@ -2,11 +2,12 @@
 
 if [ $# -eq 0 ]; then
   CONFIG_KEYS="${USER}"
+  WILDFLY_DIR="/Applications/wildfly/instance_1"
 else
+  WILDFLY_DIR="${1}"
+  shift
   CONFIG_KEYS="$@"
 fi
-
-WILDFLY_DIR="/Users/jonnyheavey/Documents/tpse-workspace/wildfly-8.0.0.Final"
 
 BUILT_DIRECTORY=`find wildfly-packager/target/ -type d -d -name "gateway-wildfly-package-*"`
 
@@ -25,7 +26,9 @@ chmod +x *.sh
 
 . ./extractEnvConfig.sh "${CONFIG_KEYS}"
 
-. ./updateTemplateConfig.sh ${ENV_CONFIG} ${SENSITIVE_CONFIG}
+. ./updateTemplateModules.sh ${ENV_CONFIG} ${SENSITIVE_CONFIG}
+
+. ./updateTemplateScripts.sh ${ENV_CONFIG} ${SENSITIVE_CONFIG}
 
 . ./deploy.sh "${WILDFLY_DIR}"
 

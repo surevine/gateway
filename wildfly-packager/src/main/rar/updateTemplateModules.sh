@@ -1,7 +1,12 @@
+#!/bin/bash
 
 if [ $# -lt 1 ]; then
   echo "Warning: No source configuration file specified for replacement processing. Template configuration will not be changed."
   echo "Usage: `basename $0` replacement_source1 [ replacement_source2 ... ]"
+fi
+
+if [ -z ${COMMUNITY_SCRIPT_FUNCTIONS} ]; then
+  . ./setFunctions.sh
 fi
 
 # Expects there to be a modules-template directory, which will be copied before substitutions are processed
@@ -18,8 +23,12 @@ fi
 
 # remove any existing directory with updated config from a previous run
 if [ -d "${TARGET_DIRECTORY}" ]; then
+  printStart "Removing existing generated modules"
   rm -rf ${TARGET_DIRECTORY}
+  printFinish
 fi
+
+printStart "Generating configured deployment modules"
 
 # Take a copy of the template directory
 cp -r "${TEMPLATE_DIRECTORY}" "${TARGET_DIRECTORY}"
@@ -53,4 +62,6 @@ for TARGET_FILE in `find ${TARGET_DIRECTORY} -name "*.properties"`; do
     done < "${REPLACEMENT_FILE}"
   done
 done
+
+printFinish
 
