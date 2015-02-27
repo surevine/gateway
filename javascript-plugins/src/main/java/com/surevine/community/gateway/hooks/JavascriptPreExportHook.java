@@ -18,7 +18,7 @@ import javax.script.ScriptEngineManager;
 
 import com.surevine.community.gateway.audit.Audit;
 import com.surevine.community.gateway.audit.action.RuleFailAuditAction;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 import com.surevine.community.gateway.model.Rule;
 import com.surevine.community.gateway.model.TransferItem;
 import com.surevine.community.gateway.rules.ConsoleRuleFileServiceImpl;
@@ -51,18 +51,18 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 
 			final Path source = item.getSource();
 			final Map<String, String> metadata = item.getMetadata();
-			final Destination destination = item.getDestination();
+			final Partner partner = item.getPartner();
 
-			LOG.info(String.format("Processing destination %s [%s]", destination.getName(), destination.getUri()
+			LOG.info(String.format("Processing destination %s [%s]", partner.getName(), partner.getUri()
 					.toString()));
 
 			Set<Path> exportRuleFiles = new HashSet<Path>();
 			try {
-				exportRuleFiles = ruleFileService.getExportRuleFiles(destination);
+				exportRuleFiles = ruleFileService.getExportRuleFiles(partner);
 			} catch (final FileNotFoundException e) {
 				LOG.warning(String
 						.format("Could not load all rule files for destination %s [%s]. Skipping item export to destination. %s",
-								destination.getName(), destination.getId(), e.getMessage()));
+								partner.getName(), partner.getId(), e.getMessage()));
 				item.setNotExportable();
 				continue;
 			}
@@ -83,7 +83,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 				jsEngine.put("Redis", new Redis("localhost"));
 				jsEngine.put("source", source);
 				jsEngine.put("metadata", metadata);
-				jsEngine.put("destination", destination.getUri().toString());
+				jsEngine.put("destination", partner.getUri().toString());
 
 				try {
 					jsEngine.eval(new InputStreamReader(Files.newInputStream(ruleFile)));
@@ -93,10 +93,10 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 				}
 
 				if (!rule.isAllowed()) {
-					LOG.info(String.format("Destination %s did not pass export rules for %s.", destination, source));
+					LOG.info(String.format("Destination %s did not pass export rules for %s.", partner, source));
 					item.setNotExportable();
 
-					final RuleFailAuditAction ruleFailAction = Audit.getRuleFailAuditAction(source, destination);
+					final RuleFailAuditAction ruleFailAction = Audit.getRuleFailAuditAction(source, partner);
 					Audit.audit(ruleFailAction);
 
 					break; // Do not continue evaluating hook scripts for this destination, we're not sending the

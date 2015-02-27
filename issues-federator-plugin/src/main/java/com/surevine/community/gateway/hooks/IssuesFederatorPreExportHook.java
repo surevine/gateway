@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import com.surevine.community.gateway.audit.Audit;
 import com.surevine.community.gateway.audit.action.SanitisationFailAuditAction;
 import com.surevine.community.gateway.management.api.GatewayManagementServiceFacade;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 import com.surevine.community.gateway.model.Repository;
 import com.surevine.community.gateway.model.TransferItem;
 import com.surevine.community.gateway.sanitisation.SanitisationResult;
@@ -43,7 +43,7 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 
 		for (final TransferItem item : transferQueue) {
 			if (isItemAppropriate(item.getMetadata())) {
-				if (!isSharedProject(item.getDestination(), item.getMetadata())) {
+				if (!isSharedProject(item.getPartner(), item.getMetadata())) {
 					// Don't export project to destination (as its not shared)
 					item.setNotExportable();
 				}
@@ -90,19 +90,17 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 	 * Determines whether project has been configured to be shared with
 	 * destination
 	 *
-	 * @param destination
-	 *            destination being shared to
-	 * @param projectName
-	 *            project to be shared
+	 * @param partner partner being shared to
+	 * @param projectName project to be shared
 	 * @return
 	 */
-	private boolean isSharedProject(final Destination destination, final Map<String, String> metadata) {
+	private boolean isSharedProject(final Partner partner, final Map<String, String> metadata) {
 
 		boolean isShared = false;
 		String repoIdentifier = metadata.get("project");
 
 		Repository federatedOutboundRepo = GatewayManagementServiceFacade.getInstance().
-				getOutboundFederatedRepository(destination, "ISSUE", repoIdentifier);
+				getOutboundFederatedRepository(partner, "ISSUE", repoIdentifier);
 
 		if(federatedOutboundRepo != null) {
 			isShared = true;
@@ -126,15 +124,15 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 			// Don't export item as sanitisation rejected
 			item.setNotExportable();
 			LOG.warning(String.format(
-					"Export of item '%s' to destination '%s' prevented by sanitisation service. Reasons:",
-					item.getSource(), item.getDestination().getName()));
+					"Export of item '%s' to partner '%s' prevented by sanitisation service. Reasons:",
+					item.getSource(), item.getPartner().getName()));
 			for (final String error : result.getErrors()) {
 				LOG.warning(error);
 			}
 
 			// Audit failure
 			final SanitisationFailAuditAction action = Audit.getSanitisationFailAuditAction(item.getSource(),
-					item.getDestination());
+					item.getPartner());
 			Audit.audit(action);
 		}
 	}

@@ -3,11 +3,11 @@ package com.surevine.community.gateway.audit.action.logfile;
 import java.nio.file.Path;
 
 import com.surevine.community.gateway.audit.action.RuleFailAuditAction;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 public class LogRuleFailAuditAction extends RuleFailAuditAction {
 
-	public LogRuleFailAuditAction(Path source, Destination destination) {
+	public LogRuleFailAuditAction(Path source, Partner destination) {
 		super(source, destination);
 	}
 

@@ -7,7 +7,7 @@ import com.surevine.community.gateway.audit.action.ExportAuditAction;
 import com.surevine.community.gateway.audit.action.ImportAuditAction;
 import com.surevine.community.gateway.audit.action.RuleFailAuditAction;
 import com.surevine.community.gateway.audit.action.SanitisationFailAuditAction;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 public class LogAuditActionFactory implements AuditActionFactory {
 
@@ -18,19 +18,19 @@ public class LogAuditActionFactory implements AuditActionFactory {
 
 	@Override
 	public ExportAuditAction getExportAuditAction(String filename,
-			Destination destination) {
+			Partner destination) {
 		return new LogExportAuditAction(filename, destination);
 	}
 
 	@Override
 	public RuleFailAuditAction getRuleFailAuditAction(Path source,
-			Destination destination) {
+			Partner destination) {
 		return new LogRuleFailAuditAction(source, destination);
 	}
 
 	@Override
 	public SanitisationFailAuditAction getSanitisationFailAuditAction(
-			Path source, Destination destination) {
+			Path source, Partner destination) {
 		return new LogSanitisationFailAuditAction(source, destination);
 	}
 }

@@ -134,7 +134,7 @@ public class IssuesFederatorImportTransferHook implements GatewayImportTransferH
 			isWhitelisted = true;
 		}
 
-		LOG.info("Is issue repository whitelisted for inbound federation from destination? " + isWhitelisted);
+		LOG.info("Is issue repository whitelisted for inbound federation from partner? " + isWhitelisted);
 		return isWhitelisted;
 	}
 

@@ -26,25 +26,25 @@ public class FileCopyExportTransferHook extends MetadataPersistingTransportHook 
 	public void transferSingleItem(TransferItem item) {
 		final Path source = item.getSource();
 		final Map<String, String> metadata = item.getMetadata();
-		final URI destination = item.getDestination().getUri();
+		final URI partnerURI = item.getPartner().getUri();
 
-		if ("file".equals(destination.getScheme()) && item.isExportable()) {
+		if ("file".equals(partnerURI.getScheme()) && item.isExportable()) {
 			try {
 				LOG.info(String.format("Copying from %s to %s",
 						source.toString(),
-						Paths.get(Paths.get(destination).toString(),
+						Paths.get(Paths.get(partnerURI).toString(),
 								source.getFileName().toString())));
 
 				// We copy to a temporary location then move. This ensures
 				// (i) any watching import doesn't start while a copy has
 				// not completed for a large file and (ii) the move doesn't
 				// prevent subsequent transfer plugins finding the source.
-				final Path temporaryFile = Paths.get(Paths.get(destination).toString(),
+				final Path temporaryFile = Paths.get(Paths.get(partnerURI).toString(),
 						source.getFileName().toString()
 						+GatewayProperties.get(GatewayProperties.TRANSFER_EXTENSION));
 
 				// Create parent directories
-				Files.createDirectories(Paths.get(destination));
+				Files.createDirectories(Paths.get(partnerURI));
 
 				// Copy source to temporary
 				Files.copy(source, temporaryFile);
@@ -52,10 +52,10 @@ public class FileCopyExportTransferHook extends MetadataPersistingTransportHook 
 				// Move from temporary to export
 				if (metadata.containsKey("destinationFilename")) {
 					LOG.info("Using destinationFilename key: " +metadata.get("destinationFilename"));
-					copy(temporaryFile, destination, metadata.get("destinationFilename").split(","));
+					copy(temporaryFile, partnerURI, metadata.get("destinationFilename").split(","));
 				} else {
 					LOG.info("No destinationFilename key. Preserving existing filename.");
-					copy(temporaryFile, destination, new String[] { source.getFileName().toString() });
+					copy(temporaryFile, partnerURI, new String[] { source.getFileName().toString() });
 				}
 
 				Files.delete(temporaryFile);
@@ -65,7 +65,7 @@ public class FileCopyExportTransferHook extends MetadataPersistingTransportHook 
 				LOG.log(Level.SEVERE, e.getMessage(), e);
 			}
 		} else {
-			LOG.warning(String.format("Unable to perform file copy for the %s scheme.", destination.getScheme()));
+			LOG.warning(String.format("Unable to perform file copy for the %s scheme.", partnerURI.getScheme()));
 		}
 
 	}

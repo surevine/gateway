@@ -38,7 +38,7 @@ import com.surevine.community.gateway.history.History;
 import com.surevine.community.gateway.hooks.GatewayTransferException;
 import com.surevine.community.gateway.hooks.Hooks;
 import com.surevine.community.gateway.management.api.GatewayManagementServiceFacade;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 import com.surevine.community.gateway.model.Project;
 import com.surevine.community.gateway.model.Projects;
 import com.surevine.community.gateway.model.TransferItem;
@@ -119,8 +119,8 @@ public class GatewayAPI {
 		// Save file to quarantine.
 		final java.nio.file.Path source = Quarantine.save(file, properties);
 
-		// Retrieve list of destinations from management console
-		final Set<Destination> destinations = GatewayManagementServiceFacade.getInstance().getDestinations();
+		// Retrieve list of partners from management console
+		final Set<Partner> partners = GatewayManagementServiceFacade.getInstance().getPartners();
 
 		HashMap<String, String> metadata = new HashMap<String, String>();
 		try {
@@ -132,8 +132,8 @@ public class GatewayAPI {
 
 		// Setup transfer queue
 		final Set<TransferItem> transferQueue = new HashSet<TransferItem>();
-		for (final Destination destination : destinations) {
-			transferQueue.add(new TransferItem(destination, source, cloneMetadata(metadata)));
+		for (final Partner partner : partners) {
+			transferQueue.add(new TransferItem(partner, source, cloneMetadata(metadata)));
 		}
 
 		// Call preExport hooks.

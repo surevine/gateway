@@ -12,7 +12,7 @@ import com.surevine.community.gateway.audit.action.RuleFailAuditAction;
 import com.surevine.community.gateway.audit.action.SanitisationFailAuditAction;
 import com.surevine.community.gateway.audit.action.logfile.LogAuditActionFactory;
 import com.surevine.community.gateway.audit.action.xml.XMLAuditActionFactory;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 /**
  * @author jonnyheavey
@@ -84,7 +84,7 @@ public abstract class Audit {
 	 * @param destination partner/system the file was exported to
 	 * @return
 	 */
-	public static ExportAuditAction getExportAuditAction(String filename, Destination destination){
+	public static ExportAuditAction getExportAuditAction(String filename, Partner destination){
 		return getAuditActionFactory().getExportAuditAction(filename, destination);
 	}
 
@@ -104,7 +104,7 @@ public abstract class Audit {
 	 * @param destination intended export destination
 	 * @return
 	 */
-	public static RuleFailAuditAction getRuleFailAuditAction(Path source, Destination destination) {
+	public static RuleFailAuditAction getRuleFailAuditAction(Path source, Partner destination) {
 		return getAuditActionFactory().getRuleFailAuditAction(source, destination);
 	}
 
@@ -114,7 +114,7 @@ public abstract class Audit {
 	 * @param destination intended export destination
 	 * @return
 	 */
-	public static SanitisationFailAuditAction getSanitisationFailAuditAction(Path source, Destination destination) {
+	public static SanitisationFailAuditAction getSanitisationFailAuditAction(Path source, Partner destination) {
 		return getAuditActionFactory().getSanitisationFailAuditAction(source, destination);
 	}
 

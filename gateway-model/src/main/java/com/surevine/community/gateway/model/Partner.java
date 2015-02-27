@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 
 @Data
-public class Destination {
+public class Partner {
 
 	@Getter
 	private Long id;
@@ -20,16 +20,7 @@ public class Destination {
 	@Getter
 	private String sourceKey;
 
-	private boolean automatedReview;
-	private long transferDelay;
-
-	public Destination(final Long id, final String name, final URI uri) {
-		this.id = id;
-		this.name = name;
-		this.uri = uri;
-	}
-
-	public Destination(final Long id, final String name, final URI uri, final String sourceKey) {
+	public Partner(final Long id, final String name, final URI uri, final String sourceKey) {
 		this.id = id;
 		this.name = name;
 		this.uri = uri;
@@ -43,10 +34,10 @@ public class Destination {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof Destination)) {
+		if (!(obj instanceof Partner)) {
 			return false;
 		}
-		final Destination oDest = (Destination) obj;
+		final Partner oDest = (Partner) obj;
 		return id == oDest.id;
 	}
 

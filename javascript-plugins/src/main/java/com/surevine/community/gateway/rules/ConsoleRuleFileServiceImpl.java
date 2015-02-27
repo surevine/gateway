@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 /**
  * Implementation of RuleFileService for gateway management console maintained rule files.
@@ -35,7 +35,7 @@ public class ConsoleRuleFileServiceImpl implements RuleFileService {
 	 * @return Set of string paths of rule files to be executed
 	 * @throws FileNotFoundException
 	 */
-	public Set<Path> getExportRuleFiles(Destination destination) throws FileNotFoundException {
+	public Set<Path> getExportRuleFiles(Partner destination) throws FileNotFoundException {
 		Set<Path> ruleFiles = new HashSet<Path>();
 
 	    // Include global rule file in rule set (first)

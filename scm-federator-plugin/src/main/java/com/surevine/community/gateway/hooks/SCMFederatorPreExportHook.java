@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import com.surevine.community.gateway.audit.Audit;
 import com.surevine.community.gateway.audit.action.SanitisationFailAuditAction;
 import com.surevine.community.gateway.management.api.GatewayManagementServiceFacade;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 import com.surevine.community.gateway.model.Repository;
 import com.surevine.community.gateway.model.TransferItem;
 import com.surevine.community.gateway.sanitisation.SanitisationResult;
@@ -44,7 +44,7 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 
 		for (final TransferItem item : transferQueue) {
 			if(isItemAppropriate(item.getMetadata())) {
-				if(!isSharedRepository(item.getDestination(), item.getMetadata())) {
+				if(!isSharedRepository(item.getPartner(), item.getMetadata())) {
 					// Don't export project to destination (as its not shared)
 					item.setNotExportable();
 				}
@@ -89,13 +89,13 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 	 * @param metadata repository metadata
 	 * @return
 	 */
-	private boolean isSharedRepository(Destination destination, Map<String, String> metadata) {
+	private boolean isSharedRepository(Partner partner, Map<String, String> metadata) {
 
 		boolean isShared = false;
 		String repoIdentifier = String.format("%s/%s", metadata.get("project"), metadata.get("repo"));
 
 		Repository federatedOutboundRepo = GatewayManagementServiceFacade.getInstance().
-				getOutboundFederatedRepository(destination, "SCM", repoIdentifier);
+				getOutboundFederatedRepository(partner, "SCM", repoIdentifier);
 
 		if(federatedOutboundRepo != null) {
 			isShared = true;
@@ -119,15 +119,15 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 		if(!result.isSane()) {
 			// Don't export item as sanitisation rejected
 			item.setNotExportable();
-			LOG.warning(String.format("Export of item '%s' to destination '%s' prevented by sanitisation service. Reasons:",
+			LOG.warning(String.format("Export of item '%s' to partner '%s' prevented by sanitisation service. Reasons:",
 					item.getSource(),
-					item.getDestination().getName()));
+					item.getPartner().getName()));
 			for(String error: result.getErrors()) {
 				LOG.warning(error);
 			}
 
 			// Audit failure
-			SanitisationFailAuditAction action = Audit.getSanitisationFailAuditAction(item.getSource(), item.getDestination());
+			SanitisationFailAuditAction action = Audit.getSanitisationFailAuditAction(item.getSource(), item.getPartner());
 			Audit.audit(action);
 		}
 	}

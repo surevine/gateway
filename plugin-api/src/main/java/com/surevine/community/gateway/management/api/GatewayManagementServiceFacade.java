@@ -17,7 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.surevine.community.gateway.GatewayProperties;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 import com.surevine.community.gateway.model.Repository;
 
 /**
@@ -51,16 +51,13 @@ public class GatewayManagementServiceFacade {
 	}
 
 	/**
-	 * Retrieve list of configured destinations
+	 * Retrieve list of configured partners
 	 *
-	 * @return Set of configured destinations
+	 * @return Set of configured partner
 	 */
-	public Set<Destination> getDestinations() {
-
-		final String jsonResponseBody = getJSONResponse(serviceBaseUrl + "/api/destinations");
-		final Set<Destination> destinations = parseDestinationsFromResponse(jsonResponseBody);
-
-		return destinations;
+	public Set<Partner> getPartners() {
+		final String jsonResponseBody = getJSONResponse(serviceBaseUrl + "/api/partners");
+		return parsePartnersFromResponse(jsonResponseBody);
 	}
 
 	/**
@@ -100,12 +97,12 @@ public class GatewayManagementServiceFacade {
 	 * @param repoIdentifier Identifier of shared repository
 	 * @return shared Repository or null if doesn't exist (or isn't shared)
 	 */
-	public Repository getOutboundFederatedRepository(Destination destination,
+	public Repository getOutboundFederatedRepository(Partner partner,
 			String repoType, String repoIdentifier) {
 
 		final Client client = ClientBuilder.newClient();
 		final Response response = client.target(serviceBaseUrl + "/api/federation/outbound-single")
-									.queryParam("destinationId", destination.getId())
+									.queryParam("destinationId", partner.getId())
 									.queryParam("repoIdentifier", repoIdentifier)
 									.queryParam("repoType", repoType)
 									.request("application/json").get();
@@ -145,30 +142,28 @@ public class GatewayManagementServiceFacade {
 	}
 
 	/**
-	 * Parses JSON response to getDestinations request into list of Destinations
+	 * Parses JSON response to getPartners request into list of Partners
 	 *
 	 * @param responseBody String body of response
-	 * @return List of destinations
-	 * @throws URISyntaxException
+	 * @return List of partners
 	 */
-	private Set<Destination> parseDestinationsFromResponse(final String responseBody) {
+	private Set<Partner> parsePartnersFromResponse(final String responseBody) {
 
-		final Set<Destination> destinations = new HashSet<Destination>();
+		final Set<Partner> partners = new HashSet<Partner>();
 
-		final JSONArray jsonDestinations = new JSONArray(responseBody);
+		final JSONArray jsonPartners = new JSONArray(responseBody);
 
-		for (int i = 0; i < jsonDestinations.length(); i++) {
+		for (int i = 0; i < jsonPartners.length(); i++) {
 
 			try {
 
-				final JSONObject jsonDestination = jsonDestinations.getJSONObject(i);
-				final Long id = jsonDestination.getLong("id");
-				final String name = jsonDestination.getString("name");
-				final URI url = new URI(jsonDestination.getString("url"));
-				final String sourceKey = jsonDestination.getString("sourceKey");
+				final JSONObject jsonPartner = jsonPartners.getJSONObject(i);
+				final Long id = jsonPartner.getLong("id");
+				final String name = jsonPartner.getString("name");
+				final URI url = new URI(jsonPartner.getString("url"));
+				final String sourceKey = jsonPartner.getString("sourceKey");
 
-				final Destination destination = new Destination(id, name, url, sourceKey);
-				destinations.add(destination);
+				partners.add(new Partner(id, name, url, sourceKey));
 
 			} catch (final JSONException e) {
 				LOG.warning("Unable to parse destination from JSON: " + e);
@@ -180,7 +175,7 @@ public class GatewayManagementServiceFacade {
 
 		}
 
-		return destinations;
+		return partners;
 	}
 
 	/**

@@ -5,7 +5,7 @@ import java.util.Set;
 import com.surevine.community.gateway.audit.Audit;
 import com.surevine.community.gateway.audit.action.ExportAuditAction;
 import com.surevine.community.gateway.hooks.GatewayExportTransferHook;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 import com.surevine.community.gateway.model.TransferItem;
 
 /**
@@ -21,10 +21,10 @@ public class AuditItemExportTransferHook implements GatewayExportTransferHook {
 		for (final TransferItem item : transferQueue) {
 
 			if(item.isExportable()) {
-				Destination destination = item.getDestination();
+				Partner partner = item.getPartner();
 				String filename = item.getSource().getFileName().toString();
 
-				ExportAuditAction exportAction = Audit.getExportAuditAction(filename, destination);
+				ExportAuditAction exportAction = Audit.getExportAuditAction(filename, partner);
 				Audit.audit(exportAction);
 			}
 

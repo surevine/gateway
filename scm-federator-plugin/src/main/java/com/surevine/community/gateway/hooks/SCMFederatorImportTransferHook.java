@@ -120,7 +120,7 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 
 	/**
 	 * Determines whether repository has been whitelisted for inbound federation from
-	 * source organisation (destination) via gateway
+	 * source organisation (partner) via gateway
 	 *
 	 * @param properties
 	 *            Properties from imported archive (representing SCM project)
@@ -139,7 +139,7 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 			isWhitelisted = true;
 		}
 
-		LOG.info("Is SCM repository whitelisted for inbound federation from destination? " + isWhitelisted);
+		LOG.info("Is SCM repository whitelisted for inbound federation from partner? " + isWhitelisted);
 		return isWhitelisted;
 
 	}
