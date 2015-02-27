@@ -3,6 +3,9 @@
 if [ $# -eq 0 ]; then
   CONFIG_KEYS="${USER}"
   WILDFLY_DIR="/Applications/wildfly/instance_1"
+elif [ $# -eq 1 ]; then
+  CONFIG_KEYS="${USER}"
+  WILDFLY_DIR="${1}"
 else
   WILDFLY_DIR="${1}"
   shift
