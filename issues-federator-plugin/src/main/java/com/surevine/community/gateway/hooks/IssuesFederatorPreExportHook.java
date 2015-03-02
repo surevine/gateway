@@ -27,6 +27,7 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 
 	private static final Logger LOG = Logger.getLogger(IssuesFederatorPreExportHook.class.getName());
 	private static final String SOURCE_TYPE = "Issues";
+	private static final String SINGLE_DISTRIBUTION_TYPE = "single_distribution";
 
 	private final Properties config = new Properties();
 
@@ -97,13 +98,17 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 	private boolean isSharedProject(final Partner partner, final Map<String, String> metadata) {
 
 		boolean isShared = false;
-		String repoIdentifier = metadata.get("project");
 
-		Repository federatedOutboundRepo = GatewayManagementServiceFacade.getInstance().
-				getOutboundFederatedRepository(partner, "ISSUE", repoIdentifier);
+		if(metadata.get("distribution_type").equalsIgnoreCase(SINGLE_DISTRIBUTION_TYPE)) {
+			isShared = partner.getSourceKey().equalsIgnoreCase(metadata.get("limit_distribution_to"));
+		} else {
+			String repoIdentifier = metadata.get("project");
+			Repository federatedOutboundRepo = GatewayManagementServiceFacade.getInstance().
+					getOutboundFederatedRepository(partner, "ISSUE", repoIdentifier);
 
-		if(federatedOutboundRepo != null) {
-			isShared = true;
+			if(federatedOutboundRepo != null) {
+				isShared = true;
+			}
 		}
 
 		return isShared;

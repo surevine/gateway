@@ -28,6 +28,7 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 
 	private static final Logger LOG = Logger.getLogger(SCMFederatorPreExportHook.class.getName());
 	private static final String SCM_SOURCE_TYPE = "SCM";
+	private static final String SINGLE_DISTRIBUTION_TYPE = "single_distribution";
 
 	private Properties config = new Properties();
 
@@ -44,6 +45,7 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 
 		for (final TransferItem item : transferQueue) {
 			if(isItemAppropriate(item.getMetadata())) {
+
 				if(!isSharedRepository(item.getPartner(), item.getMetadata())) {
 					// Don't export project to destination (as its not shared)
 					item.setNotExportable();
@@ -92,13 +94,16 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 	private boolean isSharedRepository(Partner partner, Map<String, String> metadata) {
 
 		boolean isShared = false;
-		String repoIdentifier = String.format("%s/%s", metadata.get("project"), metadata.get("repo"));
 
-		Repository federatedOutboundRepo = GatewayManagementServiceFacade.getInstance().
-				getOutboundFederatedRepository(partner, "SCM", repoIdentifier);
-
-		if(federatedOutboundRepo != null) {
-			isShared = true;
+		if(metadata.get("distribution_type").equalsIgnoreCase(SINGLE_DISTRIBUTION_TYPE)) {
+			isShared = partner.getSourceKey().equalsIgnoreCase(metadata.get("limit_distribution_to"));
+		} else {
+			String repoIdentifier = String.format("%s/%s", metadata.get("project"), metadata.get("repo"));
+			Repository federatedOutboundRepo = GatewayManagementServiceFacade.getInstance().
+					getOutboundFederatedRepository(partner, "SCM", repoIdentifier);
+			if(federatedOutboundRepo != null) {
+				isShared = true;
+			}
 		}
 
 		return isShared;
