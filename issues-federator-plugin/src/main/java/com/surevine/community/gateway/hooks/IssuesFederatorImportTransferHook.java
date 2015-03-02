@@ -39,6 +39,11 @@ public class IssuesFederatorImportTransferHook implements GatewayImportTransferH
 	@Override
 	public void call(final File[] received, final Map<String, String> properties) {
 
+		if (!isWhitelisted(properties)) {
+			LOG.info("artifact rejected as Issue project is not whitelisted for inbound federation from destination.");
+			return;
+		}
+
 		for (final File element : received) {
 
 			final MultipartEntity entity = buildImportedBundleRequestBody(element, properties);
@@ -70,12 +75,6 @@ public class IssuesFederatorImportTransferHook implements GatewayImportTransferH
 			LOG.info("Source type is: " + sourceType);
 			boolean supported = sourceType.equalsIgnoreCase(SOURCE_TYPE);
 			LOG.info("Does this class support this artifact? " + supported);
-
-			if (!isWhitelisted(properties)) {
-				LOG.info("artifact rejected as issues project is not whitelisted for inbound federation from destination.");
-				supported = false;
-			}
-
 			return supported;
 		} catch (final Exception e) {
 			LOG.log(Level.INFO, "Exception during support method.", e);
