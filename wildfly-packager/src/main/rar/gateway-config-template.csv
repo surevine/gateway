@@ -1,0 +1,42 @@
+# Template file containing details of the properties available for configuration of the application.
+# Template configuration can be parsed by the generator script to generate a usable deployment configuration file
+# Properties are expressed within a CSV format using the following headings:
+#
+# property name, default value, text to display as options, description
+#
+
+# Audit
+gateway.audit.mode,log,log | xml,The mode in which the audit component operates - relates to whether audit logs are generated as standard logs or in XML format
+gateway.audit.xml.logfile.dir,/tmp/gateway/audit,,The directory in which XML audit logs are generated
+gateway.audit.xml.system.environment,DEVELOPMENT,,Determines the environment metadata recorded against logs in the XML output format
+
+# Web-app
+gateway.export.quarantine.dir,/tmp/.export-quarantine,,A temporary directory used for files that are not sent on
+gateway.import.watch.dir,/tmp/imports,,The directory to watch for incoming files
+gateway.import.working.dir,/tmp/.import-working,,A temporary directory used to hold staging files during processing
+gateway.transfer.extension,.incomplete,,A temporary file extension applied to files during processing
+gateway.management.console.api.base.url,http://localhost:9000,,The base URL for the management console
+
+# Plugin - Issue federator
+issues.federator.api.base.url,http://localhost:8080/issue-federation/api,,The base URL for the services provided by the Issue Federator component
+sanitisation.enabled,false,,Flag determining whether sanitisation should be enabled for issue federation
+sanitisation.service.base.url,http://localhost:9000/api,,The base URL for the sanitisation service to be invoked to handle issue sanitisation
+
+# Plugin - JavaScript
+redis.cli,/opt/gitlab/redis/bin/redis-cli,,
+management.console.global.rules.dir,/tmp/gateway/rules,,Directory containing global rules to be applied to exports being processed
+management.console.destination.rules.dir,/tmp/gateway/rules/partners,,Base directory containing partner specific rules to be applied to exports being processed
+
+# Plugin - Nexus
+nexus.destinations,nexus1,,
+nexus.deploy.script,/opt/gateway/nexus-deploy.sh,,
+nexus.nexus1.url.base,http://admin:admin123@127.0.0.1:8081,,
+
+# Plugin - SCM federator
+scm.federator.api.base.url,http://localhost:8080/scm-federation/api,,The base URL for the services provided by the SCM Federation component
+sanitisation.enabled,false,,Flag determining whether sanitisation should be enabled for scm federation
+sanitisation.service.base.url,http://localhost:9000/api,,The base URL for the sanitisation service to be invoked to handle scm sanitisation
+
+# Plugin - SFTP Transfer
+#gateway.sftp.10.66.2.59.key,/home/ubuntu/.ssh/id_rsa.gateway,,
+#gateway.sftp.<ip_address>.key,,,
