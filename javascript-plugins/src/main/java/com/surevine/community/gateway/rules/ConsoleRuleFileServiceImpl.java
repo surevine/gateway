@@ -31,18 +31,18 @@ public class ConsoleRuleFileServiceImpl implements RuleFileService {
 	/**
 	 * Loads all export rule files / filters to be executed for destination (including global rules)
 	 *
-	 * @param destination Destination to load rules for
+	 * @param partner Partner to load rules for
 	 * @return Set of string paths of rule files to be executed
 	 * @throws FileNotFoundException
 	 */
-	public Set<Path> getExportRuleFiles(Partner destination) throws FileNotFoundException {
+	public Set<Path> getExportRuleFiles(Partner partner) throws FileNotFoundException {
 		Set<Path> ruleFiles = new HashSet<Path>();
 
 	    // Include global rule file in rule set (first)
 	    ruleFiles.add(Paths.get(config.getProperty("management.console.global.rules.dir") + "/global-export.js"));
 
 	    // Include destination-specific rule file in rule set
-	    ruleFiles.add(Paths.get(config.getProperty("management.console.destination.rules.dir") + "/" + destination.getId() + "/export.js"));
+	    ruleFiles.add(Paths.get(config.getProperty("management.console.destination.rules.dir") + "/" + partner.getId() + "/export.js"));
 
 	    // Ensure all rule files exists
 	    for(Path ruleFile : ruleFiles) {
