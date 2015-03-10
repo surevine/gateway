@@ -37,7 +37,7 @@ cp -r "${TEMPLATE_DIRECTORY}" "${TARGET_DIRECTORY}"
 for TARGET_FILE in `find ${TARGET_DIRECTORY} -name "*.properties"`; do
 
   # For each file we process, loop through the source configuration files given to the script
-  if [ ! -z "$@" ]; then
+  if [[ ! -z "$@" ]]; then
     for REPLACEMENT_FILE in "$@"; do
 
       # Split each line of the source files into the key and value components as separated by the =
