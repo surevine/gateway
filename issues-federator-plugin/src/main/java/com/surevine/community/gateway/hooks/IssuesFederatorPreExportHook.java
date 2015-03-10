@@ -68,7 +68,7 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 	 * @return
 	 */
 	private Boolean isSanitisationEnabled() {
-		return Boolean.parseBoolean(getConfig().getProperty("sanitisation.enabled"));
+		return Boolean.parseBoolean(getConfig().getProperty("issues.sanitisation.enabled"));
 	}
 
 	/**
