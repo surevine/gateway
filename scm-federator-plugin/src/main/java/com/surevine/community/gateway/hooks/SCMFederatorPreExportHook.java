@@ -1,8 +1,10 @@
 package com.surevine.community.gateway.hooks;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
@@ -16,8 +18,9 @@ import com.surevine.community.gateway.management.api.GatewayManagementServiceFac
 import com.surevine.community.gateway.model.Partner;
 import com.surevine.community.gateway.model.Repository;
 import com.surevine.community.gateway.model.TransferItem;
-import com.surevine.community.gateway.sanitisation.SanitisationResult;
-import com.surevine.community.gateway.sanitisation.SanitisationServiceFacade;
+import com.surevine.community.sanitisation.SanitisationException;
+import com.surevine.community.sanitisation.SanitisationResult;
+import com.surevine.community.sanitisation.SanitisationServiceFacade;
 
 /**
  * PreExportHook to apply SCM-federation specific logic
@@ -117,13 +120,32 @@ public class SCMFederatorPreExportHook implements GatewayPreExportHook {
 
 		Map<String, String> metadata = item.getMetadata();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
-		SanitisationResult result = SanitisationServiceFacade.getInstance().isSane(item.getSource(),
-																					metadata.get("project"),
-																					metadata.get("repo"),
-																					"Export-"+dateFormat.format(new Date()));
+
+		SanitisationResult result;
+		try {
+			result = SanitisationServiceFacade.getInstance(getConfig().getProperty("sanitisation.service.base.url"))
+						.isSane(item.getSource(),
+								"SCM",
+								metadata.get("project") + "/" + metadata.get("repo"),
+								"SCM-EXPORT-" + dateFormat.format(new Date()),
+								Collections.<String, String> emptyMap());
+		} catch (UnsupportedEncodingException | SanitisationException e) {
+
+			// Don't export item as sanitisation failed
+			item.setNotExportable();
+
+			LOG.log(Level.WARNING, String.format("Export of item '%s' to partner '%s' prevented due to sanitisation service failure.",
+					item.getSource(),
+					item.getPartner().getName()), e);
+
+			return;
+		}
+
 		if(!result.isSane()) {
+
 			// Don't export item as sanitisation rejected
 			item.setNotExportable();
+
 			LOG.warning(String.format("Export of item '%s' to partner '%s' prevented by sanitisation service. Reasons:",
 					item.getSource(),
 					item.getPartner().getName()));
