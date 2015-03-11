@@ -8,7 +8,14 @@
     </parent>
     <artifactId>issues-federator-plugin</artifactId>
     <name>issues-federator-plugin</name>
+
+    <properties>
+            <community.dependencies.version>0.0.8-SNAPSHOT</community.dependencies.version>
+    </properties>
+
     <dependencies>
+
+        <!-- internal dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>plugin-api</artifactId>
@@ -25,6 +32,15 @@
             <artifactId>gateway-audit</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+    	<!-- community dependencies -->
+		<dependency>
+			<groupId>com.surevine.community</groupId>
+			<artifactId>sanitisation</artifactId>
+			<version>${community.dependencies.version}</version>
+		</dependency>
+
+        <!-- third party dependencies -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
