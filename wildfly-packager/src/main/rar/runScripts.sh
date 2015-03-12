@@ -12,7 +12,7 @@ fi
 WILDFLY_DIR="$1"
 
 # run cli scripts
-for FILE in `find cli -name "*.cli"`; do
+for FILE in `find cli -name "*.cli" | sort`; do
 
   printStart "Running CLI scipt: ${FILE}"
   ${WILDFLY_DIR}/bin/jboss-cli.sh --file=${FILE}
