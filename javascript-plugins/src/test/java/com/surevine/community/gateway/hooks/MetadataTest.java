@@ -14,7 +14,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.surevine.community.gateway.audit.Audit;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 import com.surevine.community.gateway.model.TransferItem;
 import com.surevine.community.gateway.util.MockAuditActionFactory;
 import com.surevine.community.gateway.util.MockAuditService;
@@ -31,7 +31,7 @@ public class MetadataTest {
 		properties.put("name", "test.jar");
 
 		final Set<TransferItem> transferQueue = new HashSet<TransferItem>(1);
-		Destination destination = new Destination(1L, "Google", new URI("http://google.com"));
+		Partner destination = new Partner(1L, "Google", new URI("http://google.com"), "");
 		transferQueue.add(new TransferItem(destination, Paths.get("/tmp"), properties));
 
 		JavascriptPreExportHook jsPreExportHook = new JavascriptPreExportHook();

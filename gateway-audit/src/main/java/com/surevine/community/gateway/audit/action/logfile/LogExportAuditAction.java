@@ -1,11 +1,11 @@
 package com.surevine.community.gateway.audit.action.logfile;
 
 import com.surevine.community.gateway.audit.action.ExportAuditAction;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 public class LogExportAuditAction extends ExportAuditAction {
 
-	public LogExportAuditAction(String filename, Destination destination) {
+	public LogExportAuditAction(String filename, Partner destination) {
 		super(filename, destination);
 	}
 

@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.Set;
 
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 /**
  * Rule file service. Retrieves gateway rule files.
@@ -21,7 +21,7 @@ public interface RuleFileService {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	Set<Path> getExportRuleFiles(Destination destination) throws FileNotFoundException;
+	Set<Path> getExportRuleFiles(Partner destination) throws FileNotFoundException;
 
 	/**
 	 * Loads all import rule files / filters to be executed

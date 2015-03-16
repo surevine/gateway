@@ -17,7 +17,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.surevine.community.gateway.audit.Audit;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 import com.surevine.community.gateway.model.TransferItem;
 import com.surevine.community.gateway.util.MockAuditActionFactory;
 import com.surevine.community.gateway.util.MockAuditService;
@@ -36,15 +36,15 @@ public class JavaScriptExportFilterTest {
 		properties.put("groups", "STAFF");
 		properties.put("name", "test.jar");
 
-		final List<Destination> destinations = new ArrayList<Destination>(Arrays.asList(new Destination[] {
-				new Destination(1L, "FTP", new URI("ftp://host/path")),
-				new Destination(2L, "SCP", new URI("scp://host/path")),
-				new Destination(3L, "FILE_FOREIGN", new URI("file:///tmp/foreign")),
-				new Destination(4L, "FILE_DOMESTIC", new URI("file:///tmp/domestic"))
+		final List<Partner> destinations = new ArrayList<Partner>(Arrays.asList(new Partner[] {
+				new Partner(1L, "FTP", new URI("ftp://host/path"), "key"),
+				new Partner(2L, "SCP", new URI("scp://host/path"), "key"),
+				new Partner(3L, "FILE_FOREIGN", new URI("file:///tmp/foreign"), "key"),
+				new Partner(4L, "FILE_DOMESTIC", new URI("file:///tmp/domestic"), "key")
 		}));
 
 		final Set<TransferItem> transferQueue = new HashSet<TransferItem>(4);
-		for (final Destination destination : destinations) {
+		for (final Partner destination : destinations) {
 			transferQueue.add(new TransferItem(destination, Paths.get("/tmp"), properties));
 		}
 

@@ -1,11 +1,11 @@
 package com.surevine.community.gateway.audit.action.xml;
 
 import com.surevine.community.gateway.audit.action.ExportAuditAction;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 public class XMLExportAuditAction extends ExportAuditAction {
 
-	public XMLExportAuditAction(String filename, Destination destination) {
+	public XMLExportAuditAction(String filename, Partner destination) {
 		super(filename, destination);
 	}
 

@@ -14,7 +14,7 @@ import lombok.Getter;
 public class TransferItem {
 
 	@Getter
-	private Destination destination;
+	private Partner partner;
 
 	@Getter
 	private Path source;
@@ -25,9 +25,9 @@ public class TransferItem {
 	@Getter
 	private boolean exportable;
 
-	public TransferItem(final Destination destination, final Path source,
+	public TransferItem(final Partner partner, final Path source,
 			final Map<String, String> metadata) {
-		this.destination = destination;
+		this.partner = partner;
 		this.source = source;
 		this.metadata = metadata;
 
@@ -47,7 +47,7 @@ public class TransferItem {
 		result = prime * result
 				+ ((source == null) ? 0 : source.hashCode());
 		result = prime * result
-				+ ((destination == null) ? 0 : destination.hashCode());
+				+ ((partner == null) ? 0 : partner.hashCode());
 		return result;
 	}
 
@@ -65,10 +65,10 @@ public class TransferItem {
 				return false;
 		} else if (!source.equals(other.source))
 			return false;
-		if (destination == null) {
-			if (other.destination != null)
+		if (partner == null) {
+			if (other.partner != null)
 				return false;
-		} else if (!destination.equals(other.destination))
+		} else if (!partner.equals(other.partner))
 			return false;
 		return true;
 	}

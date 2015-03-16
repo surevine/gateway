@@ -2,7 +2,7 @@ package com.surevine.community.gateway.audit.action;
 
 import java.nio.file.Path;
 
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 /**
  * Factory to provide auditable actions
@@ -13,10 +13,10 @@ public interface AuditActionFactory {
 
 	ImportAuditAction getImportAuditAction(String filename, String source);
 
-	ExportAuditAction getExportAuditAction(String filename, Destination destination);
+	ExportAuditAction getExportAuditAction(String filename, Partner destination);
 
-	RuleFailAuditAction getRuleFailAuditAction(Path source, Destination destination);
+	RuleFailAuditAction getRuleFailAuditAction(Path source, Partner destination);
 
-	SanitisationFailAuditAction getSanitisationFailAuditAction(Path source, Destination destination);
+	SanitisationFailAuditAction getSanitisationFailAuditAction(Path source, Partner destination);
 
 }

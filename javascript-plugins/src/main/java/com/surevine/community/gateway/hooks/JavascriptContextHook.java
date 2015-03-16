@@ -13,18 +13,18 @@ public class JavascriptContextHook implements GatewayContextHook {
 
 	@Override
 	public void init(final ServletContextEvent event) {
-	    final Properties config = new Properties();
-	    try {
+		final Properties config = new Properties();
+		try {
 			config.load(getClass().getResourceAsStream("/javascript-hook.properties"));
 		} catch (final IOException e) {
 			// FIXME: Handle better
 			LOG.log(Level.SEVERE, "Failed to load Javascript hook module configuration.", e);
 		}
 
-	    LOG.info("Using the following JS engine properties:");
-	    for (final String key : config.stringPropertyNames()) {
-	    	LOG.info(String.format("  %s : %s", key, config.getProperty(key)));
-	    }
+		LOG.info("Using the following JS engine properties:");
+		for (final String key : config.stringPropertyNames()) {
+			LOG.info(String.format("  %s : %s", key, config.getProperty(key)));
+		}
 	}
 
 	@Override

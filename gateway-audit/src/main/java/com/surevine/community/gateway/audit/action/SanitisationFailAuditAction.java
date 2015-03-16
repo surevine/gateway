@@ -2,7 +2,7 @@ package com.surevine.community.gateway.audit.action;
 
 import java.nio.file.Path;
 
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 /**
  * Represents an sanitisation failure occurence.
@@ -13,9 +13,9 @@ import com.surevine.community.gateway.model.Destination;
 public abstract class SanitisationFailAuditAction implements AuditAction  {
 
 	protected Path source;
-	protected Destination destination;
+	protected Partner destination;
 
-	public SanitisationFailAuditAction(Path source, Destination destination) {
+	public SanitisationFailAuditAction(Path source, Partner destination) {
 		this.source = source;
 		this.destination = destination;
 	}

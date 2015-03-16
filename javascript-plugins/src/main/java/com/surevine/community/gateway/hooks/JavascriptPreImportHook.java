@@ -17,7 +17,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 import com.surevine.community.gateway.model.Rule;
 import com.surevine.community.gateway.rules.ConsoleRuleFileServiceImpl;
 import com.surevine.community.gateway.rules.RuleFileService;

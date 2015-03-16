@@ -34,25 +34,25 @@ public class SftpExportTransferHook implements GatewayExportTransferHook {
 		for (final TransferItem item : transferQueue) {
 			final Path source = item.getSource();
 //			final Map<String, String> metadata = item.getMetadata(); // TODO: Add support for destinationFilename
-			final URI destination = item.getDestination().getUri();
+			final URI partnerURI = item.getPartner().getUri();
 
-			if ("sftp".equals(destination.getScheme()) && item.isExportable()) {
+			if ("sftp".equals(partnerURI.getScheme()) && item.isExportable()) {
 				final String intermediateFileName = source.getFileName().toString()
 						+transferExtension;
-				final String intermediatePath = Paths.get(destination.getPath().toString(), intermediateFileName).toString();
+				final String intermediatePath = Paths.get(partnerURI.getPath().toString(), intermediateFileName).toString();
 				final String destinationPath = intermediatePath.substring(
 						0, (intermediatePath.length() - transferExtension.length()));
 
 				LOG.info(String.format(
 						"Calling sftp for %s to %s@%s:%s",
-						source, destination.getUserInfo(), destination.getHost(), intermediatePath));
+						source, partnerURI.getUserInfo(), partnerURI.getHost(), intermediatePath));
 
 				final JSch jsch = new JSch();
 				try {
-					jsch.addIdentity(getIdentity(destination));
-					final Session session = destination.getUserInfo() == null ?
-							jsch.getSession(destination.getHost()) : jsch.getSession(
-							destination.getUserInfo(), destination.getHost());
+					jsch.addIdentity(getIdentity(partnerURI));
+					final Session session = partnerURI.getUserInfo() == null ?
+							jsch.getSession(partnerURI.getHost()) : jsch.getSession(
+							partnerURI.getUserInfo(), partnerURI.getHost());
 					session.setConfig("StrictHostKeyChecking", "no");
 					session.connect();
 

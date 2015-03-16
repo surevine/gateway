@@ -7,7 +7,7 @@ import com.surevine.community.gateway.audit.action.ExportAuditAction;
 import com.surevine.community.gateway.audit.action.ImportAuditAction;
 import com.surevine.community.gateway.audit.action.RuleFailAuditAction;
 import com.surevine.community.gateway.audit.action.SanitisationFailAuditAction;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 public class MockAuditActionFactory implements AuditActionFactory {
 
@@ -19,21 +19,21 @@ public class MockAuditActionFactory implements AuditActionFactory {
 
 	@Override
 	public ExportAuditAction getExportAuditAction(String filename,
-			Destination destination) {
+			Partner destination) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public RuleFailAuditAction getRuleFailAuditAction(Path source,
-			Destination destination) {
+			Partner destination) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public SanitisationFailAuditAction getSanitisationFailAuditAction(
-			Path source, Destination destination) {
+			Path source, Partner destination) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -1,6 +1,6 @@
 package com.surevine.community.gateway.audit.action;
 
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 /**
  * Represents an item being exported through gateway.
@@ -11,9 +11,9 @@ import com.surevine.community.gateway.model.Destination;
 public abstract class ExportAuditAction implements AuditAction {
 
 	protected String filename;
-	protected Destination destination;
+	protected Partner destination;
 
-	public ExportAuditAction(String filename, Destination destination) {
+	public ExportAuditAction(String filename, Partner destination) {
 		this.filename = filename;
 		this.destination = destination;
 	}

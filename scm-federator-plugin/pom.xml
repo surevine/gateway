@@ -1,40 +1,77 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.surevine.community</groupId>
-    <artifactId>gateway</artifactId>
-    <version>1.0-SNAPSHOT</version>
-  </parent>
-  <artifactId>scm-federator-plugin</artifactId>
-  <name>scm-federator-plugin</name>
-  <dependencies>
-	<dependency>
-		<groupId>${project.groupId}</groupId>
-		<artifactId>plugin-api</artifactId>
-		<version>${project.version}</version>
-		<scope>provided</scope>
-	</dependency>
-	<dependency>
-		<groupId>${project.groupId}</groupId>
-		<artifactId>gateway-audit</artifactId>
-		<version>${project.version}</version>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.httpcomponents</groupId>
-		<artifactId>httpclient</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.httpcomponents</groupId>
-		<artifactId>fluent-hc</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.httpcomponents</groupId>
-		<artifactId>httpmime</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>commons-io</groupId>
-		<artifactId>commons-io</artifactId>
-		<version>2.4</version>
-	</dependency>
-  </dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.surevine.community.gateway</groupId>
+        <artifactId>gateway</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>scm-federator-plugin</artifactId>
+    <name>scm-federator-plugin</name>
+
+    <properties>
+            <community.dependencies.version>0.0.8-SNAPSHOT</community.dependencies.version>
+    </properties>
+
+    <dependencies>
+
+    	<!-- internal dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>plugin-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>gateway-audit</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+    	<!-- community dependencies -->
+		<dependency>
+			<groupId>com.surevine.community</groupId>
+			<artifactId>sanitisation</artifactId>
+			<version>${community.dependencies.version}</version>
+		</dependency>
+
+		<!-- third party dependencies -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>fluent-hc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Dependencies>com.surevine.community.config.gateway.plugins.scmfederator</Dependencies>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

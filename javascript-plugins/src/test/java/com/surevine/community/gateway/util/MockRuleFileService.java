@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 import com.surevine.community.gateway.rules.ConsoleRuleFileServiceImpl;
 
 public class MockRuleFileService extends ConsoleRuleFileServiceImpl {
@@ -18,7 +18,7 @@ public class MockRuleFileService extends ConsoleRuleFileServiceImpl {
 	}
 
 	@Override
-	public Set<Path> getExportRuleFiles(Destination destination) throws FileNotFoundException {
+	public Set<Path> getExportRuleFiles(Partner destination) throws FileNotFoundException {
 		Set<Path> testRuleFiles = new HashSet<Path>();
 
 		try {

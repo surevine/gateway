@@ -25,7 +25,7 @@ public abstract class MetadataPersistingTransportHook implements GatewayExportTr
 		for (final TransferItem item : transferQueue) {
 			final Path source = item.getSource();
 			final Map<String, String> metadata = item.getMetadata();
-			final URI destination = item.getDestination().getUri();
+			final URI partnerUri = item.getPartner().getUri();
 			try {
 				replaceMetadataFiles(item);
 			}

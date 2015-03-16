@@ -3,11 +3,11 @@ package com.surevine.community.gateway.audit.action.xml;
 import java.nio.file.Path;
 
 import com.surevine.community.gateway.audit.action.RuleFailAuditAction;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 public class XMLRuleFailAuditAction extends RuleFailAuditAction {
 
-	public XMLRuleFailAuditAction(Path source, Destination destination) {
+	public XMLRuleFailAuditAction(Path source, Partner destination) {
 		super(source, destination);
 	}
 

@@ -3,11 +3,11 @@ package com.surevine.community.gateway.audit.action.xml;
 import java.nio.file.Path;
 
 import com.surevine.community.gateway.audit.action.SanitisationFailAuditAction;
-import com.surevine.community.gateway.model.Destination;
+import com.surevine.community.gateway.model.Partner;
 
 public class XMLSanitisationFailAuditAction extends SanitisationFailAuditAction {
 
-	public XMLSanitisationFailAuditAction(Path source, Destination destination) {
+	public XMLSanitisationFailAuditAction(Path source, Partner destination) {
 		super(source, destination);
 	}
 
