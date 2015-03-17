@@ -207,8 +207,18 @@
     </scm>
     <distributionManagement>
         <repository>
-            <id>TPS</id>
-            <url>https://nexus.surevine.net/content/repositories/TPS/</url>
+            <id>surevine-releases</id>
+            <name>Surevine Internal Release Repository</name>
+            <url>https://nexus.surevine.net/content/repositories/releases</url>
+            <layout>default</layout>
+            <uniqueVersion>true</uniqueVersion>
         </repository>
+        <snapshotRepository>
+            <id>surevine-snapshots</id>
+            <name>Surevine Internal Snapshot Repository</name>
+            <url>https://nexus.surevine.net/content/repositories/snapshots</url>
+            <layout>default</layout>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
     </distributionManagement>
 </project>
