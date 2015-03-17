@@ -10,7 +10,7 @@
     <name>issues-federator-plugin</name>
 
     <properties>
-            <community.dependencies.version>0.0.8-SNAPSHOT</community.dependencies.version>
+            <community.dependencies.version>0.0.9</community.dependencies.version>
     </properties>
 
     <dependencies>
