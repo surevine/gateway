@@ -19,7 +19,7 @@ gateway.management.console.api.base.url,http://localhost:9000,,The base URL for 
 
 # Plugin - Issue federator
 issues.federator.api.base.url,http://localhost:8080/issue-federation/api,,The base URL for the services provided by the Issue Federator component
-sanitisation.enabled,false,,Flag determining whether sanitisation should be enabled for issue federation
+issues.sanitisation.enabled,false,,Flag determining whether sanitisation should be enabled for issue federation
 sanitisation.service.base.url,http://localhost:9000/api,,The base URL for the sanitisation service to be invoked to handle issue sanitisation
 
 # Plugin - JavaScript
@@ -34,7 +34,7 @@ nexus.nexus1.url.base,http://admin:admin123@127.0.0.1:8081,,
 
 # Plugin - SCM federator
 scm.federator.api.base.url,http://localhost:8080/scm-federation/api,,The base URL for the services provided by the SCM Federation component
-sanitisation.enabled,false,,Flag determining whether sanitisation should be enabled for scm federation
+scm.sanitisation.enabled,false,,Flag determining whether sanitisation should be enabled for scm federation
 sanitisation.service.base.url,http://localhost:9000/api,,The base URL for the sanitisation service to be invoked to handle scm sanitisation
 
 # Plugin - SFTP Transfer
