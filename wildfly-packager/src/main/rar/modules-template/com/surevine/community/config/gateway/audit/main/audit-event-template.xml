@@ -4,15 +4,15 @@
 	</EventTime>
 	<EventSource>
 		<System>
-			<Name>Community portal</Name>
+			<Name>Community Portal Gateway</Name>
 			<Environment>%EVENT_SYSTEM_ENVIRONMENT%</Environment>
 		</System>
-		<Generator>Gateway</Generator>
+		<Generator>Community Portal Gateway</Generator>
 		<Device>
 			<Name>Hosted web application</Name>
 		</Device>
 		<User>
-			<UserDetails>Gateway system user</UserDetails>
+			<UserDetails>Community Portal Gateway system user</UserDetails>
 		</User>
 	</EventSource>
 	<EventDetail>
