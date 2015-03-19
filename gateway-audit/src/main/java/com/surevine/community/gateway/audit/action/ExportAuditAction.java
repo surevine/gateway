@@ -11,11 +11,11 @@ import com.surevine.community.gateway.model.Partner;
 public abstract class ExportAuditAction implements AuditAction {
 
 	protected String filename;
-	protected Partner destination;
+	protected Partner partner;
 
-	public ExportAuditAction(String filename, Partner destination) {
+	public ExportAuditAction(String filename, Partner partner) {
 		this.filename = filename;
-		this.destination = destination;
+		this.partner = partner;
 	}
 
 }

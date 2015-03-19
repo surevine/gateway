@@ -13,11 +13,11 @@ import com.surevine.community.gateway.model.Partner;
 public abstract class SanitisationFailAuditAction implements AuditAction  {
 
 	protected Path source;
-	protected Partner destination;
+	protected Partner partner;
 
-	public SanitisationFailAuditAction(Path source, Partner destination) {
+	public SanitisationFailAuditAction(Path source, Partner partner) {
 		this.source = source;
-		this.destination = destination;
+		this.partner = partner;
 	}
 
 }

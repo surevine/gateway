@@ -5,16 +5,16 @@ import com.surevine.community.gateway.model.Partner;
 
 public class LogExportAuditAction extends ExportAuditAction {
 
-	public LogExportAuditAction(String filename, Partner destination) {
-		super(filename, destination);
+	public LogExportAuditAction(String filename, Partner partner) {
+		super(filename, partner);
 	}
 
 	@Override
 	public String serialize() {
-		return String.format("Item '%s' was exported to destination %s(%s).",
+		return String.format("Item '%s' was exported to partner %s(%s).",
 				filename,
-				destination.getName(),
-				destination.getUri());
+				partner.getName(),
+				partner.getUri());
 	}
 
 }
