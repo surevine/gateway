@@ -7,16 +7,16 @@ import com.surevine.community.gateway.model.Partner;
 
 public class LogRuleFailAuditAction extends RuleFailAuditAction {
 
-	public LogRuleFailAuditAction(Path source, Partner destination) {
-		super(source, destination);
+	public LogRuleFailAuditAction(Path source, Partner partner) {
+		super(source, partner);
 	}
 
 	@Override
 	public String serialize() {
-		return String.format("Export of item '%s' to destination %s(%s) failed due to rule failure.",
+		return String.format("Export of item '%s' to partner %s(%s) failed due to rule failure.",
 				source.toString(),
-				destination.getName(),
-				destination.getUri());
+				partner.getName(),
+				partner.getUri());
 	}
 
 }
