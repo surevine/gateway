@@ -46,8 +46,8 @@ for TARGET_FILE in `find ${TARGET_DIRECTORY} -name "*.properties"`; do
         # Replace '.' in the key with '\.' to ensure they are escaped in the sed regex replacements
         KEY=`echo "${KEY}" | sed "s/\./\\\./g"`
 
-        # Replace '.', ' ' and '/' in the value to ensure they are appropriately escaped in the sed regex replacements
-        VALUE=`echo "${VALUE}" | sed "s/\./\\\./g" | sed 's/[ ]/WHITESPACE/g' | sed "s/\//FORWARDSLASH/g"`
+        # Replace '*', '$', '&', '^', '.', ' ' and '/' in the value to ensure they are appropriately escaped in the sed regex replacements
+        VALUE=`echo "${VALUE}" | sed "s/\./\\\./g" | sed 's/[ ]/WHITESPACE/g' | sed "s/\//FORWARDSLASH/g" | sed "s/\*/STAR/g" | sed "s/[$]/DOLLAR/g" | sed "s/\^/CARET/g" | sed "s/\&/AMPHERSAND/g"`
 
         # Only process if we have a key (skips blank lines)
         if [ ! -z "${KEY}" ]; then
@@ -59,6 +59,10 @@ for TARGET_FILE in `find ${TARGET_DIRECTORY} -name "*.properties"`; do
           # Reverse the previous escape replacements
           sed -i -e "s/WHITESPACE/ /g" ${TARGET_FILE}
           sed -i -e "s/FORWARDSLASH/\//g" ${TARGET_FILE}
+          sed -i -e "s/STAR/\*/g" ${TARGET_FILE}
+          sed -i -e "s/DOLLAR/\$/g" ${TARGET_FILE}
+          sed -i -e "s/CARET/\^/g" ${TARGET_FILE}
+          sed -i -e "s/AMPHERSAND/\&/g" ${TARGET_FILE}
         fi
       done < "${REPLACEMENT_FILE}"
     done
