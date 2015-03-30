@@ -2,6 +2,7 @@ package com.surevine.community.gateway.hooks;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,10 +33,20 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 	private final Properties config = new Properties();
 
 	public SCMFederatorImportTransferHook() {
+		InputStream stream = null;
 		try {
-			getConfig().load(getClass().getResourceAsStream("/scm-federator-plugin.properties"));
+			stream = getClass().getResourceAsStream("/scm-federator-plugin.properties");
+			getConfig().load(stream);
 		} catch (final IOException e) {
 			LOG.log(Level.WARNING, "Failed to load SCM federation transfer hook configuration.", e);
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (final IOException e) {
+					LOG.log(Level.WARNING, "Failed to load SCM federation transfer hook configuration.", e);
+				}
+			}
 		}
 	}
 
@@ -51,11 +62,12 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 
 			final MultipartEntity entity = buildImportedBundleRequestBody(element, properties);
 
-			LOG.info("Transferring imported bundle to SCM federator. " + getConfig().getProperty("scm.federator.api.base.url") + "/incoming");
+			LOG.info("Transferring imported bundle to SCM federator. "
+					+ getConfig().getProperty("scm.federator.api.base.url") + "/incoming");
 
 			try {
 				Request.Post(getConfig().getProperty("scm.federator.api.base.url") + "/incoming").body(entity)
-				.execute().returnContent().asString();
+						.execute().returnContent().asString();
 			} catch (final IOException e) {
 				LOG.log(Level.SEVERE, "Failed to transfer bundle to SCM federator", e);
 			}
@@ -76,7 +88,7 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 				sourceType = properties.get("SOURCE_TYPE");
 			}
 			LOG.info("Source type is: " + sourceType);
-			boolean supported = sourceType.equalsIgnoreCase(SCM_SOURCE_TYPE);
+			final boolean supported = sourceType.equalsIgnoreCase(SCM_SOURCE_TYPE);
 			LOG.info("Does this class support this artifact? " + supported);
 			return supported;
 		} catch (final Exception e) {
@@ -127,12 +139,11 @@ public class SCMFederatorImportTransferHook implements GatewayImportTransferHook
 
 		boolean isWhitelisted = false;
 
-		Repository federatedInboundRepo = GatewayManagementServiceFacade.getInstance().
-			getInboundFederatedRepository(properties.get("source_organisation"),
-					properties.get("project") + "/" + properties.get("repo"),
-					"SCM");
+		final Repository federatedInboundRepo = GatewayManagementServiceFacade.getInstance()
+				.getInboundFederatedRepository(properties.get("source_organisation"),
+						properties.get("project") + "/" + properties.get("repo"), "SCM");
 
-		if(federatedInboundRepo != null) {
+		if (federatedInboundRepo != null) {
 			isWhitelisted = true;
 		}
 

@@ -1,6 +1,7 @@
 package com.surevine.community.gateway.hooks;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -35,10 +36,20 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 	private final Properties config = new Properties();
 
 	public IssuesFederatorPreExportHook() {
+		InputStream stream = null;
 		try {
-			getConfig().load(getClass().getResourceAsStream("/issues-federator-plugin.properties"));
+			stream = getClass().getResourceAsStream("/issues-federator-plugin.properties");
+			getConfig().load(stream);
 		} catch (final IOException e) {
 			LOG.log(Level.WARNING, "Failed to load issues federation export hook configuration.", e);
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (final IOException e) {
+					LOG.log(Level.WARNING, "Failed to load issues federation export hook configuration.", e);
+				}
+			}
 		}
 	}
 
@@ -94,22 +105,24 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 	 * Determines whether project has been configured to be shared with
 	 * destination
 	 *
-	 * @param partner partner being shared to
-	 * @param projectName project to be shared
+	 * @param partner
+	 *            partner being shared to
+	 * @param projectName
+	 *            project to be shared
 	 * @return
 	 */
 	private boolean isSharedProject(final Partner partner, final Map<String, String> metadata) {
 
 		boolean isShared = false;
 
-		if(metadata.get("distribution_type").equalsIgnoreCase(SINGLE_DISTRIBUTION_TYPE)) {
+		if (metadata.get("distribution_type").equalsIgnoreCase(SINGLE_DISTRIBUTION_TYPE)) {
 			isShared = partner.getSourceKey().equalsIgnoreCase(metadata.get("limit_distribution_to"));
 		} else {
-			String repoIdentifier = metadata.get("project");
-			Repository federatedOutboundRepo = GatewayManagementServiceFacade.getInstance().
-					getOutboundFederatedRepository(partner, "ISSUE", repoIdentifier);
+			final String repoIdentifier = metadata.get("project");
+			final Repository federatedOutboundRepo = GatewayManagementServiceFacade.getInstance()
+					.getOutboundFederatedRepository(partner, "ISSUE", repoIdentifier);
 
-			if(federatedOutboundRepo != null) {
+			if (federatedOutboundRepo != null) {
 				isShared = true;
 			}
 		}
@@ -120,30 +133,27 @@ public class IssuesFederatorPreExportHook implements GatewayPreExportHook {
 	/**
 	 * Confirms item is safe to export.
 	 *
-	 * @param item TransferItem to be sanitised
+	 * @param item
+	 *            TransferItem to be sanitised
 	 */
 	private void sanitise(final TransferItem item) {
 
 		final Map<String, String> metadata = item.getMetadata();
 		final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
 
-
 		SanitisationResult result;
 		try {
 			result = SanitisationServiceFacade.getInstance(getConfig().getProperty("sanitisation.service.base.url"))
-					.isSane(item.getSource(),
-								"ISSUE",
-								metadata.get("project"),
-								"ISSUE-EXPORT-" + dateFormat.format(new Date()),
-								Collections.<String, String> emptyMap());
+					.isSane(item.getSource(), "ISSUE", metadata.get("project"),
+							"ISSUE-EXPORT-" + dateFormat.format(new Date()), Collections.<String, String> emptyMap());
 		} catch (UnsupportedEncodingException | SanitisationException e) {
 
 			// Don't export item as sanitisation failed
 			item.setNotExportable();
 
-			LOG.log(Level.WARNING, String.format("Export of item '%s' to partner '%s' prevented due to sanitisation service failure.",
-					item.getSource(),
-					item.getPartner().getName()), e);
+			LOG.log(Level.WARNING, String.format(
+					"Export of item '%s' to partner '%s' prevented due to sanitisation service failure.",
+					item.getSource(), item.getPartner().getName()), e);
 
 			return;
 		}

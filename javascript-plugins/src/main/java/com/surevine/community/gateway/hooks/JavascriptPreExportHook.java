@@ -2,6 +2,7 @@ package com.surevine.community.gateway.hooks;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,10 +42,20 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 		final ScriptEngineManager manager = new ScriptEngineManager();
 		final ScriptEngine jsEngine = manager.getEngineByName("JavaScript");
 
+		InputStream stream = null;
 		try {
-			getConfig().load(getClass().getResourceAsStream("/javascript-hook.properties"));
+			stream = getClass().getResourceAsStream("/javascript-hook.properties");
+			getConfig().load(stream);
 		} catch (final IOException e) {
 			LOG.log(Level.SEVERE, "Failed to load javascript hook module configuration.", e);
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (final IOException e) {
+					LOG.log(Level.WARNING, "Failed to close input stream.");
+				}
+			}
 		}
 
 		for (final TransferItem item : transferQueue) {
@@ -53,8 +64,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 			final Map<String, String> metadata = item.getMetadata();
 			final Partner partner = item.getPartner();
 
-			LOG.info(String.format("Processing destination %s [%s]", partner.getName(), partner.getUri()
-					.toString()));
+			LOG.info(String.format("Processing destination %s [%s]", partner.getName(), partner.getUri().toString()));
 
 			Set<Path> exportRuleFiles = new HashSet<Path>();
 			try {
@@ -85,11 +95,22 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 				jsEngine.put("metadata", metadata);
 				jsEngine.put("destination", partner.getUri().toString());
 
+				InputStreamReader reader = null;
 				try {
-					jsEngine.eval(new InputStreamReader(Files.newInputStream(ruleFile)));
+					reader = new InputStreamReader(Files.newInputStream(ruleFile));
+					jsEngine.eval(reader);
 				} catch (final Exception e) {
 					rule.mandate(false, "Marking rule as failed due to " + e.getMessage());
 					LOG.log(Level.INFO, "Javascript rule failed.", e);
+				} finally {
+					if (reader != null) {
+						try {
+							reader.close();
+						} catch (final IOException e) {
+							rule.mandate(false, "Marking rule as failed due to " + e.getMessage());
+							LOG.log(Level.INFO, "Javascript rule failed.", e);
+						}
+					}
 				}
 
 				if (!rule.isAllowed()) {
@@ -100,7 +121,7 @@ public class JavascriptPreExportHook implements GatewayPreExportHook {
 					Audit.audit(ruleFailAction);
 
 					break; // Do not continue evaluating hook scripts for this destination, we're not sending the
-							// artifact.
+					// artifact.
 				}
 
 				LOG.info(String.format("COMPLETE javascript hook [%s].", ruleFile));
