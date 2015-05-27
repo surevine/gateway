@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -12,6 +14,8 @@ import com.google.common.base.Joiner;
 
 @SuppressWarnings("unchecked")
 public class SecurityLabel {
+
+	private static final Logger LOG = Logger.getLogger(SecurityLabel.class.getName());
 
 	private static Map<String, String> LABELS;
 
@@ -28,7 +32,7 @@ public class SecurityLabel {
 				try {
 					stream.close();
 				} catch (final IOException e) {
-					e.printStackTrace();
+					LOG.log(Level.WARNING, "Error when closing input stream when reading security labels resource.", e);
 				}
 			}
 		}
