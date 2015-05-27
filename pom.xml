@@ -146,6 +146,36 @@
         </dependencies>
     </dependencyManagement>
     <build>
+	    <pluginManagement>
+	            <plugins>
+					<!-- Jacoco Code Coverage -->
+		            <plugin>
+		                <groupId>org.jacoco</groupId>
+		                <artifactId>jacoco-maven-plugin</artifactId>
+		                <version>0.7.2.201409121644</version>
+		                <configuration>${project.basedir}/target/jacoco.exec</configuration>
+		                <executions>
+		                    <execution>
+		                        <id>pre-unit-test</id>
+		                        <goals>
+		                            <goal>prepare-agent</goal>
+		                        </goals>
+		                        <configuration>
+		                            <propertyName>surefireArgLine</propertyName>
+		                        </configuration>
+		                    </execution>
+		                    <execution>
+		                        <id>post-unit-test</id>
+		                        <phase>test</phase>
+		                        <goals>
+		                            <goal>report</goal>
+		                        </goals>
+		                    </execution>
+		                </executions>
+		            </plugin>
+	            </plugins>
+	    </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -155,6 +185,8 @@
                     <systemProperties>
                         <java.awt.headless>true</java.awt.headless>
                     </systemProperties>
+                    <!-- Sets the VM argument line used when unit tests are run. -->
+                    <argLine>${surefireArgLine}</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -191,6 +223,12 @@
                      </dependency>
                  </dependencies>
              </plugin>
+
+             <!-- Execute Jacoco Code Coverage -->
+	         <plugin>
+	             <groupId>org.jacoco</groupId>
+	             <artifactId>jacoco-maven-plugin</artifactId>
+	         </plugin>
         </plugins>
     </build>
     <modules>
