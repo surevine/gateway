@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.common.base.Joiner;
@@ -92,7 +93,7 @@ public class NexusDeployImportTransferHook implements GatewayImportTransferHook 
 
 					p.waitFor();
 				} catch (InterruptedException | IOException e) {
-					e.printStackTrace();
+					LOG.log(Level.SEVERE, e.getMessage(), e);
 				}
 			}
 		}
